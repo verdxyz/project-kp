@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useCallback } from "react"
+import React, { useState, useEffect, useCallback } from "react"
 import { Building2, Plus, Search, Edit3, Trash2, X, Check, AlertCircle, ChevronDown, Phone, Mail, MapPin, User, DollarSign } from "lucide-react"
 import { cn } from "../lib/utils"
 import { CustomersDB } from "../lib/db"
@@ -11,7 +11,7 @@ const SEED_CUSTOMERS = [
   { name: "Pemkot Salatiga", agencyType: "Pemerintah Kota", region: "Salatiga", address: "Jl. Sukowati No.51, Salatiga", picName: "Drs. Bambang Eko", picPhone: "0811-2233-4455", picEmail: "diskominfo@salatiagkota.go.id", npwp: "00.456.789.0-503.000", activeServices: [], totalContract: 450000000, status: "Aktif", notes: "Metro Ethernet sudah terpasang, puas dengan layanan." },
 ]
 
-function formatIDR(n) {
+function formatIDR(n: number) {
   if (!n || n === 0) return "-"
   if (n >= 1000000000) return `Rp ${(n / 1000000000).toFixed(1)}M`
   if (n >= 1000000) return `Rp ${(n / 1000000).toFixed(0)} jt`
@@ -19,23 +19,30 @@ function formatIDR(n) {
 }
 
 const AGENCY_TYPES = ["Pemerintah Kota", "Pemerintah Kabupaten", "Kepolisian Daerah", "Legislatif", "TNI", "BUMN", "Lainnya"]
-const STATUS_COLORS = {
+const STATUS_COLORS: Record<string, string> = {
   "Aktif": "bg-emerald-500/20 text-emerald-400 border-emerald-500/30",
   "Prospek": "bg-amber-500/20 text-amber-400 border-amber-500/30",
   "Tidak Aktif": "bg-slate-700 text-slate-500 border-slate-600",
 }
 const REGIONS = ["Semarang", "Kendal", "Salatiga", "Magelang", "Blora", "Grobogan", "Kebumen", "Purworejo", "Lainnya"]
 
-function blankForm() {
-  return { name: "", agencyType: "Pemerintah Kota", region: "Semarang", address: "", picName: "", picPhone: "", picEmail: "", npwp: "", activeServices: [], totalContract: 0, status: "Prospek", notes: "" }
+function blankForm(): Omit<Customer, 'id' | 'createdAt' | 'updatedAt'> {
+  return { name: "", agencyType: "Pemerintah Kota" as any, region: "Semarang", address: "", picName: "", picPhone: "", picEmail: "", npwp: "", activeServices: [], totalContract: 0, status: "Prospek", notes: "" }
 }
 
-function CustomerModal({ mode, initial, onSave, onClose }) {
+interface ModalProps {
+  mode: 'add' | 'edit';
+  initial: Omit<Customer, 'id' | 'createdAt' | 'updatedAt'>;
+  onSave: (data: Omit<Customer, 'id' | 'createdAt' | 'updatedAt'>) => void;
+  onClose: () => void;
+}
+
+function CustomerModal({ mode, initial, onSave, onClose }: ModalProps) {
   const [form, setForm] = useState(initial)
-  const [errors, setErrors] = useState({})
-  const set = (field, value) => setForm(f => ({ ...f, [field]: value }))
+  const [errors, setErrors] = useState<Record<string, string>>({})
+  const set = (field: string, value: any) => setForm(f => ({ ...f, [field]: value }))
   const validate = () => {
-    const e = {}
+    const e: Record<string, string> = {}
     if (!form.name.trim()) e.name = "Nama instansi wajib diisi"
     if (!form.picName.trim()) e.picName = "Nama PIC wajib diisi"
     if (!form.picPhone.trim()) e.picPhone = "Nomor telepon wajib diisi"
@@ -43,7 +50,7 @@ function CustomerModal({ mode, initial, onSave, onClose }) {
     setErrors(e)
     return Object.keys(e).length === 0
   }
-  const handleSubmit = (e) => { e.preventDefault(); if (!validate()) return; onSave(form) }
+  const handleSubmit = (e: React.FormEvent) => { e.preventDefault(); if (!validate()) return; onSave(form) }
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
@@ -142,7 +149,7 @@ function CustomerModal({ mode, initial, onSave, onClose }) {
   )
 }
 
-function CustomerRow({ item, onEdit, onDelete }) {
+function CustomerRow({ item, onEdit, onDelete }: { item: Customer; onEdit: () => void; onDelete: () => void }) {
   return (
     <tr className="border-b border-slate-700/30 hover:bg-slate-800/30 transition-colors group">
       <td className="px-4 py-3">
@@ -182,25 +189,25 @@ function CustomerRow({ item, onEdit, onDelete }) {
 }
 
 export function CustomerDatabase() {
-  const [customers, setCustomers] = useState([])
+  const [customers, setCustomers] = useState<Customer[]>([])
   const [search, setSearch] = useState("")
   const [filterStatus, setFilterStatus] = useState("Semua")
-  const [modal, setModal] = useState(null)
-  const [deleteConfirm, setDeleteConfirm] = useState(null)
+  const [modal, setModal] = useState<{ open: boolean; mode: 'add' | 'edit'; editId?: string } | null>(null)
+  const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null)
   const load = useCallback(() => setCustomers(CustomersDB.getAll()), [])
-  useEffect(() => { CustomersDB.seed(SEED_CUSTOMERS); load() }, [load])
+  useEffect(() => { CustomersDB.seed(SEED_CUSTOMERS as any); load() }, [load])
   const filtered = customers.filter(c => {
     const matchSearch = c.name.toLowerCase().includes(search.toLowerCase()) || c.picName.toLowerCase().includes(search.toLowerCase()) || c.region.toLowerCase().includes(search.toLowerCase())
     const matchStatus = filterStatus === "Semua" || c.status === filterStatus
     return matchSearch && matchStatus
   })
-  const handleSave = (data) => {
+  const handleSave = (data: Omit<Customer, 'id' | 'createdAt' | 'updatedAt'>) => {
     if (modal?.mode === "add") CustomersDB.create(data)
     else if (modal?.editId) CustomersDB.update(modal.editId, data)
     load(); setModal(null)
   }
-  const handleDelete = (id) => { CustomersDB.delete(id); load(); setDeleteConfirm(null) }
-  const getEditInitial = (id) => {
+  const handleDelete = (id: string) => { CustomersDB.delete(id); load(); setDeleteConfirm(null) }
+  const getEditInitial = (id: string): Omit<Customer, 'id' | 'createdAt' | 'updatedAt'> => {
     const c = CustomersDB.getById(id)
     if (!c) return blankForm()
     const { id: _id, createdAt: _c, updatedAt: _u, ...rest } = c

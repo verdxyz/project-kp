@@ -1,14 +1,14 @@
-﻿import React, { useState, useEffect, useCallback } from "react"
+import React, { useState, useEffect, useCallback } from "react"
 import { FolderPlus, Plus, Search, Edit3, Trash2, X, Check, AlertCircle, ChevronDown, Activity, Calendar, DollarSign, User, Building2 } from "lucide-react"
 import { cn } from "../lib/utils"
 import { ProjectsDB } from "../lib/db"
 import type { ProjectEntry } from "../lib/db"
 import { PROJECTS as STATIC_PROJECTS } from "../data/mockData"
 
-const STAGE_COLORS = { F0: "bg-indigo-500/20 text-indigo-400 border-indigo-500/30", F1: "bg-amber-500/20 text-amber-400 border-amber-500/30", F2: "bg-blue-500/20 text-blue-400 border-blue-500/30", F3: "bg-violet-500/20 text-violet-400 border-violet-500/30", WIN: "bg-emerald-500/20 text-emerald-400 border-emerald-500/30", LOSS: "bg-red-500/20 text-red-400 border-red-500/30" }
-const STATUS_COLORS = { Active: "bg-blue-500/20 text-blue-400 border-blue-500/30", "At Risk": "bg-red-500/20 text-red-400 border-red-500/30", Completed: "bg-emerald-500/20 text-emerald-400 border-emerald-500/30", Lost: "bg-slate-700 text-slate-500 border-slate-600" }
+const STAGE_COLORS: Record<string, string> = { F0: "bg-indigo-500/20 text-indigo-400 border-indigo-500/30", F1: "bg-amber-500/20 text-amber-400 border-amber-500/30", F2: "bg-blue-500/20 text-blue-400 border-blue-500/30", F3: "bg-violet-500/20 text-violet-400 border-violet-500/30", WIN: "bg-emerald-500/20 text-emerald-400 border-emerald-500/30", LOSS: "bg-red-500/20 text-red-400 border-red-500/30" }
+const STATUS_COLORS: Record<string, string> = { Active: "bg-blue-500/20 text-blue-400 border-blue-500/30", "At Risk": "bg-red-500/20 text-red-400 border-red-500/30", Completed: "bg-emerald-500/20 text-emerald-400 border-emerald-500/30", Lost: "bg-slate-700 text-slate-500 border-slate-600" }
 
-function formatIDR(n) {
+function formatIDR(n: number) {
   if (!n || n === 0) return "Rp 0"
   if (n >= 1000000000) return `Rp ${(n / 1000000000).toFixed(2)}M`
   if (n >= 1000000) return `Rp ${(n / 1000000).toFixed(0)} jt`
@@ -19,16 +19,23 @@ const AGENCY_TYPES = ["Pemerintah Kota", "Pemerintah Kabupaten", "Kepolisian Dae
 const REGIONS = ["Semarang", "Kendal", "Salatiga", "Magelang", "Blora", "Grobogan", "Kebumen", "Purworejo", "Lainnya"]
 const SERVICE_TYPES = ["Astinet", "VPN IP", "Metro Ethernet", "SD-WAN", "Google Workspace", "Mikrotik", "CPE", "Lainnya"]
 
-function blankForm() {
+function blankForm(): Omit<ProjectEntry, 'id' | 'createdAt' | 'updatedAt'> {
   return { idLOP: "", projectName: "", agency: "", agencyType: "Pemerintah Kota", region: "Semarang", budget: 0, procurementMethod: "Tender/e-Katalog", stage: "F0", progress: 0, startDate: "", endDate: "", pic: "", category: "On Channel", serviceType: "Astinet", status: "Active", notes: "" }
 }
 
-function ProjectModal({ mode, initial, onSave, onClose }) {
+interface ModalProps {
+  mode: 'add' | 'edit';
+  initial: Omit<ProjectEntry, 'id' | 'createdAt' | 'updatedAt'>;
+  onSave: (data: Omit<ProjectEntry, 'id' | 'createdAt' | 'updatedAt'>) => void;
+  onClose: () => void;
+}
+
+function ProjectModal({ mode, initial, onSave, onClose }: ModalProps) {
   const [form, setForm] = useState(initial)
-  const [errors, setErrors] = useState({})
-  const set = (field, value) => setForm(f => ({ ...f, [field]: value }))
+  const [errors, setErrors] = useState<Record<string, string>>({})
+  const set = (field: string, value: any) => setForm(f => ({ ...f, [field]: value }))
   const validate = () => {
-    const e = {}
+    const e: Record<string, string> = {}
     if (!form.projectName.trim()) e.projectName = "Nama proyek wajib diisi"
     if (!form.agency.trim()) e.agency = "Nama instansi wajib diisi"
     if (form.budget <= 0) e.budget = "Anggaran harus lebih dari 0"
@@ -36,9 +43,9 @@ function ProjectModal({ mode, initial, onSave, onClose }) {
     setErrors(e)
     return Object.keys(e).length === 0
   }
-  const handleSubmit = (e) => { e.preventDefault(); if (!validate()) return; onSave(form) }
-  const stageProgressMap = { F0: 5, F1: 25, F2: 50, F3: 75, WIN: 100, LOSS: 0 }
-  const handleStageChange = (stage) => { set("stage", stage); set("progress", stageProgressMap[stage] ?? form.progress) }
+  const handleSubmit = (e: React.FormEvent) => { e.preventDefault(); if (!validate()) return; onSave(form) }
+  const stageProgressMap: Record<string, number> = { F0: 5, F1: 25, F2: 50, F3: 75, WIN: 100, LOSS: 0 }
+  const handleStageChange = (stage: string) => { set("stage", stage as any); set("progress", stageProgressMap[stage] ?? form.progress) }
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
@@ -181,7 +188,7 @@ function ProjectModal({ mode, initial, onSave, onClose }) {
   )
 }
 
-function ProjectRow({ item, onEdit, onDelete }) {
+function ProjectRow({ item, onEdit, onDelete }: { item: ProjectEntry; onEdit: () => void; onDelete: () => void }) {
   return (
     <tr className="border-b border-slate-700/30 hover:bg-slate-800/30 transition-colors group">
       <td className="px-4 py-3">
@@ -220,15 +227,15 @@ function ProjectRow({ item, onEdit, onDelete }) {
 }
 
 export function ProjectDatabase() {
-  const [projects, setProjects] = useState([])
+  const [projects, setProjects] = useState<ProjectEntry[]>([])
   const [search, setSearch] = useState("")
   const [filterStage, setFilterStage] = useState("Semua")
   const [filterCat, setFilterCat] = useState("Semua")
-  const [modal, setModal] = useState(null)
-  const [deleteConfirm, setDeleteConfirm] = useState(null)
+  const [modal, setModal] = useState<{ open: boolean; mode: 'add' | 'edit'; editId?: string } | null>(null)
+  const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null)
   const load = useCallback(() => setProjects(ProjectsDB.getAll()), [])
   useEffect(() => {
-    ProjectsDB.seed(STATIC_PROJECTS.map(p => ({ ...p, notes: "" })))
+    ProjectsDB.seed(STATIC_PROJECTS.map(p => ({ ...p, notes: "" })) as any)
     load()
   }, [load])
   const filtered = projects.filter(p => {
@@ -237,13 +244,13 @@ export function ProjectDatabase() {
     const matchCat = filterCat === "Semua" || p.category === filterCat
     return matchSearch && matchStage && matchCat
   })
-  const handleSave = (data) => {
+  const handleSave = (data: Omit<ProjectEntry, 'id' | 'createdAt' | 'updatedAt'>) => {
     if (modal?.mode === "add") ProjectsDB.create(data)
     else if (modal?.editId) ProjectsDB.update(modal.editId, data)
     load(); setModal(null)
   }
-  const handleDelete = (id) => { ProjectsDB.delete(id); load(); setDeleteConfirm(null) }
-  const getEditInitial = (id) => {
+  const handleDelete = (id: string) => { ProjectsDB.delete(id); load(); setDeleteConfirm(null) }
+  const getEditInitial = (id: string): Omit<ProjectEntry, 'id' | 'createdAt' | 'updatedAt'> => {
     const p = ProjectsDB.getById(id)
     if (!p) return blankForm()
     const { id: _id, createdAt: _c, updatedAt: _u, ...rest } = p

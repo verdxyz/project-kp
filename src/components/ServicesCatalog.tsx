@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useCallback } from "react"
+import React, { useState, useEffect, useCallback } from "react"
 import { Wifi, Plus, Search, Edit3, Trash2, X, Check, AlertCircle, ChevronDown, Zap, Globe, Network, Shield } from "lucide-react"
 import { cn } from "../lib/utils"
 import { ServicesDB } from "../lib/db"
@@ -12,8 +12,8 @@ const SEED_SERVICES = [
   { name: "SD-WAN Enterprise", category: "On Channel", serviceType: "SD-WAN", bandwidth: "Multi-link", sla: "99.8%", priceMonthly: 22000000, description: "Software-defined WAN untuk manajemen jaringan terpusat dan otomatis", features: ["Zero-touch Provisioning", "Centralized Dashboard", "Traffic Optimization", "Built-in Security"], status: "Aktif" },
 ]
 
-const SERVICE_ICONS = { "Astinet": Globe, "VPN IP": Shield, "Metro Ethernet": Network, "SD-WAN": Zap, "Lainnya": Wifi }
-const SERVICE_COLORS = {
+const SERVICE_ICONS: Record<string, React.ElementType> = { "Astinet": Globe, "VPN IP": Shield, "Metro Ethernet": Network, "SD-WAN": Zap, "Lainnya": Wifi }
+const SERVICE_COLORS: Record<string, string> = {
   "Astinet": "from-blue-500/20 to-blue-600/10 border-blue-500/30 text-blue-400",
   "VPN IP": "from-violet-500/20 to-violet-600/10 border-violet-500/30 text-violet-400",
   "Metro Ethernet": "from-emerald-500/20 to-emerald-600/10 border-emerald-500/30 text-emerald-400",
@@ -21,32 +21,39 @@ const SERVICE_COLORS = {
   "Lainnya": "from-slate-500/20 to-slate-600/10 border-slate-500/30 text-slate-400",
 }
 
-function formatIDR(n) {
+function formatIDR(n: number) {
   if (n >= 1000000) return `Rp ${(n / 1000000).toFixed(1).replace(".0", "")} jt`
   if (n >= 1000) return `Rp ${(n / 1000).toFixed(0)} rb`
   return `Rp ${n.toLocaleString("id-ID")}`
 }
 
-function blankForm() {
+function blankForm(): Omit<ServiceItem, 'id' | 'createdAt' | 'updatedAt'> {
   return { name: "", category: "On Channel", serviceType: "Astinet", bandwidth: "", sla: "99.5%", priceMonthly: 0, priceOTC: undefined, description: "", features: [""], status: "Aktif" }
 }
 
-function ServiceModal({ mode, initial, onSave, onClose }) {
+interface ModalProps {
+  mode: 'add' | 'edit';
+  initial: Omit<ServiceItem, 'id' | 'createdAt' | 'updatedAt'>;
+  onSave: (data: Omit<ServiceItem, 'id' | 'createdAt' | 'updatedAt'>) => void;
+  onClose: () => void;
+}
+
+function ServiceModal({ mode, initial, onSave, onClose }: ModalProps) {
   const [form, setForm] = useState(initial)
-  const [errors, setErrors] = useState({})
-  const set = (field, value) => setForm(f => ({ ...f, [field]: value }))
-  const setFeature = (idx, val) => { const next = [...form.features]; next[idx] = val; set("features", next) }
+  const [errors, setErrors] = useState<Record<string, string>>({})
+  const set = (field: string, value: any) => setForm(f => ({ ...f, [field]: value }))
+  const setFeature = (idx: number, val: string) => { const next = [...form.features]; next[idx] = val; set("features", next) }
   const addFeature = () => set("features", [...form.features, ""])
-  const removeFeature = (idx) => set("features", form.features.filter((_, i) => i !== idx))
+  const removeFeature = (idx: number) => set("features", form.features.filter((_, i) => i !== idx))
   const validate = () => {
-    const e = {}
+    const e: Record<string, string> = {}
     if (!form.name.trim()) e.name = "Nama layanan wajib diisi"
     if (form.priceMonthly <= 0) e.priceMonthly = "Harga bulanan harus lebih dari 0"
     if (!form.description.trim()) e.description = "Deskripsi wajib diisi"
     setErrors(e)
     return Object.keys(e).length === 0
   }
-  const handleSubmit = (e) => { e.preventDefault(); if (!validate()) return; onSave({ ...form, features: form.features.filter(f => f.trim()) }) }
+  const handleSubmit = (e: React.FormEvent) => { e.preventDefault(); if (!validate()) return; onSave({ ...form, features: form.features.filter(f => f.trim()) }) }
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
@@ -148,7 +155,7 @@ function ServiceModal({ mode, initial, onSave, onClose }) {
   )
 }
 
-function ServiceCard({ item, onEdit, onDelete }) {
+function ServiceCard({ item, onEdit, onDelete }: { item: ServiceItem; onEdit: () => void; onDelete: () => void }) {
   const Icon = SERVICE_ICONS[item.serviceType] ?? Wifi
   const colorClass = SERVICE_COLORS[item.serviceType] ?? SERVICE_COLORS["Lainnya"]
   return (
@@ -186,25 +193,25 @@ function ServiceCard({ item, onEdit, onDelete }) {
 }
 
 export function ServicesCatalog() {
-  const [services, setServices] = useState([])
+  const [services, setServices] = useState<ServiceItem[]>([])
   const [search, setSearch] = useState("")
   const [filterType, setFilterType] = useState("Semua")
-  const [modal, setModal] = useState(null)
-  const [deleteConfirm, setDeleteConfirm] = useState(null)
+  const [modal, setModal] = useState<{ open: boolean; mode: 'add' | 'edit'; editId?: string } | null>(null)
+  const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null)
   const load = useCallback(() => setServices(ServicesDB.getAll()), [])
-  useEffect(() => { ServicesDB.seed(SEED_SERVICES); load() }, [load])
+  useEffect(() => { ServicesDB.seed(SEED_SERVICES as any); load() }, [load])
   const filtered = services.filter(s => {
     const matchSearch = s.name.toLowerCase().includes(search.toLowerCase()) || s.description.toLowerCase().includes(search.toLowerCase())
     const matchType = filterType === "Semua" || s.serviceType === filterType
     return matchSearch && matchType
   })
-  const handleSave = (data) => {
+  const handleSave = (data: Omit<ServiceItem, 'id' | 'createdAt' | 'updatedAt'>) => {
     if (modal?.mode === "add") ServicesDB.create(data)
     else if (modal?.editId) ServicesDB.update(modal.editId, data)
     load(); setModal(null)
   }
-  const handleDelete = (id) => { ServicesDB.delete(id); load(); setDeleteConfirm(null) }
-  const getEditInitial = (id) => {
+  const handleDelete = (id: string) => { ServicesDB.delete(id); load(); setDeleteConfirm(null) }
+  const getEditInitial = (id: string): Omit<ServiceItem, 'id' | 'createdAt' | 'updatedAt'> => {
     const svc = ServicesDB.getById(id)
     if (!svc) return blankForm()
     const { id: _id, createdAt: _c, updatedAt: _u, ...rest } = svc
