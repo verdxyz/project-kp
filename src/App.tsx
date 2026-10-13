@@ -8,6 +8,9 @@ import { PipelineFunnel, ServiceBreakdown, WinRateCard } from './components/Anal
 import { ServicesCatalog } from './components/ServicesCatalog'
 import { CustomerDatabase } from './components/CustomerDatabase'
 import { ProjectDatabase } from './components/ProjectDatabase'
+import { AnalyticsReports } from './components/AnalyticsReports'
+import { LoginScreen } from './components/LoginScreen'
+import { AuthService, type AuthUser } from './lib/auth'
 import { PROJECTS } from './data/mockData'
 import {
   FolderOpen,
@@ -66,14 +69,14 @@ function SectionHeader({
 }
 
 // Map nav IDs to one of view buckets
-type ViewKey = 'pipeline' | 'contracts' | 'audit' | 'services-catalog' | 'customers-db' | 'projects-db'
+type ViewKey = 'pipeline' | 'contracts' | 'audit' | 'services-catalog' | 'customers-db' | 'projects-db' | 'analytics'
 
 const VIEW_MAP: Record<string, ViewKey> = {
   dashboard: 'pipeline',
   projects: 'pipeline',
   sirup: 'pipeline',
   pipeline: 'pipeline',
-  analytics: 'pipeline',
+  analytics: 'analytics',
   services: 'services-catalog',
   'services-catalog': 'services-catalog',
   'customers-db': 'customers-db',
@@ -85,8 +88,19 @@ const VIEW_MAP: Record<string, ViewKey> = {
 }
 
 export default function App() {
+  const [currentUser, setCurrentUser] = useState<AuthUser | null>(() => AuthService.getCurrentUser())
   const [activeMenu, setActiveMenu] = useState('pipeline')
   const [activeTab, setActiveTab] = useState<TabKey>('On Channel')
+
+  const handleLogout = () => {
+    AuthService.logout()
+    setCurrentUser(null)
+  }
+
+  // If user is not authenticated, show Login Screen
+  if (!currentUser) {
+    return <LoginScreen onLoginSuccess={setCurrentUser} />
+  }
 
   // Resolve which content view to render
   const activeView: ViewKey = VIEW_MAP[activeMenu] ?? 'pipeline'
@@ -101,11 +115,18 @@ export default function App() {
   return (
     <div className="flex h-screen bg-slate-900 overflow-hidden">
       {/* Sidebar */}
-      <Sidebar activeNav={activeMenu} onNavChange={setActiveMenu} />
+      <Sidebar
+        activeNav={activeMenu}
+        onNavChange={setActiveMenu}
+        currentUser={currentUser}
+        onLogout={handleLogout}
+      />
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col overflow-hidden">
         <Topbar
+          currentUser={currentUser}
+          onLogout={handleLogout}
           title={
             activeView === 'contracts'
               ? 'Kontrak & Manajemen Dokumen'
@@ -117,6 +138,8 @@ export default function App() {
               ? 'Database Instansi Pemerintah'
               : activeView === 'projects-db'
               ? 'Input & Manajemen Proyek'
+              : activeView === 'analytics'
+              ? 'Analytics & Laporan Pipeline'
               : 'B2G Project & Contract Management'
           }
           subtitle={
@@ -130,6 +153,8 @@ export default function App() {
               ? 'Manajemen data instansi pemerintah, PIC, dan nilai kontrak'
               : activeView === 'projects-db'
               ? 'Input, update, dan tracking proyek pipeline B2G'
+              : activeView === 'analytics'
+              ? 'Analisis performa funnel, progres pekerjaan per tahap, dan evaluasi audit proyek'
               : 'Telkom Indonesia · Witel Jateng Utara · Dashboard Pengadaan Pemerintah'
           }
         />
@@ -358,6 +383,15 @@ export default function App() {
                 subtitle="Database proyek pipeline dengan CRUD lengkap — data tersimpan di browser"
               />
               <ProjectDatabase />
+            </section>
+          )}
+
+          {/* ═══════════════════════════════════════════════════════════════════ */}
+          {/* VIEW: Analytics & Laporan                                           */}
+          {/* ═══════════════════════════════════════════════════════════════════ */}
+          {activeView === 'analytics' && (
+            <section>
+              <AnalyticsReports />
             </section>
           )}
 

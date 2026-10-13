@@ -10,8 +10,8 @@ const STATUS_COLORS: Record<string, string> = { Active: "bg-blue-500/20 text-blu
 
 function formatIDR(n: number) {
   if (!n || n === 0) return "Rp 0"
-  if (n >= 1000000000) return `Rp ${(n / 1000000000).toFixed(2)}M`
-  if (n >= 1000000) return `Rp ${(n / 1000000).toFixed(0)} jt`
+  if (n >= 1000000000) return `Rp ${(n / 1000000000).toFixed(2).replace('.00', '')} M`
+  if (n >= 1000000) return `Rp ${(n / 1000000).toFixed(0)} Jt`
   return `Rp ${n.toLocaleString("id-ID")}`
 }
 

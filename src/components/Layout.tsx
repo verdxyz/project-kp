@@ -57,12 +57,16 @@ const NAV_ITEMS: NavItem[] = [
   { id: 'settings', label: 'Pengaturan', icon: Settings },
 ]
 
+import type { AuthUser } from '../lib/auth'
+
 interface SidebarProps {
   activeNav: string
   onNavChange: (id: string) => void
+  currentUser?: AuthUser | null
+  onLogout?: () => void
 }
 
-export function Sidebar({ activeNav, onNavChange }: SidebarProps) {
+export function Sidebar({ activeNav, onNavChange, currentUser, onLogout }: SidebarProps) {
   const [collapsed, setCollapsed] = useState(false)
   const [expandedItem, setExpandedItem] = useState<string | null>('projects')
   const [mobileOpen, setMobileOpen] = useState(false)
@@ -163,17 +167,43 @@ export function Sidebar({ activeNav, onNavChange }: SidebarProps) {
 
       {/* User Profile */}
       <div className="p-3 border-t border-slate-700/50">
-        <div className={cn('flex items-center gap-3 p-2 rounded-lg hover:bg-slate-700/30 cursor-pointer transition-colors', collapsed && 'justify-center')}>
-          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-violet-500 to-purple-700 flex items-center justify-center text-xs font-bold text-white flex-shrink-0">
-            AS
+        <div className={cn('flex items-center gap-3 p-2 rounded-lg hover:bg-slate-800/60 transition-colors', collapsed && 'justify-center')}>
+          <div className={cn(
+            'w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white flex-shrink-0 shadow-md',
+            currentUser?.role === 'admin'
+              ? 'bg-gradient-to-br from-red-500 to-rose-700 ring-1 ring-red-400/50'
+              : currentUser?.role === 'am'
+              ? 'bg-gradient-to-br from-blue-500 to-indigo-700 ring-1 ring-blue-400/50'
+              : 'bg-gradient-to-br from-emerald-500 to-teal-700 ring-1 ring-emerald-400/50'
+          )}>
+            {currentUser?.avatar_initials || 'TK'}
           </div>
           {!collapsed && (
             <div className="min-w-0 flex-1">
-              <p className="text-xs font-semibold text-white truncate">Agus Setiawan</p>
-              <p className="text-xs text-slate-400 truncate">Account Manager</p>
+              <p className="text-xs font-semibold text-white truncate">{currentUser?.nama || 'Pengguna Telkom'}</p>
+              <div className="flex items-center gap-1.5 mt-0.5">
+                <span className={cn(
+                  'text-[10px] font-semibold px-1.5 py-0.2 rounded uppercase tracking-wider',
+                  currentUser?.role === 'admin'
+                    ? 'bg-red-500/20 text-red-300'
+                    : currentUser?.role === 'am'
+                    ? 'bg-blue-500/20 text-blue-300'
+                    : 'bg-emerald-500/20 text-emerald-300'
+                )}>
+                  {currentUser?.role === 'admin' ? 'Administrator' : currentUser?.role === 'am' ? 'Account Manager' : 'Viewer'}
+                </span>
+              </div>
             </div>
           )}
-          {!collapsed && <LogOut size={14} className="text-slate-500 hover:text-red-400 cursor-pointer transition-colors" />}
+          {!collapsed && onLogout && (
+            <button
+              onClick={onLogout}
+              title="Keluar / Logout"
+              className="p-1 rounded text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition-colors ml-auto"
+            >
+              <LogOut size={15} />
+            </button>
+          )}
         </div>
       </div>
     </div>
@@ -225,9 +255,11 @@ export function Sidebar({ activeNav, onNavChange }: SidebarProps) {
 interface TopbarProps {
   title: string
   subtitle?: string
+  currentUser?: AuthUser | null
+  onLogout?: () => void
 }
 
-export function Topbar({ title, subtitle }: TopbarProps) {
+export function Topbar({ title, subtitle, currentUser, onLogout }: TopbarProps) {
   return (
     <div className="flex items-center justify-between px-6 py-4 border-b border-slate-700/50 bg-slate-900/50 backdrop-blur-sm sticky top-0 z-30">
       <div>
@@ -235,6 +267,24 @@ export function Topbar({ title, subtitle }: TopbarProps) {
         {subtitle && <p className="text-xs text-slate-400 mt-0.5">{subtitle}</p>}
       </div>
       <div className="flex items-center gap-3">
+        {/* User Role Tag */}
+        {currentUser && (
+          <div className="hidden sm:flex items-center gap-2 px-2.5 py-1 rounded-lg bg-slate-800/80 border border-slate-700/80 text-xs">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+            <span className="text-slate-300 font-medium">{currentUser.nama.split(' ')[0]}</span>
+            <span className={cn(
+              'text-[10px] uppercase font-bold px-1.5 py-0.2 rounded',
+              currentUser.role === 'admin'
+                ? 'bg-red-500/20 text-red-300'
+                : currentUser.role === 'am'
+                ? 'bg-blue-500/20 text-blue-300'
+                : 'bg-emerald-500/20 text-emerald-300'
+            )}>
+              {currentUser.role}
+            </span>
+          </div>
+        )}
+
         {/* Notification Bell */}
         <button className="relative p-2 rounded-lg bg-slate-800 border border-slate-700 text-slate-400 hover:text-white hover:border-slate-600 transition-all">
           <Bell size={16} />
@@ -245,9 +295,20 @@ export function Topbar({ title, subtitle }: TopbarProps) {
 
         {/* Telkom Badge */}
         <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-800 border border-slate-700">
-          <Building2 size={14} className="text-blue-400" />
+          <Building2 size={14} className="text-red-400" />
           <span className="text-xs font-medium text-slate-300">Witel Jateng Utara</span>
         </div>
+
+        {/* Logout Quick Button */}
+        {onLogout && (
+          <button
+            onClick={onLogout}
+            title="Keluar"
+            className="p-2 rounded-lg bg-slate-800 border border-slate-700 text-slate-400 hover:text-red-400 hover:border-red-500/40 transition-all"
+          >
+            <LogOut size={16} />
+          </button>
+        )}
       </div>
     </div>
   )

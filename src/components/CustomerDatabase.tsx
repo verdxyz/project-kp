@@ -12,9 +12,9 @@ const SEED_CUSTOMERS = [
 ]
 
 function formatIDR(n: number) {
-  if (!n || n === 0) return "-"
-  if (n >= 1000000000) return `Rp ${(n / 1000000000).toFixed(1)}M`
-  if (n >= 1000000) return `Rp ${(n / 1000000).toFixed(0)} jt`
+  if (!n || n === 0) return "Rp 0"
+  if (n >= 1000000000) return `Rp ${(n / 1000000000).toFixed(1).replace('.0', '')} M`
+  if (n >= 1000000) return `Rp ${(n / 1000000).toFixed(0)} Jt`
   return `Rp ${n.toLocaleString("id-ID")}`
 }
 
