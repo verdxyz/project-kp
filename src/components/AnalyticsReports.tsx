@@ -1,8 +1,7 @@
-import React, { useState, useMemo } from 'react'
+import React, { useState, useMemo, useEffect } from 'react'
 import {
   BarChart3,
   Filter,
-  Search,
   RotateCcw,
   CheckCircle2,
   Clock,
@@ -26,8 +25,11 @@ import {
   Download,
 } from 'lucide-react'
 import { cn, formatIDR, abbreviateIDR } from '../lib/utils'
-import { PROJECTS as STATIC_PROJECTS, type Project } from '../data/mockData'
 import { ProjectsDB, type ProjectEntry } from '../lib/db'
+import { MASTER_INSTANSI_NAMES } from '../lib/constants'
+import { ProjectDocumentsModal } from './ProjectDatabase'
+import { getProjectDocumentLabel, ProjectDocuments, type ProjectDocument } from '../lib/projectDocuments'
+import { SERVICE_PRODUCTS, ServicePoints, type ServicePivotRow } from '../lib/servicePoints'
 
 // Normalized Project interface
 export interface UnifiedProject {
@@ -39,14 +41,17 @@ export interface UnifiedProject {
   region: string
   budget: number
   procurementMethod: string
-  stage: 'F0' | 'F1' | 'F2' | 'F3' | 'WIN' | 'LOSS'
+  stage: ProjectEntry['stage']
   progress: number
   startDate: string
   endDate: string
   pic: string
-  category: 'On Channel' | 'GTMA'
+  category: ProjectEntry['category']
   serviceType: string
-  status: 'Active' | 'At Risk' | 'Completed' | 'Lost'
+  totalCapacityMbps: number | null
+  sid: string | null
+  subsidiaryName?: string | null
+  status: ProjectEntry['status']
   notes?: string
 }
 
@@ -55,21 +60,11 @@ const STAGE_CONFIG: Record<string, { label: string; color: string; bg: string; b
   F1: { label: 'F1 — Pengajuan Penawaran', color: '#f59e0b', bg: 'bg-amber-500/10', border: 'border-amber-500/30', desc: 'Penyusunan proposal harga, BoM, dan spesifikasi teknis' },
   F2: { label: 'F2 — Proses Tender / Katalog', color: '#3b82f6', bg: 'bg-blue-500/10', border: 'border-blue-500/30', desc: 'Submit e-Katalog LKPP / negosiasi teknis & harga' },
   F3: { label: 'F3 — Penetapan & Kontrak', color: '#a855f7', bg: 'bg-purple-500/10', border: 'border-purple-500/30', desc: 'Penerbitan SPPBJ, SPK, dan penandatanganan kontrak' },
-  WIN: { label: 'WIN — Dimenangkan & Operasi', color: '#10b981', bg: 'bg-emerald-500/10', border: 'border-emerald-500/30', desc: 'Proyek dimenangkan, aktivasi layanan, dan BASTO' },
-  LOSS: { label: 'LOSS — Kalah Tender', color: '#ef4444', bg: 'bg-red-500/10', border: 'border-red-500/30', desc: 'Kalah oleh kompetitor / pengadaan dibatalkan' },
+  F4: { label: 'F4 — Implementasi', color: '#06b6d4', bg: 'bg-cyan-500/10', border: 'border-cyan-500/30', desc: 'Implementasi layanan dan penyelesaian pekerjaan' },
+  F5: { label: 'F5 — Berhasil', color: '#10b981', bg: 'bg-emerald-500/10', border: 'border-emerald-500/30', desc: 'Proyek berhasil, aktivasi layanan, dan BASTO' },
+  Loss: { label: 'Loss — Kalah', color: '#ef4444', bg: 'bg-red-500/10', border: 'border-red-500/30', desc: 'Proyek kalah dalam proses pengadaan' },
+  Cancel: { label: 'Cancel — Batal', color: '#94a3b8', bg: 'bg-slate-500/10', border: 'border-slate-500/30', desc: 'Proyek dibatalkan' },
 }
-
-const REGION_OPTIONS = [
-  'Semua Wilayah',
-  'Semarang',
-  'Kendal',
-  'Salatiga',
-  'Batang',
-  'Pekalongan',
-  'Pemalang',
-  'Tegal',
-  'Brebes',
-]
 
 const STAGE_OPTIONS = [
   { value: 'ALL', label: 'Semua Tahap' },
@@ -77,47 +72,56 @@ const STAGE_OPTIONS = [
   { value: 'F1', label: 'F1 (Penawaran)' },
   { value: 'F2', label: 'F2 (Tender/Katalog)' },
   { value: 'F3', label: 'F3 (Kontrak)' },
-  { value: 'WIN', label: 'WIN (Menang)' },
-  { value: 'LOSS', label: 'LOSS (Kalah)' },
+  { value: 'F4', label: 'F4 (Implementasi)' },
+  { value: 'F5', label: 'F5 (Berhasil)' },
+  { value: 'Loss', label: 'Loss (Kalah)' },
+  { value: 'Cancel', label: 'Cancel (Batal)' },
 ]
 
 export function AnalyticsReports() {
-  // Combine stored projects from ProjectsDB with STATIC_PROJECTS
-  const allProjects: UnifiedProject[] = useMemo(() => {
-    try {
-      const stored = ProjectsDB.getAll()
-      if (stored && stored.length > 0) {
-        // Merge without duplicating idLOP
-        const storedMap = new Map(stored.map((p) => [p.idLOP, p]))
-        const merged: UnifiedProject[] = [...stored.map((p) => ({
-          ...p,
-          stage: p.stage as UnifiedProject['stage'],
-          category: (p.category === 'GTMA' ? 'GTMA' : 'On Channel') as UnifiedProject['category'],
-          status: (p.status || 'Active') as UnifiedProject['status'],
-        }))]
+  const [allProjects, setAllProjects] = useState<UnifiedProject[]>([])
+  const [loadError, setLoadError] = useState('')
+  const [loading, setLoading] = useState(true)
+  const [pivotAgency, setPivotAgency] = useState('ALL')
+  const [servicePivot, setServicePivot] = useState<ServicePivotRow[]>([])
+  const [loadedPivotAgency, setLoadedPivotAgency] = useState<string | null>(null)
+  const [pivotError, setPivotError] = useState('')
+  const pivotLoading = loadedPivotAgency !== pivotAgency
 
-        STATIC_PROJECTS.forEach((sp) => {
-          if (!storedMap.has(sp.idLOP)) {
-            merged.push(sp)
-          }
-        })
-        return merged
-      }
-    } catch (e) {
-      console.error(e)
-    }
-    return STATIC_PROJECTS
+  useEffect(() => {
+    ProjectsDB.getAll()
+      .then((projects) => setAllProjects(projects))
+      .catch((error: unknown) => setLoadError(error instanceof Error ? error.message : 'Gagal memuat data proyek.'))
+      .finally(() => setLoading(false))
   }, [])
+
+  useEffect(() => {
+    let active = true
+    ServicePoints.getPivot(pivotAgency === 'ALL' ? undefined : pivotAgency)
+      .then((rows) => {
+        if (!active) return
+        setServicePivot(rows)
+        setPivotError('')
+        setLoadedPivotAgency(pivotAgency)
+      })
+      .catch((error: unknown) => {
+        if (!active) return
+        setPivotError(error instanceof Error ? error.message : 'Gagal memuat ringkasan layanan.')
+        setLoadedPivotAgency(pivotAgency)
+      })
+    return () => { active = false }
+  }, [pivotAgency])
 
   // Filter States
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedStage, setSelectedStage] = useState('ALL')
-  const [selectedRegion, setSelectedRegion] = useState('Semua Wilayah')
-  const [selectedCategory, setSelectedCategory] = useState<'ALL' | 'On Channel' | 'GTMA'>('ALL')
-  const [selectedStatus, setSelectedStatus] = useState<'ALL' | 'Active' | 'At Risk' | 'Completed' | 'Lost'>('ALL')
+  const [selectedAgency, setSelectedAgency] = useState('Semua Instansi')
+  const [selectedCategory, setSelectedCategory] = useState<'ALL' | ProjectEntry['category']>('ALL')
+  const [selectedStatus, setSelectedStatus] = useState<'ALL' | ProjectEntry['status']>('ALL')
 
   // Selected project for Detail Modal
   const [detailProject, setDetailProject] = useState<UnifiedProject | null>(null)
+  const [documentsFor, setDocumentsFor] = useState<{ idLOP: string; category: ProjectEntry['category'] } | null>(null)
 
   // Filter Logic
   const filteredProjects = useMemo(() => {
@@ -136,10 +140,7 @@ export function AnalyticsReports() {
       // Stage
       if (selectedStage !== 'ALL' && p.stage !== selectedStage) return false
 
-      // Region
-      if (selectedRegion !== 'Semua Wilayah' && !p.region.toLowerCase().includes(selectedRegion.toLowerCase())) {
-        return false
-      }
+      if (selectedAgency !== 'Semua Instansi' && p.agency !== selectedAgency) return false
 
       // Category
       if (selectedCategory !== 'ALL' && p.category !== selectedCategory) return false
@@ -149,22 +150,22 @@ export function AnalyticsReports() {
 
       return true
     })
-  }, [allProjects, searchQuery, selectedStage, selectedRegion, selectedCategory, selectedStatus])
+  }, [allProjects, searchQuery, selectedStage, selectedAgency, selectedCategory, selectedStatus])
 
   // Computed summary metrics based on filtered set
   const totalValue = filteredProjects.reduce((sum, p) => sum + p.budget, 0)
   const avgProgress = filteredProjects.length > 0
     ? Math.round(filteredProjects.reduce((sum, p) => sum + p.progress, 0) / filteredProjects.length)
     : 0
-  const winCount = filteredProjects.filter((p) => p.stage === 'WIN').length
-  const lossCount = filteredProjects.filter((p) => p.stage === 'LOSS').length
+  const winCount = filteredProjects.filter((p) => p.stage === 'F5').length
+  const lossCount = filteredProjects.filter((p) => p.stage === 'Loss').length
   const winRate = winCount + lossCount > 0 ? Math.round((winCount / (winCount + lossCount)) * 100) : 0
   const atRiskCount = filteredProjects.filter((p) => p.status === 'At Risk').length
 
   const handleResetFilters = () => {
     setSearchQuery('')
     setSelectedStage('ALL')
-    setSelectedRegion('Semua Wilayah')
+    setSelectedAgency('Semua Instansi')
     setSelectedCategory('ALL')
     setSelectedStatus('ALL')
   }
@@ -186,6 +187,8 @@ export function AnalyticsReports() {
 
   return (
     <div className="space-y-6">
+      {loadError && <div role="alert" className="rounded-xl border border-red-500/30 bg-red-500/10 p-3 text-sm text-red-300">{loadError}</div>}
+      {loading && <div className="text-sm text-slate-400">Memuat laporan proyek...</div>}
       {/* ─── Header & Quick Actions ─── */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-800">
         <div>
@@ -196,7 +199,7 @@ export function AnalyticsReports() {
             </span>
           </div>
           <p className="text-xs text-slate-400 mt-0.5">
-            Monitoring performa funnel, progres pekerjaan per tahap (F0–WIN), dan audit kelayakan proyek instansi pemerintah.
+            Monitoring progres pekerjaan per tahap (F0–F5), status Loss/Cancel, serta kinerja proyek instansi pemerintah.
           </p>
         </div>
 
@@ -208,6 +211,55 @@ export function AnalyticsReports() {
           <span>Export Laporan (.CSV)</span>
         </button>
       </div>
+
+      <section className="card bg-slate-900/90 border-slate-800 p-0 overflow-hidden">
+        <header className="flex flex-col gap-3 border-b border-slate-800 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h3 className="text-sm font-bold text-white">Ringkasan Titik & Kapasitas Layanan</h3>
+            <p className="mt-1 text-xs text-slate-500">Total SID dan Mbps per produk</p>
+          </div>
+          <select
+            aria-label="Filter instansi pemda"
+            value={pivotAgency}
+            onChange={(event) => setPivotAgency(event.target.value)}
+            className="form-input w-full sm:w-auto"
+          >
+            <option value="ALL">Semua Instansi</option>
+            {MASTER_INSTANSI_NAMES.map((agency) => <option key={agency} value={agency}>{agency}</option>)}
+          </select>
+        </header>
+        {pivotError && <p role="alert" className="px-5 pt-3 text-xs text-red-400">{pivotError}</p>}
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[520px] text-left text-xs">
+            <thead className="bg-slate-950/70 text-[10px] uppercase text-slate-500">
+              <tr>
+                <th className="px-5 py-3">Produk</th>
+                <th className="px-5 py-3 text-right">Titik Layanan</th>
+                <th className="px-5 py-3 text-right">Kapasitas Total (Mbps)</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-800/70">
+              {SERVICE_PRODUCTS.map((product) => {
+                const row = servicePivot.find((item) => item.productType === product)
+                return (
+                  <tr key={product}>
+                    <th className="px-5 py-3 font-semibold text-slate-200">{product}</th>
+                    <td className="px-5 py-3 text-right tabular-nums text-slate-300">{pivotLoading ? '—' : (row?.pointCount ?? 0).toLocaleString('id-ID')}</td>
+                    <td className="px-5 py-3 text-right tabular-nums text-slate-300">{pivotLoading ? '—' : (row?.capacityMbps ?? 0).toLocaleString('id-ID', { maximumFractionDigits: 3 })}</td>
+                  </tr>
+                )
+              })}
+            </tbody>
+            <tfoot className="border-t border-slate-700 bg-slate-950/50 font-bold text-white">
+              <tr>
+                <th className="px-5 py-3">Total</th>
+                <td className="px-5 py-3 text-right tabular-nums">{pivotLoading ? '—' : servicePivot.reduce((sum, row) => sum + row.pointCount, 0).toLocaleString('id-ID')}</td>
+                <td className="px-5 py-3 text-right tabular-nums">{pivotLoading ? '—' : servicePivot.reduce((sum, row) => sum + row.capacityMbps, 0).toLocaleString('id-ID', { maximumFractionDigits: 3 })}</td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </section>
 
       {/* ─── Metric Highlight Cards ─── */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
@@ -277,7 +329,7 @@ export function AnalyticsReports() {
             <span>Filter & Penelusuran Laporan</span>
           </div>
 
-          {(searchQuery || selectedStage !== 'ALL' || selectedRegion !== 'Semua Wilayah' || selectedCategory !== 'ALL' || selectedStatus !== 'ALL') && (
+          {(searchQuery || selectedStage !== 'ALL' || selectedAgency !== 'Semua Instansi' || selectedCategory !== 'ALL' || selectedStatus !== 'ALL') && (
             <button
               onClick={handleResetFilters}
               className="flex items-center gap-1.5 text-xs text-slate-400 hover:text-white transition-colors cursor-pointer"
@@ -291,14 +343,13 @@ export function AnalyticsReports() {
         {/* Filter Inputs Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 text-xs">
           {/* 1. Search Box */}
-          <div className="relative">
-            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
+          <div>
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Cari proyek, instansi, PIC..."
-              className="w-full pl-9 pr-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 transition-all"
+              className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 transition-all"
             />
           </div>
 
@@ -317,16 +368,17 @@ export function AnalyticsReports() {
             </select>
           </div>
 
-          {/* 3. Region Filter */}
+          {/* 3. Customer Agency Filter */}
           <div>
             <select
-              value={selectedRegion}
-              onChange={(e) => setSelectedRegion(e.target.value)}
+              value={selectedAgency}
+              onChange={(e) => setSelectedAgency(e.target.value)}
               className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-white focus:outline-none focus:border-blue-500"
             >
-              {REGION_OPTIONS.map((r) => (
-                <option key={r} value={r}>
-                  {r}
+              <option value="Semua Instansi">Semua Instansi</option>
+              {MASTER_INSTANSI_NAMES.map((agency) => (
+                <option key={agency} value={agency}>
+                  {agency}
                 </option>
               ))}
             </select>
@@ -342,6 +394,7 @@ export function AnalyticsReports() {
               <option value="ALL">Semua Kategori</option>
               <option value="On Channel">On Channel (Konektivitas)</option>
               <option value="GTMA">GTMA (CPE / Third-Party)</option>
+              <option value="NGTMA">NGTMA</option>
             </select>
           </div>
 
@@ -357,6 +410,7 @@ export function AnalyticsReports() {
               <option value="At Risk">At Risk (Perhatian Khusus)</option>
               <option value="Completed">Completed (Selesai)</option>
               <option value="Lost">Lost (Kalah)</option>
+              <option value="Cancelled">Cancelled (Batal)</option>
             </select>
           </div>
         </div>
@@ -387,7 +441,9 @@ export function AnalyticsReports() {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-800/60">
-              {filteredProjects.length === 0 ? (
+              {loading ? (
+                <tr><td colSpan={7} className="py-12 text-center text-slate-400">Memuat proyek...</td></tr>
+              ) : filteredProjects.length === 0 ? (
                 <tr>
                   <td colSpan={7} className="px-6 py-12 text-center text-slate-500">
                     <FolderOpen size={32} className="mx-auto mb-2 opacity-40" />
@@ -414,7 +470,9 @@ export function AnalyticsReports() {
                           {p.projectName}
                         </div>
                         <div className="text-[11px] text-slate-400 font-mono mt-0.5 flex items-center gap-2">
-                          <span>{p.idLOP}</span>
+                          <button type="button" onClick={() => setDocumentsFor({ idLOP: p.idLOP, category: p.category })} className="text-blue-400 hover:text-blue-300">
+                            {p.idLOP}
+                          </button>
                           <span>•</span>
                           <span className="text-slate-500">{p.serviceType}</span>
                         </div>
@@ -451,15 +509,17 @@ export function AnalyticsReports() {
                         <div className="flex items-center justify-between text-[11px] mb-1">
                           <span className="font-semibold text-white">{p.progress}%</span>
                           <span className="text-slate-500 text-[10px]">
-                            {p.progress === 100 ? 'Selesai' : p.stage === 'LOSS' ? 'Gagal' : 'In Progress'}
+                            {p.stage === 'Loss' ? 'Kalah' : p.stage === 'Cancel' ? 'Batal' : p.progress === 100 ? 'Selesai' : 'In Progress'}
                           </span>
                         </div>
                         <div className="w-full h-2 bg-slate-800 rounded-full overflow-hidden">
                           <div
                             className={cn(
                               'h-full rounded-full transition-all duration-300',
-                              p.stage === 'LOSS'
+                              p.stage === 'Loss'
                                 ? 'bg-red-500'
+                                : p.stage === 'Cancel'
+                                ? 'bg-slate-500'
                                 : p.progress >= 70
                                 ? 'bg-emerald-500'
                                 : p.progress >= 40
@@ -515,6 +575,13 @@ export function AnalyticsReports() {
           onClose={() => setDetailProject(null)}
         />
       )}
+      {documentsFor && (
+        <ProjectDocumentsModal
+          idLOP={documentsFor.idLOP}
+          category={documentsFor.category}
+          onClose={() => setDocumentsFor(null)}
+        />
+      )}
     </div>
   )
 }
@@ -529,8 +596,36 @@ interface ProjectDetailModalProps {
 }
 
 function ProjectDetailModal({ project, onClose }: ProjectDetailModalProps) {
-  const STAGES_LIST: ('F0' | 'F1' | 'F2' | 'F3' | 'WIN')[] = ['F0', 'F1', 'F2', 'F3', 'WIN']
-  const currentStageIndex = project.stage === 'LOSS' ? -1 : STAGES_LIST.indexOf(project.stage as any)
+  const STAGES_LIST: Extract<ProjectEntry['stage'], `F${number}`>[] = ['F0', 'F1', 'F2', 'F3', 'F4', 'F5']
+  const isTerminalFailure = project.stage === 'Loss' || project.stage === 'Cancel'
+  const currentStageIndex = isTerminalFailure ? -1 : STAGES_LIST.indexOf(project.stage as typeof STAGES_LIST[number])
+  const [documents, setDocuments] = useState<ProjectDocument[]>([])
+  const [documentsLoading, setDocumentsLoading] = useState(true)
+  const [documentsError, setDocumentsError] = useState('')
+  const [downloadingDocumentId, setDownloadingDocumentId] = useState<string | null>(null)
+
+  useEffect(() => {
+    let active = true
+    ProjectDocuments.list(project.idLOP)
+      .then((result) => { if (active) setDocuments(result) })
+      .catch((error: unknown) => {
+        if (active) setDocumentsError(error instanceof Error ? error.message : 'Gagal memuat dokumen proyek.')
+      })
+      .finally(() => { if (active) setDocumentsLoading(false) })
+    return () => { active = false }
+  }, [project.idLOP])
+
+  const handleDocumentDownload = async (document: ProjectDocument) => {
+    setDownloadingDocumentId(document.id)
+    setDocumentsError('')
+    try {
+      await ProjectDocuments.download(project.idLOP, document.documentType, document.originalName)
+    } catch (error) {
+      setDocumentsError(error instanceof Error ? error.message : 'Gagal mengunduh dokumen.')
+    } finally {
+      setDownloadingDocumentId(null)
+    }
+  }
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/80 backdrop-blur-md animate-in fade-in duration-200">
@@ -543,10 +638,12 @@ function ProjectDetailModal({ project, onClose }: ProjectDetailModalProps) {
               <span className="text-xs font-mono text-blue-400 font-semibold">{project.idLOP}</span>
               <span className={cn(
                 'text-[10px] uppercase font-bold px-2 py-0.5 rounded border',
-                project.stage === 'WIN'
+                project.stage === 'F5'
                   ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30'
-                  : project.stage === 'LOSS'
+                  : project.stage === 'Loss'
                   ? 'bg-red-500/20 text-red-400 border-red-500/30'
+                  : project.stage === 'Cancel'
+                  ? 'bg-slate-500/20 text-slate-300 border-slate-500/30'
                   : 'bg-blue-500/20 text-blue-400 border-blue-500/30'
               )}>
                 {project.stage}
@@ -576,22 +673,26 @@ function ProjectDetailModal({ project, onClose }: ProjectDetailModalProps) {
               <span className="text-slate-400 font-mono font-bold">{project.progress}% Selesai</span>
             </div>
 
-            {project.stage === 'LOSS' ? (
-              <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/30 text-red-300">
+            {isTerminalFailure ? (
+              <div className={cn(
+                'p-3 rounded-lg border',
+                project.stage === 'Loss'
+                  ? 'bg-red-500/10 border-red-500/30 text-red-300'
+                  : 'bg-slate-500/10 border-slate-500/30 text-slate-300',
+              )}>
                 <p className="font-bold flex items-center gap-1.5">
-                  <AlertTriangle size={14} /> Proyek Dinyatakan Kalah (LOSS)
+                  <AlertTriangle size={14} /> {project.stage === 'Loss' ? 'Proyek Kalah (Loss)' : 'Proyek Dibatalkan (Cancel)'}
                 </p>
-                <p className="text-[11px] mt-1 text-red-300/80">
-                  {project.notes || 'Kalah dalam evaluasi penawaran harga kompetitor / pembatalan DPA pemda.'}
+                <p className="text-[11px] mt-1 opacity-80">
+                  {project.notes || (project.stage === 'Loss' ? 'Proyek kalah dalam proses pengadaan.' : 'Proyek dibatalkan.')}
                 </p>
               </div>
             ) : (
               <div className="relative pt-2">
-                <div className="grid grid-cols-5 gap-2 text-center">
+                <div className="grid grid-cols-6 gap-2 text-center">
                   {STAGES_LIST.map((stg, idx) => {
-                    const isDone = idx < currentStageIndex || project.stage === 'WIN'
-                    const isCurrent = idx === currentStageIndex && project.stage !== 'WIN'
-                    const isNext = idx > currentStageIndex && project.stage !== 'WIN'
+                    const isDone = idx < currentStageIndex || project.stage === 'F5'
+                    const isCurrent = idx === currentStageIndex && project.stage !== 'F5'
 
                     return (
                       <div key={stg} className="flex flex-col items-center">
@@ -611,7 +712,7 @@ function ProjectDetailModal({ project, onClose }: ProjectDetailModalProps) {
                           {stg}
                         </span>
                         <span className="text-[9px] text-slate-500 line-clamp-1">
-                          {idx === 0 ? 'Inisiasi' : idx === 1 ? 'Proposal' : idx === 2 ? 'Tender' : idx === 3 ? 'Kontrak' : 'Win/Ops'}
+                          {['Inisiasi', 'Proposal', 'Tender', 'Kontrak', 'Implementasi', 'Berhasil'][idx]}
                         </span>
                       </div>
                     )
@@ -639,6 +740,15 @@ function ProjectDetailModal({ project, onClose }: ProjectDetailModalProps) {
               <span className="text-slate-500 text-[10px] block">Kategori & Layanan</span>
               <span className="text-slate-200 font-semibold mt-0.5 block truncate">{project.serviceType}</span>
               <span className="text-blue-400 text-[10px]">{project.category}</span>
+              {project.subsidiaryName && <span className="mt-1 block truncate text-[10px] text-slate-400">Anak perusahaan: {project.subsidiaryName}</span>}
+            </div>
+
+            <div className="p-3 rounded-xl bg-slate-900 border border-slate-800">
+              <span className="text-slate-500 text-[10px] block">Kapasitas & SID</span>
+              <span className="text-slate-200 font-semibold mt-0.5 block">
+                {project.totalCapacityMbps === null ? '—' : `${project.totalCapacityMbps} Mbps`}
+              </span>
+              <span className="text-slate-500 text-[10px]">{project.sid || 'SID belum diisi'}</span>
             </div>
 
             <div className="p-3 rounded-xl bg-slate-900 border border-slate-800">
@@ -663,6 +773,46 @@ function ProjectDetailModal({ project, onClose }: ProjectDetailModalProps) {
               <span className="text-slate-500 text-[10px]">Tahun Anggaran 2024/2026</span>
             </div>
           </div>
+
+          {/* Project documents */}
+          <section className="p-4 rounded-xl bg-slate-900 border border-slate-800 space-y-3">
+            <div className="flex items-center justify-between gap-3">
+              <h4 className="font-bold text-white uppercase tracking-wider text-[11px] flex items-center gap-1.5">
+                <FileText size={14} className="text-blue-400" />
+                Dokumen Proyek
+              </h4>
+              <span className="text-[10px] text-slate-500">{documents.length} file</span>
+            </div>
+            {documentsError && <p role="alert" className="text-xs text-red-400">{documentsError}</p>}
+            {documentsLoading ? (
+              <p className="text-xs text-slate-400">Memuat dokumen...</p>
+            ) : documents.length === 0 ? (
+              <p className="text-xs text-slate-500">Belum ada dokumen yang diunggah untuk proyek ini.</p>
+            ) : (
+              <ul className="divide-y divide-slate-800">
+                {documents.map((document) => (
+                  <li key={document.id} className="flex items-center justify-between gap-3 py-2.5 first:pt-0 last:pb-0">
+                    <div className="min-w-0">
+                      <p className="text-[10px] font-semibold text-blue-400">
+                        {getProjectDocumentLabel(document.documentType)}
+                      </p>
+                      <p className="truncate text-xs text-slate-200" title={document.originalName}>{document.originalName}</p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => void handleDocumentDownload(document)}
+                      disabled={downloadingDocumentId === document.id}
+                      title={`Unduh ${document.originalName}`}
+                      aria-label={`Unduh ${document.originalName}`}
+                      className="rounded-lg p-2 text-blue-400 hover:bg-blue-500/10 disabled:opacity-50"
+                    >
+                      <Download size={15} />
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
 
           {/* 3. Compliance & Risk Audit Note */}
           <div className="p-4 rounded-xl bg-slate-900 border border-slate-800 space-y-2">

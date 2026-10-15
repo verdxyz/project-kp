@@ -1,22 +1,16 @@
 import React, { useState } from 'react'
 import {
-  LayoutDashboard,
-  FolderOpen,
   FileText,
   BarChart3,
-  Settings,
-  Bell,
   ChevronDown,
-  Building2,
-  Shield,
   Wifi,
-  Layers,
   LogOut,
   Menu,
   X,
   TrendingUp,
   Database,
   FolderPlus,
+  MapPin,
 } from 'lucide-react'
 import { cn } from '../lib/utils'
 
@@ -29,32 +23,18 @@ interface NavItem {
 }
 
 const NAV_ITEMS: NavItem[] = [
-  { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  {
-    id: 'projects',
-    label: 'Project Pipeline',
-    icon: FolderOpen,
-    badge: 10,
-    children: [
-      { id: 'sirup', label: 'SiRUP Monitor' },
-      { id: 'pipeline', label: 'Sales Pipeline' },
-    ],
-  },
   { id: 'contracts', label: 'Kontrak & Dokumen', icon: FileText, badge: 3 },
   { id: 'analytics', label: 'Analytics & Laporan', icon: BarChart3 },
+  { id: 'maps', label: 'Maps', icon: MapPin },
   {
     id: 'services',
-    label: 'Layanan (On Channel)',
+    label: 'Data Layanan',
     icon: Wifi,
     children: [
-      { id: 'services-catalog', label: 'Katalog Layanan' },
+      { id: 'gtma', label: 'GTMA Services' },
       { id: 'customers-db', label: 'Database Instansi' },
-      { id: 'projects-db', label: 'Input Proyek' },
     ],
   },
-  { id: 'gtma', label: 'GTMA Services', icon: Layers },
-  { id: 'audit', label: 'Audit & Compliance', icon: Shield, badge: 2 },
-  { id: 'settings', label: 'Pengaturan', icon: Settings },
 ]
 
 import type { AuthUser } from '../lib/auth'
@@ -68,7 +48,7 @@ interface SidebarProps {
 
 export function Sidebar({ activeNav, onNavChange, currentUser, onLogout }: SidebarProps) {
   const [collapsed, setCollapsed] = useState(false)
-  const [expandedItem, setExpandedItem] = useState<string | null>('projects')
+  const [expandedItem, setExpandedItem] = useState<string | null>(null)
   const [mobileOpen, setMobileOpen] = useState(false)
 
   const toggleItem = (id: string) => {
@@ -170,27 +150,16 @@ export function Sidebar({ activeNav, onNavChange, currentUser, onLogout }: Sideb
         <div className={cn('flex items-center gap-3 p-2 rounded-lg hover:bg-slate-800/60 transition-colors', collapsed && 'justify-center')}>
           <div className={cn(
             'w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white flex-shrink-0 shadow-md',
-            currentUser?.role === 'admin'
-              ? 'bg-gradient-to-br from-red-500 to-rose-700 ring-1 ring-red-400/50'
-              : currentUser?.role === 'am'
-              ? 'bg-gradient-to-br from-blue-500 to-indigo-700 ring-1 ring-blue-400/50'
-              : 'bg-gradient-to-br from-emerald-500 to-teal-700 ring-1 ring-emerald-400/50'
+            'bg-gradient-to-br from-red-500 to-rose-700 ring-1 ring-red-400/50'
           )}>
-            {currentUser?.avatar_initials || 'TK'}
+            {currentUser?.nama.slice(0, 2).toUpperCase() || 'AS'}
           </div>
           {!collapsed && (
             <div className="min-w-0 flex-1">
               <p className="text-xs font-semibold text-white truncate">{currentUser?.nama || 'Pengguna Telkom'}</p>
               <div className="flex items-center gap-1.5 mt-0.5">
-                <span className={cn(
-                  'text-[10px] font-semibold px-1.5 py-0.2 rounded uppercase tracking-wider',
-                  currentUser?.role === 'admin'
-                    ? 'bg-red-500/20 text-red-300'
-                    : currentUser?.role === 'am'
-                    ? 'bg-blue-500/20 text-blue-300'
-                    : 'bg-emerald-500/20 text-emerald-300'
-                )}>
-                  {currentUser?.role === 'admin' ? 'Administrator' : currentUser?.role === 'am' ? 'Account Manager' : 'Viewer'}
+                <span className="text-[10px] font-semibold px-1.5 py-0.2 rounded uppercase tracking-wider bg-red-500/20 text-red-300">
+                  Admin Support
                 </span>
               </div>
             </div>
@@ -255,60 +224,14 @@ export function Sidebar({ activeNav, onNavChange, currentUser, onLogout }: Sideb
 interface TopbarProps {
   title: string
   subtitle?: string
-  currentUser?: AuthUser | null
-  onLogout?: () => void
 }
 
-export function Topbar({ title, subtitle, currentUser, onLogout }: TopbarProps) {
+export function Topbar({ title, subtitle }: TopbarProps) {
   return (
     <div className="flex items-center justify-between px-6 py-4 border-b border-slate-700/50 bg-slate-900/50 backdrop-blur-sm sticky top-0 z-30">
       <div>
         <h1 className="text-lg font-bold text-white">{title}</h1>
         {subtitle && <p className="text-xs text-slate-400 mt-0.5">{subtitle}</p>}
-      </div>
-      <div className="flex items-center gap-3">
-        {/* User Role Tag */}
-        {currentUser && (
-          <div className="hidden sm:flex items-center gap-2 px-2.5 py-1 rounded-lg bg-slate-800/80 border border-slate-700/80 text-xs">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-            <span className="text-slate-300 font-medium">{currentUser.nama.split(' ')[0]}</span>
-            <span className={cn(
-              'text-[10px] uppercase font-bold px-1.5 py-0.2 rounded',
-              currentUser.role === 'admin'
-                ? 'bg-red-500/20 text-red-300'
-                : currentUser.role === 'am'
-                ? 'bg-blue-500/20 text-blue-300'
-                : 'bg-emerald-500/20 text-emerald-300'
-            )}>
-              {currentUser.role}
-            </span>
-          </div>
-        )}
-
-        {/* Notification Bell */}
-        <button className="relative p-2 rounded-lg bg-slate-800 border border-slate-700 text-slate-400 hover:text-white hover:border-slate-600 transition-all">
-          <Bell size={16} />
-          <span className="absolute -top-0.5 -right-0.5 w-3.5 h-3.5 bg-red-500 rounded-full text-[9px] font-bold flex items-center justify-center text-white">
-            5
-          </span>
-        </button>
-
-        {/* Telkom Badge */}
-        <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-800 border border-slate-700">
-          <Building2 size={14} className="text-red-400" />
-          <span className="text-xs font-medium text-slate-300">Witel Jateng Utara</span>
-        </div>
-
-        {/* Logout Quick Button */}
-        {onLogout && (
-          <button
-            onClick={onLogout}
-            title="Keluar"
-            className="p-2 rounded-lg bg-slate-800 border border-slate-700 text-slate-400 hover:text-red-400 hover:border-red-500/40 transition-all"
-          >
-            <LogOut size={16} />
-          </button>
-        )}
       </div>
     </div>
   )

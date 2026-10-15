@@ -7,12 +7,12 @@ export interface Project {
   region: string
   budget: number
   procurementMethod: 'Tender/e-Katalog' | 'Penunjukan Langsung'
-  stage: 'F0' | 'F1' | 'F2' | 'F3' | 'WIN' | 'LOSS'
+  stage: 'F0' | 'F1' | 'F2' | 'F3' | 'F4' | 'F5' | 'Loss' | 'Cancel'
   progress: number
   startDate: string
   endDate: string
   pic: string
-  category: 'On Channel' | 'GTMA'
+  category: 'On Channel' | 'GTMA' | 'NGTMA'
   serviceType: string
   status: 'Active' | 'At Risk' | 'Completed' | 'Lost'
 }
@@ -63,7 +63,7 @@ export const PROJECTS: Project[] = [
     region: 'Salatiga',
     budget: 450_000_000,
     procurementMethod: 'Tender/e-Katalog',
-    stage: 'WIN',
+    stage: 'F5',
     progress: 100,
     startDate: '2024-01-20',
     endDate: '2024-04-20',
@@ -99,7 +99,7 @@ export const PROJECTS: Project[] = [
     region: 'Semarang',
     budget: 120_000_000,
     procurementMethod: 'Penunjukan Langsung',
-    stage: 'WIN',
+    stage: 'F5',
     progress: 100,
     startDate: '2024-02-15',
     endDate: '2024-03-15',
@@ -171,7 +171,7 @@ export const PROJECTS: Project[] = [
     region: 'Kebumen',
     budget: 280_000_000,
     procurementMethod: 'Tender/e-Katalog',
-    stage: 'LOSS',
+    stage: 'Loss',
     progress: 0,
     startDate: '2024-01-05',
     endDate: '2024-03-05',
@@ -220,16 +220,18 @@ export const COMPETITORS: CompetitorRecord[] = [
   },
 ]
 
-export const STAGE_LABELS = ['F0', 'F1', 'F2', 'F3', 'WIN'] as const
-export type Stage = typeof STAGE_LABELS[number] | 'LOSS'
+export const STAGE_LABELS = ['F0', 'F1', 'F2', 'F3', 'F4', 'F5'] as const
+export type Stage = typeof STAGE_LABELS[number] | 'Loss' | 'Cancel'
 
 export const STAGE_COLORS: Record<string, string> = {
   F0: '#6366f1',
   F1: '#f59e0b',
   F2: '#3b82f6',
   F3: '#8b5cf6',
-  WIN: '#10b981',
-  LOSS: '#ef4444',
+  F4: '#06b6d4',
+  F5: '#10b981',
+  Loss: '#ef4444',
+  Cancel: '#94a3b8',
 }
 
 export const TOP_OPTIONS = [

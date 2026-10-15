@@ -1,100 +1,74 @@
-import type { Pengguna, UserRole } from './types'
-
-export interface AuthUser extends Pengguna {
-  unit?: string
-  telepon?: string
+export interface AuthUser {
+  id: string
+  nama: string
+  email: string
 }
 
-export const DEFAULT_USERS: AuthUser[] = [
-  {
-    id: 'USR-001',
-    nama: 'Arya Wirawan, S.T., M.M.',
-    email: 'admin@telkom.co.id',
-    password: 'admin123',
-    role: 'admin',
-    avatar_initials: 'AW',
-    unit: 'Divisi B2G & Enterprise Jateng Utara',
-    telepon: '0812-2800-1001',
-    created_at: '2024-01-01T08:00:00Z',
-  },
-  {
-    id: 'USR-002',
-    nama: 'Budi Santoso, S.Kom.',
-    email: 'am.semarang@telkom.co.id',
-    password: 'am123',
-    role: 'am',
-    avatar_initials: 'BS',
-    unit: 'Account Manager Witel Jateng Utara',
-    telepon: '0813-9022-3344',
-    created_at: '2024-01-15T09:30:00Z',
-  },
-  {
-    id: 'USR-003',
-    nama: 'Verdy Rizky (Intern/Viewer)',
-    email: 'viewer@telkom.co.id',
-    password: 'viewer123',
-    role: 'viewer',
-    avatar_initials: 'VR',
-    unit: 'Government Business Intern',
-    telepon: '0857-1234-5678',
-    created_at: '2024-02-01T10:00:00Z',
-  },
-]
+interface AuthResponse {
+  user?: AuthUser
+  message?: string
+}
 
-const AUTH_STORAGE_KEY = 'b2g_telkom_auth_user'
-const USERS_LIST_KEY = 'b2g_telkom_users_list'
+let currentUser: AuthUser | null = null
+
+async function readResponse(response: Response): Promise<AuthResponse> {
+  const body = await response.json().catch(() => ({})) as AuthResponse
+  if (!response.ok) {
+    throw new Error(body.message || 'Permintaan autentikasi gagal.')
+  }
+  return body
+}
 
 export const AuthService = {
-  getUsers(): AuthUser[] {
-    try {
-      const stored = localStorage.getItem(USERS_LIST_KEY)
-      if (stored) {
-        return JSON.parse(stored)
-      }
-      localStorage.setItem(USERS_LIST_KEY, JSON.stringify(DEFAULT_USERS))
-      return DEFAULT_USERS
-    } catch {
-      return DEFAULT_USERS
-    }
+  getCurrentUser(): AuthUser | null {
+    return currentUser
   },
 
-  getCurrentUser(): AuthUser | null {
+  async restoreSession(): Promise<AuthUser | null> {
     try {
-      const data = localStorage.getItem(AUTH_STORAGE_KEY)
-      return data ? JSON.parse(data) : null
-    } catch {
+      localStorage.removeItem('b2g_telkom_auth_user')
+      localStorage.removeItem('b2g_telkom_users_list')
+    } catch (error) {
+      console.error('Failed to clear legacy browser-stored credentials:', error)
+    }
+    const response = await fetch('/api/auth/me', { credentials: 'same-origin' })
+    if (response.status === 401) {
+      currentUser = null
       return null
     }
+    const body = await readResponse(response)
+    currentUser = body.user ?? null
+    return currentUser
   },
 
-  login(email: string, password: string): { success: boolean; user?: AuthUser; message?: string } {
-    const users = this.getUsers()
-    const user = users.find(
-      (u) => u.email.toLowerCase().trim() === email.toLowerCase().trim()
-    )
-
-    if (!user) {
-      return { success: false, message: 'Email tidak terdaftar dalam sistem Telkom B2G.' }
-    }
-
-    if (user.password !== password) {
-      return { success: false, message: 'Kata sandi salah. Silakan coba lagi.' }
-    }
-
+  async login(email: string, password: string): Promise<{ success: boolean; user?: AuthUser; message?: string }> {
     try {
-      localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(user))
-    } catch (e) {
-      console.error('Failed to save session', e)
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      })
+      const body = await readResponse(response)
+      currentUser = body.user ?? null
+      return { success: Boolean(currentUser), user: currentUser ?? undefined }
+    } catch (error) {
+      return {
+        success: false,
+        message: error instanceof Error ? error.message : 'Login gagal.',
+      }
     }
-
-    return { success: true, user }
   },
 
-  logout(): void {
-    try {
-      localStorage.removeItem(AUTH_STORAGE_KEY)
-    } catch (e) {
-      console.error('Failed to clear session', e)
+  async logout(): Promise<void> {
+    const response = await fetch('/api/auth/logout', {
+      method: 'POST',
+      credentials: 'same-origin',
+    })
+    if (!response.ok && response.status !== 401) {
+      const body = await response.json().catch(() => ({})) as AuthResponse
+      throw new Error(body.message || 'Gagal mengakhiri sesi.')
     }
+    currentUser = null
   },
 }

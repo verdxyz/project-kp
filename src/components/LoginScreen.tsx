@@ -8,15 +8,10 @@ import {
   EyeOff,
   ShieldCheck,
   Sparkles,
-  UserCheck,
-  Briefcase,
-  Eye as EyeIcon,
-  CheckCircle2,
   AlertCircle,
   Activity,
-  Layers,
 } from 'lucide-react'
-import { AuthService, DEFAULT_USERS, type AuthUser } from '../lib/auth'
+import { AuthService, type AuthUser } from '../lib/auth'
 
 interface LoginScreenProps {
   onLoginSuccess: (user: AuthUser) => void
@@ -29,8 +24,8 @@ export function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
 
-  const handleLogin = (e?: React.FormEvent) => {
-    if (e) e.preventDefault()
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault()
     setError(null)
 
     if (!email.trim() || !password) {
@@ -39,29 +34,16 @@ export function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
     }
 
     setLoading(true)
-    setTimeout(() => {
-      const res = AuthService.login(email, password)
-      setLoading(false)
+    try {
+      const res = await AuthService.login(email, password)
       if (res.success && res.user) {
         onLoginSuccess(res.user)
       } else {
         setError(res.message || 'Login gagal.')
       }
-    }, 400)
-  }
-
-  const handleQuickLogin = (demoUser: AuthUser) => {
-    setEmail(demoUser.email)
-    setPassword(demoUser.password)
-    setError(null)
-    setLoading(true)
-    setTimeout(() => {
-      const res = AuthService.login(demoUser.email, demoUser.password)
+    } finally {
       setLoading(false)
-      if (res.success && res.user) {
-        onLoginSuccess(res.user)
-      }
-    }, 300)
+    }
   }
 
   return (
@@ -93,7 +75,7 @@ export function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
                 Telkom Enterprise
               </span>
             </div>
-            <p className="text-[11px] text-slate-400">Monitoring Pipeline Pengadaan Pemerintah (Salatiga – Brebes)</p>
+            <p className="text-[11px] text-slate-400">Manajemen Pengadaan Pemerintah (Jawa Tengah)</p>
           </div>
         </div>
 
@@ -116,13 +98,13 @@ export function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
 
             <div>
               <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight leading-tight">
-                Kelola Pipeline <br />
+              Kelola Proyek <br />
                 <span className="bg-gradient-to-r from-red-400 via-rose-300 to-blue-400 bg-clip-text text-transparent">
                   Pengadaan Pemerintah
                 </span>
               </h1>
               <p className="text-slate-400 text-sm mt-3 leading-relaxed">
-                Pantau proses tender SiRUP LKPP, progres tahapan F0 sampai Win, kepatuhan dokumen P0/P1, serta alur kontrak mitra secara terintegrasi.
+                Kelola data proyek pengadaan, tahapan F0 sampai F5, dokumen kontrak, dan layanan instansi secara terpusat.
               </p>
             </div>
 
@@ -140,48 +122,6 @@ export function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
               </p>
             </div>
 
-            {/* Quick Demo Selector */}
-            <div className="space-y-2">
-              <p className="text-xs font-semibold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
-                <UserCheck size={14} className="text-red-400" />
-                Pilih Akun Demo (1-Click Login):
-              </p>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
-                {DEFAULT_USERS.map((u) => {
-                  const roleStyle =
-                    u.role === 'admin'
-                      ? 'border-red-500/40 hover:border-red-500 bg-red-500/5'
-                      : u.role === 'am'
-                      ? 'border-blue-500/40 hover:border-blue-500 bg-blue-500/5'
-                      : 'border-emerald-500/40 hover:border-emerald-500 bg-emerald-500/5'
-
-                  const badgeColor =
-                    u.role === 'admin'
-                      ? 'bg-red-500/20 text-red-300'
-                      : u.role === 'am'
-                      ? 'bg-blue-500/20 text-blue-300'
-                      : 'bg-emerald-500/20 text-emerald-300'
-
-                  return (
-                    <button
-                      key={u.id}
-                      type="button"
-                      onClick={() => handleQuickLogin(u)}
-                      className={`text-left p-2.5 rounded-xl border transition-all duration-200 group hover:scale-[1.02] ${roleStyle}`}
-                    >
-                      <div className="flex items-center justify-between mb-1.5">
-                        <span className={`text-[10px] font-bold uppercase px-1.5 py-0.5 rounded ${badgeColor}`}>
-                          {u.role === 'admin' ? 'Admin' : u.role === 'am' ? 'AM' : 'Viewer'}
-                        </span>
-                        <ArrowRight size={12} className="text-slate-500 group-hover:text-white transition-colors" />
-                      </div>
-                      <p className="text-xs font-semibold text-white truncate">{u.nama.split(' ')[0]}</p>
-                      <p className="text-[10px] text-slate-400 truncate">{u.email.split('@')[0]}</p>
-                    </button>
-                  )
-                })}
-              </div>
-            </div>
           </div>
 
           {/* Right Column: Form Card */}
@@ -195,7 +135,7 @@ export function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
                   <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
                 </h2>
                 <p className="text-xs text-slate-400 mt-1">
-                  Gunakan email Telkom atau pilih salah satu akun demo di samping.
+                  Masuk menggunakan akun admin support yang dikelola secara terpusat.
                 </p>
               </div>
 
@@ -217,7 +157,7 @@ export function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
                       type="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      placeholder="contoh: am.semarang@telkom.co.id"
+                      placeholder="Email admin support"
                       className="w-full pl-10 pr-4 py-2.5 bg-slate-950/70 border border-slate-800 rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 transition-all"
                     />
                   </div>
@@ -226,7 +166,6 @@ export function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
                 <div>
                   <div className="flex items-center justify-between mb-1.5">
                     <label className="text-xs font-medium text-slate-300">Kata Sandi</label>
-                    <span className="text-[11px] text-slate-500">Default: password sesuai peran</span>
                   </div>
                   <div className="relative">
                     <Lock size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500" />
@@ -272,7 +211,7 @@ export function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
               <div className="mt-5 pt-4 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-slate-500">
                 <span className="flex items-center gap-1.5">
                   <ShieldCheck size={13} className="text-emerald-400" />
-                  Sesi aman (LocalStorage session)
+                  Sesi admin aman (cookie HTTP-only)
                 </span>
                 <span>v1.2.0 • Build Magang</span>
               </div>

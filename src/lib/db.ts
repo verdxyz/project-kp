@@ -8,7 +8,7 @@
 export interface ServiceItem {
   id: string
   name: string
-  category: 'On Channel' | 'GTMA'
+  category: 'On Channel' | 'GTMA' | 'NGTMA'
   serviceType: 'Astinet' | 'VPN IP' | 'Metro Ethernet' | 'SD-WAN' | 'Lainnya'
   bandwidth?: string
   sla: string
@@ -55,14 +55,17 @@ export interface ProjectEntry {
   region: string
   budget: number
   procurementMethod: 'Tender/e-Katalog' | 'Penunjukan Langsung'
-  stage: 'F0' | 'F1' | 'F2' | 'F3' | 'WIN' | 'LOSS'
+  stage: 'F0' | 'F1' | 'F2' | 'F3' | 'F4' | 'F5' | 'Loss' | 'Cancel'
   progress: number
   startDate: string
   endDate: string
   pic: string
-  category: 'On Channel' | 'GTMA'
+  category: 'On Channel' | 'GTMA' | 'NGTMA'
   serviceType: string
-  status: 'Active' | 'At Risk' | 'Completed' | 'Lost'
+  totalCapacityMbps: number | null
+  sid: string | null
+  subsidiaryName?: string | null
+  status: 'Active' | 'At Risk' | 'Completed' | 'Lost' | 'Cancelled'
   notes?: string
   createdAt: string
   updatedAt: string
@@ -73,7 +76,6 @@ export interface ProjectEntry {
 const KEYS = {
   services: 'b2g_services',
   customers: 'b2g_customers',
-  projects: 'b2g_projects',
 } as const
 
 // ─── Generic Helpers ─────────────────────────────────────────────────────────
@@ -196,46 +198,53 @@ export const CustomersDB = {
 // ─── Projects CRUD ────────────────────────────────────────────────────────────
 
 export const ProjectsDB = {
-  getAll(): ProjectEntry[] {
-    return loadAll<ProjectEntry>(KEYS.projects)
+  async getAll(): Promise<ProjectEntry[]> {
+    const response = await fetch('/api/projects', { credentials: 'same-origin' })
+    const body = await response.json()
+    if (!response.ok) throw new Error(body.message || 'Gagal memuat data proyek.')
+    return body.projects as ProjectEntry[]
   },
 
-  getById(id: string): ProjectEntry | undefined {
-    return this.getAll().find((p) => p.id === id)
+  async getById(idLOP: string): Promise<ProjectEntry | undefined> {
+    const response = await fetch(`/api/projects/${encodeURIComponent(idLOP)}`, { credentials: 'same-origin' })
+    if (response.status === 404) return undefined
+    const body = await response.json()
+    if (!response.ok) throw new Error(body.message || 'Gagal memuat proyek.')
+    return body.project as ProjectEntry
   },
 
-  create(data: Omit<ProjectEntry, 'id' | 'createdAt' | 'updatedAt'>): ProjectEntry {
-    const item: ProjectEntry = {
-      ...data,
-      id: generateId('PRJ'),
-      createdAt: now(),
-      updatedAt: now(),
+  async create(data: Omit<ProjectEntry, 'id' | 'createdAt' | 'updatedAt'>): Promise<ProjectEntry> {
+    const response = await fetch('/api/projects', {
+      method: 'POST',
+      credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    })
+    const body = await response.json()
+    if (!response.ok) throw new Error(body.message || 'Gagal menyimpan proyek.')
+    return body.project as ProjectEntry
+  },
+
+  async update(id: string, data: Omit<ProjectEntry, 'id' | 'createdAt' | 'updatedAt'>): Promise<ProjectEntry> {
+    const response = await fetch(`/api/projects/${encodeURIComponent(id)}`, {
+      method: 'PUT',
+      credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    })
+    const body = await response.json()
+    if (!response.ok) throw new Error(body.message || 'Gagal memperbarui proyek.')
+    return body.project as ProjectEntry
+  },
+
+  async delete(idLOP: string): Promise<void> {
+    const response = await fetch(`/api/projects/${encodeURIComponent(idLOP)}`, {
+      method: 'DELETE',
+      credentials: 'same-origin',
+    })
+    if (!response.ok) {
+      const body = await response.json().catch(() => ({}))
+      throw new Error(body.message || 'Gagal menghapus proyek.')
     }
-    const all = this.getAll()
-    all.push(item)
-    saveAll(KEYS.projects, all)
-    return item
-  },
-
-  update(id: string, data: Partial<Omit<ProjectEntry, 'id' | 'createdAt'>>): ProjectEntry | null {
-    const all = this.getAll()
-    const idx = all.findIndex((p) => p.id === id)
-    if (idx === -1) return null
-    all[idx] = { ...all[idx], ...data, updatedAt: now() }
-    saveAll(KEYS.projects, all)
-    return all[idx]
-  },
-
-  delete(id: string): boolean {
-    const all = this.getAll()
-    const filtered = all.filter((p) => p.id !== id)
-    if (filtered.length === all.length) return false
-    saveAll(KEYS.projects, filtered)
-    return true
-  },
-
-  seed(items: Omit<ProjectEntry, 'id' | 'createdAt' | 'updatedAt'>[]): void {
-    if (this.getAll().length > 0) return
-    items.forEach((item) => this.create(item))
   },
 }

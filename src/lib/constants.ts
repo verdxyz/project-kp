@@ -12,20 +12,22 @@ import type {
 // ═══════════════════════════════════════════════════════════════
 
 export const MASTER_INSTANSI = [
-  { nama: 'Kota Salatiga', tipe: 'pemkot' as const, wilayah: 'Salatiga' },
-  { nama: 'Kab. Semarang', tipe: 'pemkab' as const, wilayah: 'Semarang' },
+  { nama: 'Pemkot Salatiga', tipe: 'pemkot' as const, wilayah: 'Salatiga' },
+  { nama: 'Kabupaten Semarang', tipe: 'pemkab' as const, wilayah: 'Semarang' },
   { nama: 'Kota Semarang', tipe: 'pemkot' as const, wilayah: 'Semarang' },
-  { nama: 'Kab. Kendal', tipe: 'pemkab' as const, wilayah: 'Kendal' },
-  { nama: 'Kab. Batang', tipe: 'pemkab' as const, wilayah: 'Batang' },
-  { nama: 'Kab. Pekalongan', tipe: 'pemkab' as const, wilayah: 'Pekalongan' },
+  { nama: 'Pemkab Kendal', tipe: 'pemkab' as const, wilayah: 'Kendal' },
+  { nama: 'Pemkab Batang', tipe: 'pemkab' as const, wilayah: 'Batang' },
+  { nama: 'Pemkab Pekalongan', tipe: 'pemkab' as const, wilayah: 'Pekalongan' },
   { nama: 'Kota Pekalongan', tipe: 'pemkot' as const, wilayah: 'Pekalongan' },
-  { nama: 'Kab. Pemalang', tipe: 'pemkab' as const, wilayah: 'Pemalang' },
+  { nama: 'Pemkab Pemalang', tipe: 'pemkab' as const, wilayah: 'Pemalang' },
   { nama: 'Kota Tegal', tipe: 'pemkot' as const, wilayah: 'Tegal' },
-  { nama: 'Kab. Tegal', tipe: 'pemkab' as const, wilayah: 'Tegal' },
-  { nama: 'Kab. Brebes', tipe: 'pemkab' as const, wilayah: 'Brebes' },
+  { nama: 'Pemkab Tegal', tipe: 'pemkab' as const, wilayah: 'Tegal' },
+  { nama: 'Pemkab Brebes', tipe: 'pemkab' as const, wilayah: 'Brebes' },
   { nama: 'Provinsi Jawa Tengah', tipe: 'provinsi' as const, wilayah: 'Semarang' },
   { nama: 'Polda Jawa Tengah', tipe: 'polda' as const, wilayah: 'Semarang' },
 ] as const
+
+export const MASTER_INSTANSI_NAMES = MASTER_INSTANSI.map((agency) => agency.nama)
 
 // ═══════════════════════════════════════════════════════════════
 // JENIS LAYANAN
@@ -77,20 +79,23 @@ export const METODE_PENGADAAN_LIST: { value: MetodePengadaan; label: string }[] 
 // ═══════════════════════════════════════════════════════════════
 
 export const STATUS_LOP_LABELS: Record<StatusLOP, { label: string; color: string; bg: string; border: string }> = {
-  inisiasi: { label: 'Inisiasi', color: '#818cf8', bg: '#6366f120', border: '#6366f140' },
   in_progress: { label: 'In Progress', color: '#3b82f6', bg: '#3b82f620', border: '#3b82f640' },
-  win: { label: 'Win', color: '#10b981', bg: '#10b98120', border: '#10b98140' },
-  kalah: { label: 'Kalah', color: '#ef4444', bg: '#ef444420', border: '#ef444440' },
+  F5: { label: 'F5 — Berhasil', color: '#10b981', bg: '#10b98120', border: '#10b98140' },
+  Loss: { label: 'Loss — Kalah', color: '#ef4444', bg: '#ef444420', border: '#ef444440' },
+  Cancel: { label: 'Cancel — Batal', color: '#94a3b8', bg: '#64748b20', border: '#64748b40' },
 }
 
-export const TAHAP_PIPELINE_LIST: TahapPipeline[] = ['F0', 'F1', 'F2', 'F3', 'win']
+export const TAHAP_PIPELINE_LIST: TahapPipeline[] = ['F0', 'F1', 'F2', 'F3', 'F4', 'F5', 'Loss', 'Cancel']
 
 export const TAHAP_PIPELINE_COLORS: Record<TahapPipeline, string> = {
   F0: '#6366f1',
   F1: '#f59e0b',
   F2: '#3b82f6',
   F3: '#8b5cf6',
-  win: '#10b981',
+  F4: '#06b6d4',
+  F5: '#10b981',
+  Loss: '#ef4444',
+  Cancel: '#94a3b8',
 }
 
 // ═══════════════════════════════════════════════════════════════

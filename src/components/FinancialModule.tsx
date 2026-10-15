@@ -186,7 +186,7 @@ export function FinancialModule() {
       topScheme: topOptionObj?.label || 'Bulanan (Monthly)',
       status: isDiscountExceeded ? 'need_gm_approval' : 'approved',
       createdAt: new Date().toLocaleString('id-ID', { dateStyle: 'short', timeStyle: 'short' }),
-      createdBy: currentUser ? `${currentUser.nama} (${currentUser.role.toUpperCase()})` : 'Account Manager',
+      createdBy: currentUser ? `${currentUser.nama} (ADMIN SUPPORT)` : 'Admin Support',
     }
 
     setDiscountsList([newJustification, ...discountsList])
@@ -208,7 +208,7 @@ export function FinancialModule() {
       telkomPrice: finalPrice > 0 ? finalPrice : priceNum,
       notes: competitorNotes.trim() || 'Evaluasi harga dan keunggulan teknis kompetitor',
       createdAt: new Date().toLocaleString('id-ID', { dateStyle: 'short', timeStyle: 'short' }),
-      createdBy: currentUser ? `${currentUser.nama} (${currentUser.role.toUpperCase()})` : 'Account Manager',
+      createdBy: currentUser ? `${currentUser.nama} (ADMIN SUPPORT)` : 'Admin Support',
     }
 
     setCompetitorsList([newEntry, ...competitorsList])

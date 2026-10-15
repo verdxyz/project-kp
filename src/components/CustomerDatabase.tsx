@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react"
-import { Building2, Plus, Search, Edit3, Trash2, X, Check, AlertCircle, ChevronDown, Phone, Mail, MapPin, User, DollarSign } from "lucide-react"
+import { Building2, Plus, Edit3, Trash2, X, Check, AlertCircle, ChevronDown, Phone, Mail, MapPin, User, DollarSign } from "lucide-react"
 import { cn } from "../lib/utils"
 import { CustomersDB } from "../lib/db"
 import type { Customer } from "../lib/db"
@@ -235,9 +235,8 @@ export function CustomerDatabase() {
         ))}
       </div>
       <div className="flex items-center gap-3 flex-wrap">
-        <div className="relative flex-1 min-w-48">
-          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
-          <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Cari instansi, PIC, atau wilayah..." className="form-input pl-9 py-2" />
+        <div className="flex-1 min-w-48">
+          <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Cari instansi, PIC, atau wilayah..." className="form-input py-2" />
         </div>
         <div className="flex gap-1 p-1 rounded-xl bg-slate-800 border border-slate-700/50">
           {["Semua", "Aktif", "Prospek", "Tidak Aktif"].map(s => (
