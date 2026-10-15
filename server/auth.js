@@ -19,7 +19,6 @@ export async function seedGlobalAdmin() {
      ON CONFLICT (singleton) DO UPDATE SET
        email = EXCLUDED.email,
        display_name = EXCLUDED.display_name,
-       password_hash = EXCLUDED.password_hash,
        updated_at = now()`,
     [email, displayName, passwordHash],
   )

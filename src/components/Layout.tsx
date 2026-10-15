@@ -29,7 +29,6 @@ const NAV_ITEMS: NavItem[] = [
     label: 'Data Layanan',
     icon: Wifi,
     children: [
-      { id: 'gtma', label: 'GTMA Services' },
       { id: 'customers-db', label: 'Database Instansi' },
     ],
   },
