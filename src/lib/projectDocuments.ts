@@ -24,7 +24,15 @@ export interface ProjectDocument {
   uploadedAt: string
 }
 
-export const PROJECT_DOCUMENT_TYPES: { id: ProjectDocumentType; label: string }[] = [
+export interface ProjectDocumentTypeOption {
+  id: ProjectDocumentType
+  label: string
+  helperText?: string
+  templateUrl?: string
+  aliases?: ProjectDocumentType[]
+}
+
+export const PROJECT_DOCUMENT_TYPES: ProjectDocumentTypeOption[] = [
   { id: 'p0', label: 'P0' },
   { id: 'p1', label: 'P1' },
   { id: 'ba_split', label: 'BA Split' },
@@ -35,22 +43,34 @@ export const PROJECT_DOCUMENT_TYPES: { id: ProjectDocumentType; label: string }[
   { id: 'other', label: 'Lain-lain' },
 ]
 
-export const NGTMA_DOCUMENT_TYPES: { id: ProjectDocumentType; label: string }[] = [
-  { id: 'ngtma_agreement', label: 'BA Kesepakatan NGTMA' },
-  { id: 'nce_quote', label: 'Quote NCE' },
-  { id: 'rpa', label: 'Dokumen RPA' },
-  { id: 'contract', label: 'Kontrak' },
-  { id: 'bast', label: 'BAST' },
-  { id: 'invoice', label: 'Invoice' },
-  { id: 'billing_evidence', label: 'Billing Evidence' },
+export const NGTMA_DOCUMENT_TYPES: ProjectDocumentTypeOption[] = [
+  {
+    id: 'ngtma_agreement',
+    label: 'BA Kesepakatan NGTMA',
+    helperText: 'Antara GM Telkom (Segmen/Witel) dan GM AP setingkat. Tanggal BA sebelum submit lelang/sebelum SPK.',
+    templateUrl: 'https://tlkm.id/RybUgR',
+  },
+  { id: 'nce_quote', label: 'Quote NCX' },
+  {
+    id: 'rpa',
+    label: 'Dokumen RPA',
+    helperText: 'RPA proyek NGTMA mengikuti template. Tanggal RPA sebelum submit lelang/sebelum SPK.',
+    templateUrl: 'https://tlkm.id/RybUgR',
+  },
+  { id: 'contract', label: 'Dokumen Kontrak / SPPBJ' },
+  { id: 'bast', label: 'Dokumen Delivery / BAST' },
+  { id: 'billing_evidence', label: 'Billing Evidence / Invoice', aliases: ['invoice'] },
 ]
 
-export function getProjectDocumentTypes(category: string) {
+export function getProjectDocumentTypes(category: string): ProjectDocumentTypeOption[] {
   return category === 'NGTMA' ? NGTMA_DOCUMENT_TYPES : PROJECT_DOCUMENT_TYPES
 }
 
-export function getProjectDocumentLabel(documentType: ProjectDocumentType) {
-  return [...PROJECT_DOCUMENT_TYPES, ...NGTMA_DOCUMENT_TYPES].find((type) => type.id === documentType)?.label ?? documentType
+export function getProjectDocumentLabel(documentType: ProjectDocumentType, category?: string) {
+  const documentTypes = category === 'NGTMA'
+    ? [...NGTMA_DOCUMENT_TYPES, ...PROJECT_DOCUMENT_TYPES]
+    : [...PROJECT_DOCUMENT_TYPES, ...NGTMA_DOCUMENT_TYPES]
+  return documentTypes.find((type) => type.id === documentType || type.aliases?.includes(documentType))?.label ?? documentType
 }
 
 async function responseJson(response: Response) {

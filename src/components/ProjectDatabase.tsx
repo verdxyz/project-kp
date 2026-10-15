@@ -213,6 +213,10 @@ function ProjectModal({ mode, initial, fixedCategory, onSave, onClose, saving, s
     if (validate()) void onSave(form, files)
   }
 
+  const matchingServices = services.filter((service) => service.category === (fixedCategory ?? form.category))
+  const availablePICs = customers.filter((customer) => customer.picName.trim())
+  const documentTypes = getProjectDocumentTypes(form.category)
+
   const selectFile = (documentType: ProjectDocumentType, file?: File) => {
     setFiles((current) => {
       const next = { ...current }
@@ -221,10 +225,6 @@ function ProjectModal({ mode, initial, fixedCategory, onSave, onClose, saving, s
       return next
     })
   }
-
-  const matchingServices = services.filter((service) => service.category === (fixedCategory ?? form.category))
-  const availablePICs = customers.filter((customer) => customer.picName.trim())
-  const documentTypes = getProjectDocumentTypes(form.category)
 
   const handleServiceSelection = (value: string) => {
     if (value.startsWith('catalog:')) {
@@ -420,32 +420,47 @@ function ProjectModal({ mode, initial, fixedCategory, onSave, onClose, saving, s
             <textarea value={form.notes ?? ''} onChange={(event) => set('notes', event.target.value)} rows={2} className="form-input resize-none" />
           </Field>
 
-          <section className="space-y-3 border-t border-slate-800 pt-4">
-            <div>
-              <h4 className="text-sm font-semibold text-white">Dokumen berdasarkan ID LOP</h4>
-              <p className="text-xs text-slate-500 mt-1">File PDF, Office, atau gambar; maksimal 10 MB per dokumen.</p>
-            </div>
-            {documentError && <p className="text-xs text-red-400">{documentError}</p>}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              {documentTypes.map((documentType) => {
-                const existing = documents.find((document) => document.documentType === documentType.id)
-                return (
-                  <label key={documentType.id} className="block p-3 rounded-xl border border-slate-700/70 bg-slate-950/40">
-                    <span className="block text-xs font-semibold text-slate-300 mb-2">{documentType.label}</span>
-                    <input
-                      type="file"
-                      accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg"
-                      onChange={(event) => selectFile(documentType.id, event.target.files?.[0])}
-                      className="block w-full text-xs text-slate-400 file:mr-2 file:rounded-lg file:border-0 file:bg-slate-700 file:px-2 file:py-1 file:text-xs file:text-slate-200"
-                    />
-                    <span className="block text-[11px] text-slate-500 mt-1 truncate">
-                      {files[documentType.id]?.name ?? (existing ? `Tersimpan: ${existing.originalName}` : 'Belum diunggah')}
-                    </span>
-                  </label>
-                )
-              })}
-            </div>
-          </section>
+          {mode === 'edit' && (
+            <section className="space-y-3 border-t border-slate-800 pt-4">
+              <div>
+                <h4 className="text-sm font-semibold text-white">Dokumen berdasarkan ID LOP</h4>
+                <p className="text-xs text-slate-500 mt-1">File PDF, Office, atau gambar; maksimal 10 MB per dokumen.</p>
+                {form.category === 'NGTMA' && (
+                  <p className="mt-2 text-[11px] leading-relaxed text-slate-400">
+                    Dokumen ini wajib sebagai evidence Kontrak Management dan dapat dilengkapi bertahap saat edit. Kirim melalui NDE ke Segmen dengan tembusan GPO untuk pencatatan performa dan input pada aplikasi Web NGTMA.
+                  </p>
+                )}
+              </div>
+              {documentError && <p role="alert" className="text-xs text-red-400">{documentError}</p>}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {documentTypes.map((documentType) => {
+                  const existing = documents.find((document) => (
+                    document.documentType === documentType.id || documentType.aliases?.includes(document.documentType)
+                  ))
+                  return (
+                    <label key={documentType.id} className="block p-3 rounded-xl border border-slate-700/70 bg-slate-950/40">
+                      <span className="block text-xs font-semibold text-slate-300 mb-2">{documentType.label}</span>
+                      {documentType.helperText && <span className="mb-2 block text-[11px] text-amber-300">{documentType.helperText}</span>}
+                      {documentType.templateUrl && (
+                        <a href={documentType.templateUrl} target="_blank" rel="noreferrer" className="mb-2 inline-block text-[11px] text-blue-400 hover:text-blue-300">
+                          Unduh template
+                        </a>
+                      )}
+                      <input
+                        type="file"
+                        accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg"
+                        onChange={(event) => selectFile(documentType.id, event.target.files?.[0])}
+                        className="block w-full text-xs text-slate-400 file:mr-2 file:rounded-lg file:border-0 file:bg-slate-700 file:px-2 file:py-1 file:text-xs file:text-slate-200"
+                      />
+                      <span className="block text-[11px] text-slate-500 mt-1 truncate">
+                        {files[documentType.id]?.name ?? (existing ? `Tersimpan: ${existing.originalName}` : 'Belum diunggah')}
+                      </span>
+                    </label>
+                  )
+                })}
+              </div>
+            </section>
+          )}
 
           <div className="flex gap-3 pt-2">
             <button type="button" onClick={onClose} className="btn-secondary flex-1" disabled={saving}>Batal</button>
@@ -512,7 +527,7 @@ export function ProjectDocumentsModal({ idLOP, category, onClose }: {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/70" onClick={onClose} />
-      <section className="relative w-full max-w-xl rounded-2xl border border-slate-700 bg-slate-900 p-5 shadow-2xl">
+      <section className="relative max-h-[92vh] w-full max-w-xl overflow-y-auto rounded-2xl border border-slate-700 bg-slate-900 p-5 shadow-2xl">
         <header className="flex items-start justify-between border-b border-slate-800 pb-4">
           <div>
             <h3 className="font-bold text-white">Dokumen Proyek</h3>
@@ -525,25 +540,29 @@ export function ProjectDocumentsModal({ idLOP, category, onClose }: {
           <ul className="mt-3 divide-y divide-slate-800">
             {getProjectDocumentTypes(category).map((type) => {
               const document = documents.find((item) => item.documentType === type.id)
+                ?? documents.find((item) => type.aliases?.includes(item.documentType))
               return (
-                <li key={type.id} className="flex items-center justify-between gap-3 py-3">
-                  <div className="min-w-0">
-                    <p className="text-sm font-medium text-slate-200">{type.label}</p>
-                    <p className="truncate text-xs text-slate-500">
-                      {document ? `${document.originalName} · ${formatBytes(document.sizeBytes)}` : 'Belum diunggah'}
-                    </p>
+                <li key={type.id} className="space-y-2 py-3">
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium text-slate-200">{type.label}</p>
+                      <p className="truncate text-xs text-slate-500">
+                        {document ? `${document.originalName} · ${formatBytes(document.sizeBytes)}` : 'Belum diunggah'}
+                      </p>
+                    </div>
+                    {document && (
+                      <button
+                        type="button"
+                        onClick={() => void handleDownload(document)}
+                        disabled={downloading === type.id}
+                        title={`Unduh ${document.originalName}`}
+                        aria-label={`Unduh ${document.originalName}`}
+                        className="rounded-lg p-2 text-blue-400 hover:bg-blue-500/10 disabled:opacity-50"
+                      >
+                        <Download size={16} />
+                      </button>
+                    )}
                   </div>
-                  {document && (
-                    <button
-                      type="button"
-                      onClick={() => void handleDownload(document)}
-                      disabled={downloading === type.id}
-                      title={`Unduh ${document.originalName}`}
-                      className="rounded-lg p-2 text-blue-400 hover:bg-blue-500/10 disabled:opacity-50"
-                    >
-                      <Download size={16} />
-                    </button>
-                  )}
                 </li>
               )
             })}
@@ -608,11 +627,11 @@ export function ProjectDatabase({ initialCategory }: { initialCategory?: Project
       setProjects((current) => mode === 'add'
         ? [saved, ...current]
         : current.map((project) => project.id === saved.id ? saved : project))
-      if (mode === 'add') setModal({ mode: 'edit', editId: saved.id })
-      for (const documentType of getProjectDocumentTypes(form.category)) {
+      for (const documentType of getProjectDocumentTypes(projectForm.category)) {
         const file = files[documentType.id]
         if (file) await ProjectDocuments.upload(saved.idLOP, documentType.id, file)
       }
+      if (mode === 'add') setModal({ mode: 'edit', editId: saved.id })
       setModal(null)
       await load()
     } catch (error) {

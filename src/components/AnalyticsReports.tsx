@@ -18,7 +18,6 @@ import {
   Calendar,
   X,
   ChevronRight,
-  ShieldCheck,
   Percent,
   Activity,
   FileText,
@@ -794,7 +793,7 @@ function ProjectDetailModal({ project, onClose }: ProjectDetailModalProps) {
                   <li key={document.id} className="flex items-center justify-between gap-3 py-2.5 first:pt-0 last:pb-0">
                     <div className="min-w-0">
                       <p className="text-[10px] font-semibold text-blue-400">
-                        {getProjectDocumentLabel(document.documentType)}
+                        {getProjectDocumentLabel(document.documentType, project.category)}
                       </p>
                       <p className="truncate text-xs text-slate-200" title={document.originalName}>{document.originalName}</p>
                     </div>
@@ -813,37 +812,6 @@ function ProjectDetailModal({ project, onClose }: ProjectDetailModalProps) {
               </ul>
             )}
           </section>
-
-          {/* 3. Compliance & Risk Audit Note */}
-          <div className="p-4 rounded-xl bg-slate-900 border border-slate-800 space-y-2">
-            <h4 className="font-bold text-white uppercase tracking-wider text-[11px] flex items-center gap-1.5">
-              <ShieldCheck size={14} className="text-emerald-400" />
-              Kelayakan Regulasi & Catatan Account Manager
-            </h4>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
-              <div className="p-2.5 rounded-lg bg-slate-950 border border-slate-800/80">
-                <span className="text-slate-400 text-[10px]">Aturan Dokumen P0 / P1</span>
-                <p className="text-slate-200 font-medium mt-0.5">
-                  {project.category === 'GTMA'
-                    ? 'Wajib P0 & P1 (Komponen perangkat & mitra)'
-                    : 'Dokumen P1 Opsional (Konektivitas On Channel murni)'}
-                </p>
-              </div>
-
-              <div className="p-2.5 rounded-lg bg-slate-950 border border-slate-800/80">
-                <span className="text-slate-400 text-[10px]">Skema Penagihan (Term of Payment)</span>
-                <p className="text-slate-200 font-medium mt-0.5">
-                  {project.category === 'On Channel' ? 'Bulanan (Monthly Recurring Charge)' : 'Termin Pengerjaan (Milestone 2x/3x)'}
-                </p>
-              </div>
-            </div>
-
-            {project.notes && (
-              <div className="mt-2 p-2.5 rounded-lg bg-blue-500/10 border border-blue-500/20 text-blue-300 text-[11px]">
-                <strong>Catatan Proyek:</strong> {project.notes}
-              </div>
-            )}
-          </div>
 
         </div>
 
