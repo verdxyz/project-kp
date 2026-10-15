@@ -10,7 +10,6 @@ import {
   TrendingUp,
   Database,
   FolderPlus,
-  MapPin,
 } from 'lucide-react'
 import { cn } from '../lib/utils'
 
@@ -25,7 +24,6 @@ interface NavItem {
 const NAV_ITEMS: NavItem[] = [
   { id: 'contracts', label: 'Kontrak & Dokumen', icon: FileText, badge: 3 },
   { id: 'analytics', label: 'Analytics & Laporan', icon: BarChart3 },
-  { id: 'maps', label: 'Maps', icon: MapPin },
   {
     id: 'services',
     label: 'Data Layanan',

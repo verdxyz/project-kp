@@ -4,6 +4,8 @@ import { cn } from "../lib/utils"
 import { ServicesDB } from "../lib/db"
 import type { ServiceItem } from "../lib/db"
 
+const SERVICE_TYPES = ["HSI", "WiFi", "Astinet", "IP Transit", "VPN", "Metro", "DDOS", "UHOS", "PIJAR", "NETMONK"]
+
 const SEED_SERVICES = [
   { name: "Astinet Dedicated 100 Mbps", category: "On Channel", serviceType: "Astinet", bandwidth: "100 Mbps", sla: "99.5%", priceMonthly: 8500000, description: "Layanan internet dedicated enterprise berkecepatan tinggi dengan SLA terjamin", features: ["IP Publik Statis", "SLA 99.5%", "Monitoring 24/7", "Redundant Path"], status: "Aktif" },
   { name: "Astinet Dedicated 50 Mbps", category: "On Channel", serviceType: "Astinet", bandwidth: "50 Mbps", sla: "99.5%", priceMonthly: 4800000, description: "Layanan internet dedicated untuk instansi skala menengah", features: ["IP Publik Statis", "SLA 99.5%", "Monitoring 24/7"], status: "Aktif" },
@@ -89,7 +91,7 @@ function ServiceModal({ mode, initial, onSave, onClose }: ModalProps) {
               <label className="block text-xs font-semibold text-slate-400 mb-1.5">Tipe Layanan</label>
               <div className="relative">
                 <select value={form.serviceType} onChange={e => set("serviceType", e.target.value)} className="form-input appearance-none pr-8">
-                  {["Astinet", "VPN IP", "Metro Ethernet", "SD-WAN", "Lainnya"].map(t => <option key={t}>{t}</option>)}
+                  {SERVICE_TYPES.map(t => <option key={t}>{t}</option>)}
                 </select>
                 <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
               </div>
@@ -227,7 +229,6 @@ export function ServicesCatalog({ initialCategory = "Semua" }: ServicesCatalogPr
     const { id: _id, createdAt: _c, updatedAt: _u, ...rest } = svc
     return rest
   }
-  const SERVICE_TYPES = ["Semua", "Astinet", "VPN IP", "Metro Ethernet", "SD-WAN", "Lainnya"]
   const SERVICE_CATEGORIES = ["Semua", "On Channel", "GTMA", "NGTMA"]
   const stats = {
     total: services.length,
@@ -241,21 +242,30 @@ export function ServicesCatalog({ initialCategory = "Semua" }: ServicesCatalogPr
           <div key={s.label} className="card-glass rounded-xl px-5 py-4"><p className="text-xs text-slate-500">{s.label}</p><p className={cn("text-xl font-bold mt-0.5", s.color)}>{s.value}</p></div>
         ))}
       </div>
-      <div className="flex items-center gap-3 flex-wrap">
-        <div className="flex-1 min-w-48">
-          <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Cari layanan..." className="form-input py-2" />
+      <div className="space-y-3">
+        <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Cari layanan..." className="form-input py-2" />
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto] items-end gap-3">
+          <label className="block text-xs font-semibold text-slate-400">
+            Tipe Layanan
+            <span className="relative mt-1.5 block">
+              <select value={filterType} onChange={e => setFilterType(e.target.value)} className="form-input w-full appearance-none pr-8 text-sm font-normal">
+                <option value="Semua">Semua Tipe</option>
+                {SERVICE_TYPES.map(type => <option key={type} value={type}>{type}</option>)}
+              </select>
+              <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+            </span>
+          </label>
+          <label className="block text-xs font-semibold text-slate-400">
+            Kategori
+            <span className="relative mt-1.5 block">
+              <select value={filterCategory} onChange={e => setFilterCategory(e.target.value)} className="form-input w-full appearance-none pr-8 text-sm font-normal">
+                {SERVICE_CATEGORIES.map(category => <option key={category} value={category}>{category === "Semua" ? "Semua Kategori" : category}</option>)}
+              </select>
+              <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+            </span>
+          </label>
+          <button onClick={() => setModal({ open: true, mode: "add" })} className="btn-primary flex items-center justify-center gap-2" id="btn-add-service"><Plus size={15} />Tambah Layanan</button>
         </div>
-        <div className="flex gap-1 p-1 rounded-xl bg-slate-800 border border-slate-700/50">
-          {SERVICE_TYPES.map(t => (
-            <button key={t} onClick={() => setFilterType(t)} className={cn("text-xs px-3 py-1.5 rounded-lg font-medium transition-all", filterType === t ? "bg-blue-600 text-white shadow-sm" : "text-slate-400 hover:text-slate-200 hover:bg-slate-700/50")}>{t}</button>
-          ))}
-        </div>
-        <div className="flex gap-1 p-1 rounded-xl bg-slate-800 border border-slate-700/50">
-          {SERVICE_CATEGORIES.map(category => (
-            <button key={category} onClick={() => setFilterCategory(category)} className={cn("text-xs px-3 py-1.5 rounded-lg font-medium transition-all", filterCategory === category ? "bg-blue-600 text-white shadow-sm" : "text-slate-400 hover:text-slate-200 hover:bg-slate-700/50")}>{category}</button>
-          ))}
-        </div>
-        <button onClick={() => setModal({ open: true, mode: "add" })} className="btn-primary flex items-center gap-2" id="btn-add-service"><Plus size={15} />Tambah Layanan</button>
       </div>
       {filtered.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-16 text-center">

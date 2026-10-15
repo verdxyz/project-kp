@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react'
-import { MapPin } from 'lucide-react'
 import { Sidebar, Topbar } from './components/Layout'
 import { ServicesCatalog } from './components/ServicesCatalog'
 import { CustomerDatabase } from './components/CustomerDatabase'
@@ -33,11 +32,10 @@ function SectionHeader({
 }
 
 // Map nav IDs to one of view buckets
-type ViewKey = 'contracts' | 'services-catalog' | 'customers-db' | 'projects-db' | 'analytics' | 'maps'
+type ViewKey = 'contracts' | 'services-catalog' | 'customers-db' | 'projects-db' | 'analytics'
 
 const VIEW_MAP: Record<string, ViewKey> = {
   analytics: 'analytics',
-  maps: 'maps',
   services: 'services-catalog',
   'services-catalog': 'services-catalog',
   'customers-db': 'customers-db',
@@ -111,8 +109,6 @@ export default function App() {
               ? activeMenu === 'gtma' ? 'GTMA Services' : 'Input & Manajemen Proyek'
               : activeView === 'analytics'
               ? 'Analytics & Laporan Proyek'
-              : activeView === 'maps'
-              ? 'Maps'
               : 'B2G Project & Contract Management'
           }
           subtitle={
@@ -130,8 +126,6 @@ export default function App() {
                 : 'Manajemen data pengadaan, progres, dan dokumen proyek'
               : activeView === 'analytics'
               ? 'Analisis progres pekerjaan per tahap dan performa proyek'
-              : activeView === 'maps'
-              ? 'Integrasi Maps disiapkan bersama tim pengembang terkait'
               : 'Telkom Indonesia · Witel Jateng Utara · Dashboard Pengadaan Pemerintah'
           }
         />
@@ -200,16 +194,6 @@ export default function App() {
           {activeView === 'analytics' && (
             <section>
               <AnalyticsReports />
-            </section>
-          )}
-
-          {activeView === 'maps' && (
-            <section>
-              <SectionHeader title="Maps" subtitle="Integrasi peta akan dikembangkan bersama tim terkait" />
-              <div className="flex min-h-64 flex-col items-center justify-center rounded-xl border border-dashed border-slate-700 bg-slate-900/60 text-center">
-                <MapPin size={28} className="mb-3 text-slate-500" />
-                <p className="text-sm font-semibold text-slate-300">Peta belum terhubung</p>
-              </div>
             </section>
           )}
 

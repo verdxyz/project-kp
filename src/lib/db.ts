@@ -9,7 +9,7 @@ export interface ServiceItem {
   id: string
   name: string
   category: 'On Channel' | 'GTMA' | 'NGTMA'
-  serviceType: 'Astinet' | 'VPN IP' | 'Metro Ethernet' | 'SD-WAN' | 'Lainnya'
+  serviceType: 'HSI' | 'WiFi' | 'Astinet' | 'IP Transit' | 'VPN' | 'Metro' | 'DDOS' | 'UHOS' | 'PIJAR' | 'NETMONK' | 'VPN IP' | 'Metro Ethernet' | 'SD-WAN' | 'Lainnya'
   bandwidth?: string
   sla: string
   priceMonthly: number

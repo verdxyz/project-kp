@@ -170,18 +170,33 @@ export function AnalyticsReports() {
   }
 
   const handleExportCSV = () => {
-    const headers = ['ID LOP,Nama Proyek,Instansi,Wilayah,Pagu Anggaran,Tahap,Progres %,Kategori,Layanan,Status,PIC,Mulai,Selesai']
-    const rows = filteredProjects.map((p) =>
-      `"${p.idLOP}","${p.projectName.replace(/"/g, '""')}","${p.agency}","${p.region}",${p.budget},"${p.stage}",${p.progress},"${p.category}","${p.serviceType}","${p.status}","${p.pic}","${p.startDate}","${p.endDate}"`
-    )
-    const csvContent = 'data:text/csv;charset=utf-8,' + [headers, ...rows].join('\n')
-    const encodedUri = encodeURI(csvContent)
+    const headers = ['ID LOP', 'Nama Proyek', 'Instansi', 'Wilayah', 'Pagu Anggaran (Rp)', 'Tahap', 'Progres (%)', 'Kategori', 'Layanan', 'Status', 'PIC', 'Mulai', 'Selesai']
+    const escapeCSV = (value: string | number | null | undefined) => `"${String(value ?? '').replace(/"/g, '""')}"`
+    const rows = filteredProjects.map((project) => [
+      project.idLOP,
+      project.projectName,
+      project.agency,
+      project.region,
+      project.budget,
+      project.stage,
+      project.progress,
+      project.category,
+      project.serviceType,
+      project.status,
+      project.pic,
+      project.startDate,
+      project.endDate,
+    ])
+    const csvContent = `\uFEFF${[headers, ...rows].map((row) => row.map(escapeCSV).join(';')).join('\r\n')}`
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8' })
+    const url = URL.createObjectURL(blob)
     const link = document.createElement('a')
-    link.setAttribute('href', encodedUri)
+    link.setAttribute('href', url)
     link.setAttribute('download', `Laporan_Pipeline_B2G_Telkom_${new Date().toISOString().slice(0, 10)}.csv`)
     document.body.appendChild(link)
     link.click()
     document.body.removeChild(link)
+    URL.revokeObjectURL(url)
   }
 
   return (

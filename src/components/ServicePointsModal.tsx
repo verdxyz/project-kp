@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { FileSpreadsheet, Upload, X } from 'lucide-react'
+import { Download, FileSpreadsheet, Upload, X } from 'lucide-react'
 import { ServicePoints, type ProjectServicePoint } from '../lib/servicePoints'
 
 export function ServicePointsModal({ idLOP, onClose }: { idLOP: string; onClose: () => void }) {
@@ -43,6 +43,14 @@ export function ServicePointsModal({ idLOP, onClose }: { idLOP: string; onClose:
     }
   }
 
+  const downloadTemplate = async () => {
+    const XLSX = await import('xlsx')
+    const worksheet = XLSX.utils.aoa_to_sheet([['SID', 'Produk', 'Kapasitas (Mbps)']])
+    const workbook = XLSX.utils.book_new()
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Data SID')
+    XLSX.writeFile(workbook, 'template-import-SID.xlsx')
+  }
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
@@ -56,6 +64,9 @@ export function ServicePointsModal({ idLOP, onClose }: { idLOP: string; onClose:
         </header>
 
         <form onSubmit={handleImport} className="flex flex-wrap items-end gap-3 border-b border-slate-800 p-5">
+          <button type="button" onClick={downloadTemplate} className="btn-secondary flex items-center gap-2">
+            <Download size={14} />Unduh Template
+          </button>
           <label className="min-w-0 flex-1 text-xs font-semibold text-slate-300">
             File Excel
             <input
@@ -68,6 +79,7 @@ export function ServicePointsModal({ idLOP, onClose }: { idLOP: string; onClose:
           <button type="submit" disabled={!file || importing} className="btn-primary flex items-center gap-2 disabled:cursor-not-allowed disabled:opacity-50">
             <Upload size={14} />{importing ? 'Mengimpor...' : 'Import SID'}
           </button>
+          <p className="w-full text-xs text-slate-500">Isi satu SID per baris. Produk boleh dikosongkan untuk memakai tipe layanan proyek; kapasitas menggunakan Mbps.</p>
         </form>
 
         {(error || message) && (

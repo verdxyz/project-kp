@@ -226,7 +226,6 @@ export interface Reminder {
 
 export type PageKey =
   | 'analytics'
-  | 'maps'
   | 'contracts'
   | 'services'
   | 'services-catalog'
