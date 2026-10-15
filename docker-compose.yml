@@ -1,0 +1,20 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: b2g_dashboard
+      POSTGRES_USER: b2g
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-b2g_local_dev_password}
+    ports:
+      - "5432:5432"
+    volumes:
+      - b2g-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U b2g -d b2g_dashboard"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  b2g-postgres-data:
