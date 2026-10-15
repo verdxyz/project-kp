@@ -43,6 +43,7 @@ function findColumn(headers, aliases) {
 export async function listServicePoints(req, res, next) {
   try {
     const { rows } = await pool.query(
+<<<<<<< HEAD
       `SELECT id, id_lop AS "idLOP", sid,
               product_type AS "productType",
               capacity_mbps::float8 AS "capacityMbps",
@@ -54,6 +55,11 @@ export async function listServicePoints(req, res, next) {
               bandwidth,
               created_at AS "createdAt", updated_at AS "updatedAt"
          FROM project_service_points WHERE id_lop = $1 ORDER BY created_at ASC, id ASC`,
+=======
+      `SELECT id, id_lop AS "idLOP", sid, product_type AS "productType",
+              capacity_mbps::float8 AS "capacityMbps", created_at AS "createdAt", updated_at AS "updatedAt"
+         FROM project_service_points WHERE id_lop = $1 ORDER BY product_type, sid`,
+>>>>>>> 6aa6fdd5c6590190ec52e0615772fa98f5081420
       [req.params.idLOP],
     )
     res.json({ servicePoints: rows })
@@ -62,6 +68,7 @@ export async function listServicePoints(req, res, next) {
   }
 }
 
+<<<<<<< HEAD
 export async function batchUpdateServicePoints(req, res, next) {
   const { idLOP } = req.params
   const { servicePoints = [], ngtmaInfo } = req.body
@@ -143,6 +150,8 @@ export async function batchUpdateServicePoints(req, res, next) {
   }
 }
 
+=======
+>>>>>>> 6aa6fdd5c6590190ec52e0615772fa98f5081420
 export async function importServicePoints(req, res, next) {
   const file = req.file
   let client
@@ -165,10 +174,13 @@ export async function importServicePoints(req, res, next) {
     if (!sidColumn) return res.status(400).json({ message: 'Kolom SID tidak ditemukan. Gunakan header SID atau Service ID.' })
     const productColumn = findColumn(headers, ['product', 'produk', 'service', 'layanan', 'producttype', 'tipeproduk', 'tipelayanan'])
     const capacityColumn = findColumn(headers, ['capacitymbps', 'totalcapacitymbps', 'kapasitasmbps', 'kapasitas', 'bandwidth'])
+<<<<<<< HEAD
     const orderColumn = findColumn(headers, ['noorder', 'nomororder', 'orderno', 'order'])
     const quoteColumn = findColumn(headers, ['quote', 'noquote', 'nomorquote'])
     const locationColumn = findColumn(headers, ['lokasi', 'location', 'alamat'])
     const activeDateColumn = findColumn(headers, ['tanggalaktif', 'tglaktif', 'activedate', 'startdate'])
+=======
+>>>>>>> 6aa6fdd5c6590190ec52e0615772fa98f5081420
 
     const importRows = new Map()
     let skippedRows = 0
@@ -184,6 +196,7 @@ export async function importServicePoints(req, res, next) {
         continue
       }
       const productType = normalizeProduct(productColumn ? row[productColumn] : '', project.rows[0].service_type)
+<<<<<<< HEAD
       const orderNo = orderColumn ? String(row[orderColumn] ?? '').trim() : ''
       const quote = quoteColumn ? String(row[quoteColumn] ?? '').trim() : ''
       const location = locationColumn ? String(row[locationColumn] ?? '').trim() : ''
@@ -201,6 +214,13 @@ export async function importServicePoints(req, res, next) {
         activeDate: activeDate || null,
         bandwidth: capacityMbps ? `${capacityMbps} Mbps` : null,
       })
+=======
+      if (!productType) {
+        skippedRows += 1
+        continue
+      }
+      importRows.set(sid, { sid, productType, capacityMbps })
+>>>>>>> 6aa6fdd5c6590190ec52e0615772fa98f5081420
     }
     if (!importRows.size) return res.status(400).json({ message: 'Tidak ada baris SID valid untuk diimpor.' })
 
@@ -217,6 +237,7 @@ export async function importServicePoints(req, res, next) {
 
     for (const point of importRows.values()) {
       await client.query(
+<<<<<<< HEAD
         `INSERT INTO project_service_points (
            id, id_lop, sid, product_type, capacity_mbps, service_group, order_no, quote, location, active_date, bandwidth
          ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
@@ -243,6 +264,15 @@ export async function importServicePoints(req, res, next) {
           point.activeDate,
           point.bandwidth,
         ],
+=======
+        `INSERT INTO project_service_points (id, id_lop, sid, product_type, capacity_mbps)
+         VALUES ($1, $2, $3, $4, $5)
+         ON CONFLICT (id_lop, sid) DO UPDATE SET
+           product_type = EXCLUDED.product_type,
+           capacity_mbps = EXCLUDED.capacity_mbps,
+           updated_at = now()`,
+        [randomUUID(), req.params.idLOP, point.sid, point.productType, point.capacityMbps],
+>>>>>>> 6aa6fdd5c6590190ec52e0615772fa98f5081420
       )
     }
     await client.query('COMMIT')
@@ -258,6 +288,7 @@ export async function importServicePoints(req, res, next) {
   }
 }
 
+<<<<<<< HEAD
 export async function getServicePivot(_req, res, next) {
   try {
     const { rows } = await pool.query(
@@ -278,6 +309,29 @@ export async function getServicePivot(_req, res, next) {
            ELSE 3 
          END,
          a.name ASC`,
+=======
+export async function getServicePivot(req, res, next) {
+  try {
+    const agency = String(req.query.agency || '').trim() || null
+    const { rows } = await pool.query(
+      `WITH products(product_type, sort_order) AS (
+         VALUES ('HSI', 1), ('WMS', 2), ('Astinet', 3), ('IP Transit', 4), ('VPN', 5)
+       ), totals AS (
+         SELECT sp.product_type, count(*)::int AS "pointCount",
+                COALESCE(sum(sp.capacity_mbps), 0)::float8 AS "capacityMbps"
+           FROM project_service_points sp
+           JOIN projects p ON p.id_lop = sp.id_lop
+           JOIN government_agencies a ON a.id = p.agency_id
+          WHERE ($1::text IS NULL OR a.name = $1)
+          GROUP BY sp.product_type
+       )
+       SELECT products.product_type AS "productType",
+              COALESCE(totals."pointCount", 0)::int AS "pointCount",
+              COALESCE(totals."capacityMbps", 0)::float8 AS "capacityMbps"
+         FROM products LEFT JOIN totals USING (product_type)
+        ORDER BY products.sort_order`,
+      [agency],
+>>>>>>> 6aa6fdd5c6590190ec52e0615772fa98f5081420
     )
     res.json({ rows })
   } catch (error) {

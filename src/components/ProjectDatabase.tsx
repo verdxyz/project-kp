@@ -16,7 +16,11 @@ import {
 import { cn } from '../lib/utils'
 import { CustomersDB, ProjectsDB, ServicesDB, type Customer, type ProjectEntry, type ServiceItem } from '../lib/db'
 import { ServicePointsModal } from './ServicePointsModal'
+<<<<<<< HEAD
 import { MASTER_INSTANSI, MASTER_DINAS } from '../lib/constants'
+=======
+import { MASTER_INSTANSI } from '../lib/constants'
+>>>>>>> 6aa6fdd5c6590190ec52e0615772fa98f5081420
 import {
   getProjectDocumentTypes,
   ProjectDocuments,
@@ -28,7 +32,11 @@ type ProjectStage = ProjectEntry['stage']
 type ProjectForm = Omit<ProjectEntry, 'id' | 'createdAt' | 'updatedAt'>
 type SelectedFiles = Partial<Record<ProjectDocumentType, File>>
 
+<<<<<<< HEAD
 const STAGES: ProjectStage[] = ['F0', 'F1', 'F2', 'F3', 'F4', 'F5', 'Cancel', 'Loss']
+=======
+const STAGES: ProjectStage[] = ['F0', 'F1', 'F2', 'F3', 'F4', 'F5', 'Cancel']
+>>>>>>> 6aa6fdd5c6590190ec52e0615772fa98f5081420
 const STAGE_PROGRESS: Record<ProjectStage, number> = {
   F0: 0, F1: 20, F2: 40, F3: 60, F4: 80, F5: 100, Loss: 0, Cancel: 0,
 }
@@ -133,8 +141,11 @@ function blankForm(category: ProjectEntry['category'] = 'On Channel'): ProjectFo
     totalCapacityMbps: null,
     sid: null,
     subsidiaryName: '',
+<<<<<<< HEAD
     customerName: '',
     dinasName: '',
+=======
+>>>>>>> 6aa6fdd5c6590190ec52e0615772fa98f5081420
     status: 'Active',
     notes: '',
   }
@@ -201,7 +212,15 @@ function ProjectModal({ mode, initial, fixedCategory, onSave, onClose, saving, s
       nextErrors.subsidiaryName = 'Nama anak perusahaan wajib diisi untuk NGTMA'
     }
     if (!form.agency) nextErrors.agency = 'Instansi wajib dipilih'
+<<<<<<< HEAD
     if (!form.pic.trim()) nextErrors.pic = 'PIC wajib diisi'
+=======
+    if (form.budget <= 0) nextErrors.budget = 'Anggaran harus lebih dari 0'
+    if (!form.pic.trim()) nextErrors.pic = 'PIC wajib diisi'
+    if (form.totalCapacityMbps !== null && form.totalCapacityMbps < 0) {
+      nextErrors.totalCapacityMbps = 'Kapasitas tidak boleh negatif'
+    }
+>>>>>>> 6aa6fdd5c6590190ec52e0615772fa98f5081420
     setErrors(nextErrors)
     return Object.keys(nextErrors).length === 0
   }
@@ -272,11 +291,15 @@ function ProjectModal({ mode, initial, fixedCategory, onSave, onClose, saving, s
                   setSelectedCatalogServiceId('')
                   set('category', value as ProjectEntry['category'])
                 }}>
+<<<<<<< HEAD
                   {CATEGORIES.map((category) => (
                     <option key={category} value={category}>
                       {category === 'On Channel' ? 'Own Channel' : category}
                     </option>
                   ))}
+=======
+                  {CATEGORIES.map((category) => <option key={category}>{category}</option>)}
+>>>>>>> 6aa6fdd5c6590190ec52e0615772fa98f5081420
                 </Select>
               </Field>
             )}
@@ -285,6 +308,7 @@ function ProjectModal({ mode, initial, fixedCategory, onSave, onClose, saving, s
             <input value={form.projectName} onChange={(event) => set('projectName', event.target.value)} className="form-input" />
           </Field>
           {form.category === 'NGTMA' && (
+<<<<<<< HEAD
             <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/30 space-y-4">
               <div className="flex items-center gap-2">
                 <span className="text-xs font-bold text-amber-300 uppercase tracking-wider">
@@ -333,6 +357,16 @@ function ProjectModal({ mode, initial, fixedCategory, onSave, onClose, saving, s
                 />
               </Field>
             </div>
+=======
+            <Field label="Nama Anak Perusahaan *" error={errors.subsidiaryName}>
+              <input
+                value={form.subsidiaryName ?? ''}
+                onChange={(event) => set('subsidiaryName', event.target.value)}
+                placeholder="Nama anak perusahaan untuk pembagian pendapatan"
+                className="form-input"
+              />
+            </Field>
+>>>>>>> 6aa6fdd5c6590190ec52e0615772fa98f5081420
           )}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Field label="Instansi Pelanggan *" error={errors.agency}>
@@ -344,6 +378,67 @@ function ProjectModal({ mode, initial, fixedCategory, onSave, onClose, saving, s
                 {MASTER_INSTANSI.map((agency) => <option key={agency.nama}>{agency.nama}</option>)}
               </Select>
             </Field>
+<<<<<<< HEAD
+=======
+            <Field label="Tipe Layanan">
+              <Select
+                value={selectedCatalogServiceId ? `catalog:${selectedCatalogServiceId}` : `manual:${form.serviceType}`}
+                onChange={handleServiceSelection}
+              >
+                {matchingServices.length > 0 && (
+                  <optgroup label="Data Layanan">
+                    {matchingServices.map((service) => (
+                      <option key={service.id} value={`catalog:${service.id}`}>
+                        {service.name} ({service.serviceType})
+                      </option>
+                    ))}
+                  </optgroup>
+                )}
+                <optgroup label="Tipe Manual">
+                  {!SERVICE_TYPES.includes(form.serviceType) && <option value={`manual:${form.serviceType}`}>{form.serviceType}</option>}
+                  {SERVICE_TYPES.map((type) => <option key={type} value={`manual:${type}`}>{type}</option>)}
+                </optgroup>
+              </Select>
+            </Field>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Field label="Total Kapasitas Layanan (Mbps)" error={errors.totalCapacityMbps}>
+              <input
+                type="number"
+                min="0"
+                step="0.001"
+                value={form.totalCapacityMbps ?? ''}
+                onChange={(event) => set('totalCapacityMbps', event.target.value === '' ? null : Number(event.target.value))}
+                className="form-input"
+              />
+            </Field>
+            <Field label="Nomor SID (Service ID)">
+              <input value={form.sid ?? ''} onChange={(event) => set('sid', event.target.value || null)} className="form-input" />
+            </Field>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Field label="Pagu Anggaran (Rp) *" error={errors.budget}>
+              <input
+                type="text"
+                inputMode="decimal"
+                value={budgetInput}
+                onChange={(event) => {
+                  const input = event.currentTarget
+                  const beforeCursor = input.value.slice(0, input.selectionStart ?? input.value.length)
+                  const decimalIndex = beforeCursor.indexOf(',')
+                  const hasDecimal = decimalIndex >= 0
+                  const integerDigits = (hasDecimal ? beforeCursor.slice(0, decimalIndex) : beforeCursor).replace(/\D/g, '').length
+                  const fractionalDigits = hasDecimal ? beforeCursor.slice(decimalIndex + 1).replace(/\D/g, '').length : 0
+                  const formatted = formatBudgetInput(input.value)
+                  setBudgetInput(formatted)
+                  set('budget', parseBudgetInput(formatted))
+                  const cursor = cursorAfterBudgetInput(formatted, integerDigits, hasDecimal, fractionalDigits)
+                  requestAnimationFrame(() => input.setSelectionRange(cursor, cursor))
+                }}
+                className="form-input"
+              />
+            </Field>
+>>>>>>> 6aa6fdd5c6590190ec52e0615772fa98f5081420
             <Field label="Metode Pengadaan">
               <Select
                 value={form.procurementMethod}
@@ -354,6 +449,7 @@ function ProjectModal({ mode, initial, fixedCategory, onSave, onClose, saving, s
               </Select>
             </Field>
           </div>
+<<<<<<< HEAD
           {mode === 'edit' && (
             <>
               <Field label="Tahap Proyek">
@@ -378,6 +474,28 @@ function ProjectModal({ mode, initial, fixedCategory, onSave, onClose, saving, s
               </Field>
             </>
           )}
+=======
+          <Field label="Tahap Proyek">
+            <div className="flex flex-wrap gap-2">
+              {STAGES.map((stage) => (
+                <button
+                  key={stage}
+                  type="button"
+                  onClick={() => handleStageChange(stage)}
+                  className={cn(
+                    'px-3 py-1.5 rounded-lg text-xs font-bold border',
+                    form.stage === stage ? STAGE_COLORS[stage] : 'bg-slate-800 border-slate-700 text-slate-500',
+                  )}
+                >
+                  {stage}
+                </button>
+              ))}
+            </div>
+          </Field>
+          <Field label={`Progress (${form.progress}%)`}>
+            <input type="range" min={0} max={100} value={form.progress} onChange={(event) => set('progress', Number(event.target.value))} className="w-full accent-blue-500" />
+          </Field>
+>>>>>>> 6aa6fdd5c6590190ec52e0615772fa98f5081420
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Field label="PIC *" error={errors.pic}>
               <Select value={form.pic} onChange={(value) => set('pic', value)}>
@@ -561,6 +679,7 @@ export function ProjectDocumentsModal({ idLOP, category, onClose }: {
   )
 }
 
+<<<<<<< HEAD
 export function ProjectDatabase({
   initialCategory,
   showStats = true,
@@ -568,6 +687,9 @@ export function ProjectDatabase({
   initialCategory?: ProjectEntry['category']
   showStats?: boolean
 }) {
+=======
+export function ProjectDatabase({ initialCategory }: { initialCategory?: ProjectEntry['category'] }) {
+>>>>>>> 6aa6fdd5c6590190ec52e0615772fa98f5081420
   const [projects, setProjects] = useState<ProjectEntry[]>([])
   const [search, setSearch] = useState('')
   const [filterStage, setFilterStage] = useState('Semua')
@@ -613,11 +735,15 @@ export function ProjectDatabase({
     setPageError('')
     try {
       const mode = modal.mode
+<<<<<<< HEAD
       const baseForm = {
         ...form,
         budget: form.budget && form.budget > 0 ? form.budget : 1,
       }
       const projectForm = initialCategory ? { ...baseForm, category: initialCategory } : baseForm
+=======
+      const projectForm = initialCategory ? { ...form, category: initialCategory } : form
+>>>>>>> 6aa6fdd5c6590190ec52e0615772fa98f5081420
       const saved = mode === 'add'
         ? await ProjectsDB.create(projectForm)
         : await ProjectsDB.update(modal.editId!, projectForm)
@@ -671,8 +797,11 @@ export function ProjectDatabase({
         totalCapacityMbps: editing.totalCapacityMbps,
         sid: editing.sid,
         subsidiaryName: editing.subsidiaryName ?? '',
+<<<<<<< HEAD
         customerName: editing.customerName ?? '',
         dinasName: editing.dinasName ?? '',
+=======
+>>>>>>> 6aa6fdd5c6590190ec52e0615772fa98f5081420
         status: editing.status,
         notes: editing.notes ?? '',
       }
@@ -680,6 +809,7 @@ export function ProjectDatabase({
 
   return (
     <div className="space-y-6">
+<<<<<<< HEAD
       {showStats && (
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           {[
@@ -695,6 +825,21 @@ export function ProjectDatabase({
           ))}
         </div>
       )}
+=======
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        {[
+          { label: 'Total Proyek', value: filtered.length, color: 'text-blue-400' },
+          { label: 'Total Anggaran', value: formatIDR(totalBudget), color: 'text-emerald-400' },
+          { label: 'Tahap F5', value: wins, color: 'text-violet-400' },
+          { label: 'At Risk', value: atRisk, color: 'text-red-400' },
+        ].map((stat) => (
+          <div key={stat.label} className="card-glass rounded-xl px-5 py-4">
+            <p className="text-xs text-slate-500">{stat.label}</p>
+            <p className={cn('mt-0.5 text-xl font-bold', stat.color)}>{stat.value}</p>
+          </div>
+        ))}
+      </div>
+>>>>>>> 6aa6fdd5c6590190ec52e0615772fa98f5081420
 
       {pageError && <div role="alert" className="rounded-xl border border-red-500/30 bg-red-500/10 p-3 text-sm text-red-300">{pageError}</div>}
       <div className="flex flex-wrap items-center gap-3">
@@ -712,11 +857,15 @@ export function ProjectDatabase({
         {!initialCategory && (
           <select value={filterCategory} onChange={(event) => setFilterCategory(event.target.value)} className="form-input w-auto">
             <option>Semua</option>
+<<<<<<< HEAD
             {CATEGORIES.map((category) => (
               <option key={category} value={category}>
                 {category === 'On Channel' ? 'Own Channel' : category}
               </option>
             ))}
+=======
+            {CATEGORIES.map((category) => <option key={category}>{category}</option>)}
+>>>>>>> 6aa6fdd5c6590190ec52e0615772fa98f5081420
           </select>
         )}
         <button type="button" onClick={() => { setPageError(''); setModal({ mode: 'add' }) }} className="btn-primary flex items-center gap-2">
@@ -750,7 +899,11 @@ export function ProjectDatabase({
                   <span className="flex items-center gap-1.5 text-xs text-slate-300"><Building2 size={11} />{project.agency}</span>
                 </td>
                 <td className="px-4 py-3 text-xs text-slate-300">
+<<<<<<< HEAD
                   <div>{project.category === 'On Channel' ? 'Own Channel' : project.category}</div>
+=======
+                  <div>{project.category}</div>
+>>>>>>> 6aa6fdd5c6590190ec52e0615772fa98f5081420
                   {project.subsidiaryName && <div className="mt-1 text-slate-400">{project.subsidiaryName}</div>}
                   <div className="mt-1 text-slate-500">{project.sid || 'SID belum diisi'}</div>
                 </td>

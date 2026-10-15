@@ -78,7 +78,11 @@ export default function App() {
               : activeView === 'services-catalog'
               ? activeMenu === 'gtma'
                 ? 'Data layanan dengan kategori GTMA'
+<<<<<<< HEAD
                 : 'Kelola seluruh data layanan Own Channel, GTMA, dan NGTMA'
+=======
+                : 'Kelola seluruh data layanan On Channel, GTMA, dan NGTMA'
+>>>>>>> 6aa6fdd5c6590190ec52e0615772fa98f5081420
               : activeView === 'customers-db'
               ? 'Manajemen data instansi pemerintah, PIC, dan nilai kontrak'
               : activeView === 'projects-db'
@@ -104,7 +108,11 @@ export default function App() {
                 title="Dokumen Kontrak per Proyek"
                 subtitle="Unggah dan unduh dokumen yang terhubung langsung dengan ID LOP"
               />
+<<<<<<< HEAD
               <ProjectDatabase showStats={false} />
+=======
+              <ProjectDatabase />
+>>>>>>> 6aa6fdd5c6590190ec52e0615772fa98f5081420
             </section>
           )}
 
@@ -115,7 +123,11 @@ export default function App() {
             <section>
               <SectionHeader
                 title="Data Layanan"
+<<<<<<< HEAD
                 subtitle="Kelola layanan Own Channel, GTMA, dan NGTMA"
+=======
+                subtitle="Kelola layanan On Channel, GTMA, dan NGTMA"
+>>>>>>> 6aa6fdd5c6590190ec52e0615772fa98f5081420
               />
               <ServicesCatalog initialCategory={activeMenu === 'gtma' ? 'GTMA' : 'Semua'} />
             </section>

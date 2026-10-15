@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react"
+<<<<<<< HEAD
 import {
   Wifi,
   Plus,
@@ -26,6 +27,12 @@ import { cn } from "../lib/utils"
 import { ProjectsDB, ServicesDB, type ProjectEntry, type ServiceItem } from "../lib/db"
 import { ServicePoints, type ProjectServicePoint } from "../lib/servicePoints"
 import { MASTER_INSTANSI, MASTER_DINAS, NGTMA_PRODUCTS } from "../lib/constants"
+=======
+import { Wifi, Plus, Edit3, Trash2, X, Check, AlertCircle, ChevronDown, Zap, Globe, Network, Shield } from "lucide-react"
+import { cn } from "../lib/utils"
+import { ServicesDB } from "../lib/db"
+import type { ServiceItem } from "../lib/db"
+>>>>>>> 6aa6fdd5c6590190ec52e0615772fa98f5081420
 
 const SERVICE_TYPES = ["HSI", "WiFi", "Astinet", "IP Transit", "VPN", "Metro", "DDOS", "UHOS", "PIJAR", "NETMONK"]
 
@@ -103,7 +110,11 @@ function ServiceModal({ mode, initial, onSave, onClose }: ModalProps) {
               <label className="block text-xs font-semibold text-slate-400 mb-1.5">Kategori</label>
               <div className="relative">
                 <select value={form.category} onChange={e => set("category", e.target.value)} className="form-input appearance-none pr-8">
+<<<<<<< HEAD
                   <option value="On Channel">Own Channel</option>
+=======
+                  <option value="On Channel">On Channel</option>
+>>>>>>> 6aa6fdd5c6590190ec52e0615772fa98f5081420
                   <option value="GTMA">GTMA</option>
                   <option value="NGTMA">NGTMA</option>
                 </select>
@@ -220,6 +231,7 @@ function ServiceCard({ item, onEdit, onDelete }: { item: ServiceItem; onEdit: ()
   )
 }
 
+<<<<<<< HEAD
 interface ServicePointInputRow {
   id?: string
   serviceGroup: 'Non-POTS' | 'POTS'
@@ -247,20 +259,26 @@ function emptyServicePointRow(defaultProduct = 'HSI'): ServicePointInputRow {
   }
 }
 
+=======
+>>>>>>> 6aa6fdd5c6590190ec52e0615772fa98f5081420
 interface ServicesCatalogProps {
   initialCategory?: string
 }
 
 export function ServicesCatalog({ initialCategory = "Semua" }: ServicesCatalogProps) {
+<<<<<<< HEAD
   const [activeTab, setActiveTab] = useState<'service-points' | 'catalog'>('service-points')
 
   // Catalog State
+=======
+>>>>>>> 6aa6fdd5c6590190ec52e0615772fa98f5081420
   const [services, setServices] = useState<ServiceItem[]>([])
   const [search, setSearch] = useState("")
   const [filterType, setFilterType] = useState("Semua")
   const [filterCategory, setFilterCategory] = useState(initialCategory)
   const [modal, setModal] = useState<{ open: boolean; mode: 'add' | 'edit'; editId?: string } | null>(null)
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null)
+<<<<<<< HEAD
 
   // Service Points per ID LOP State (Revisi 1, 2, 4)
   const [projectsList, setProjectsList] = useState<ProjectEntry[]>([])
@@ -463,12 +481,30 @@ export function ServicesCatalog({ initialCategory = "Semua" }: ServicesCatalogPr
     setDeleteConfirm(null)
   }
 
+=======
+  const load = useCallback(() => setServices(ServicesDB.getAll()), [])
+  useEffect(() => { ServicesDB.seed(SEED_SERVICES as any); load() }, [load])
+  useEffect(() => { setFilterCategory(initialCategory) }, [initialCategory])
+  const filtered = services.filter(s => {
+    const matchSearch = s.name.toLowerCase().includes(search.toLowerCase()) || s.description.toLowerCase().includes(search.toLowerCase())
+    const matchType = filterType === "Semua" || s.serviceType === filterType
+    const matchCategory = filterCategory === "Semua" || s.category === filterCategory
+    return matchSearch && matchType && matchCategory
+  })
+  const handleSave = (data: Omit<ServiceItem, 'id' | 'createdAt' | 'updatedAt'>) => {
+    if (modal?.mode === "add") ServicesDB.create(data)
+    else if (modal?.editId) ServicesDB.update(modal.editId, data)
+    load(); setModal(null)
+  }
+  const handleDelete = (id: string) => { ServicesDB.delete(id); load(); setDeleteConfirm(null) }
+>>>>>>> 6aa6fdd5c6590190ec52e0615772fa98f5081420
   const getEditInitial = (id: string): Omit<ServiceItem, 'id' | 'createdAt' | 'updatedAt'> => {
     const svc = ServicesDB.getById(id)
     if (!svc) return blankForm()
     const { id: _id, createdAt: _c, updatedAt: _u, ...rest } = svc
     return rest
   }
+<<<<<<< HEAD
 
   const SERVICE_CATEGORIES = ["Semua", "On Channel", "GTMA", "NGTMA"]
   const filteredCatalog = services.filter((s) => {
@@ -1061,6 +1097,72 @@ export function ServicesCatalog({ initialCategory = "Semua" }: ServicesCatalogPr
               </div>
             </div>
           )}
+=======
+  const SERVICE_CATEGORIES = ["Semua", "On Channel", "GTMA", "NGTMA"]
+  const stats = {
+    total: services.length,
+    active: services.filter(s => s.status === "Aktif").length,
+    avgPrice: services.length ? Math.round(services.reduce((a, s) => a + s.priceMonthly, 0) / services.length) : 0,
+  }
+  return (
+    <div className="space-y-6">
+      <div className="grid grid-cols-3 gap-4">
+        {[{ label: "Total Layanan", value: stats.total, color: "text-blue-400" }, { label: "Layanan Aktif", value: stats.active, color: "text-emerald-400" }, { label: "Avg Harga/Bulan", value: formatIDR(stats.avgPrice), color: "text-violet-400" }].map(s => (
+          <div key={s.label} className="card-glass rounded-xl px-5 py-4"><p className="text-xs text-slate-500">{s.label}</p><p className={cn("text-xl font-bold mt-0.5", s.color)}>{s.value}</p></div>
+        ))}
+      </div>
+      <div className="space-y-3">
+        <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Cari layanan..." className="form-input py-2" />
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto] items-end gap-3">
+          <label className="block text-xs font-semibold text-slate-400">
+            Tipe Layanan
+            <span className="relative mt-1.5 block">
+              <select value={filterType} onChange={e => setFilterType(e.target.value)} className="form-input w-full appearance-none pr-8 text-sm font-normal">
+                <option value="Semua">Semua Tipe</option>
+                {SERVICE_TYPES.map(type => <option key={type} value={type}>{type}</option>)}
+              </select>
+              <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+            </span>
+          </label>
+          <label className="block text-xs font-semibold text-slate-400">
+            Kategori
+            <span className="relative mt-1.5 block">
+              <select value={filterCategory} onChange={e => setFilterCategory(e.target.value)} className="form-input w-full appearance-none pr-8 text-sm font-normal">
+                {SERVICE_CATEGORIES.map(category => <option key={category} value={category}>{category === "Semua" ? "Semua Kategori" : category}</option>)}
+              </select>
+              <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+            </span>
+          </label>
+          <button onClick={() => setModal({ open: true, mode: "add" })} className="btn-primary flex items-center justify-center gap-2" id="btn-add-service"><Plus size={15} />Tambah Layanan</button>
+        </div>
+      </div>
+      {filtered.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-16 text-center">
+          <div className="w-16 h-16 rounded-2xl bg-slate-800 border border-slate-700 flex items-center justify-center mb-4"><Wifi size={28} className="text-slate-600" /></div>
+          <p className="text-sm font-semibold text-slate-400">Tidak ada layanan ditemukan</p>
+          <p className="text-xs text-slate-600 mt-1">Coba ubah filter atau tambah layanan baru</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {filtered.map(svc => <ServiceCard key={svc.id} item={svc} onEdit={() => setModal({ open: true, mode: "edit", editId: svc.id })} onDelete={() => setDeleteConfirm(svc.id)} />)}
+        </div>
+      )}
+      {modal?.open && <ServiceModal mode={modal.mode} initial={modal.mode === "edit" && modal.editId ? getEditInitial(modal.editId) : blankForm()} onSave={handleSave} onClose={() => setModal(null)} />}
+      {deleteConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={() => setDeleteConfirm(null)} />
+          <div className="relative bg-slate-900 border border-slate-700 rounded-2xl p-6 max-w-sm w-full shadow-2xl">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 rounded-xl bg-red-500/20 border border-red-500/30 flex items-center justify-center"><Trash2 size={18} className="text-red-400" /></div>
+              <div><h4 className="text-sm font-bold text-white">Hapus Layanan</h4><p className="text-xs text-slate-400 mt-0.5">Aksi ini tidak bisa dibatalkan</p></div>
+            </div>
+            <p className="text-sm text-slate-300 mb-5">Apakah Anda yakin ingin menghapus layanan <strong className="text-white">{services.find(s => s.id === deleteConfirm)?.name}</strong>?</p>
+            <div className="flex gap-3">
+              <button onClick={() => setDeleteConfirm(null)} className="btn-secondary flex-1">Batal</button>
+              <button onClick={() => handleDelete(deleteConfirm)} className="flex-1 px-4 py-2 rounded-xl bg-red-600 hover:bg-red-500 text-white text-sm font-semibold transition-colors">Hapus</button>
+            </div>
+          </div>
+>>>>>>> 6aa6fdd5c6590190ec52e0615772fa98f5081420
         </div>
       )}
     </div>

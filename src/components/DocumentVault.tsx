@@ -332,7 +332,11 @@ export function DocumentVault() {
       }
       setSupportingDocs((prev) => [newDoc, ...prev])
       setShowAddModal(false)
+<<<<<<< HEAD
       setAddForm({ name: '', instansi: 'Pemkot Semarang', nomorSurat: '', deskripsi: '' })
+=======
+      setAddForm({ name: '', instansi: 'Kota Semarang', nomorSurat: '', deskripsi: '' })
+>>>>>>> 6aa6fdd5c6590190ec52e0615772fa98f5081420
       setSelectedAddFile(null)
     }
 
@@ -576,6 +580,7 @@ export function DocumentVault() {
                     onChange={(e) => setAddForm({ ...addForm, instansi: e.target.value })}
                     className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-white focus:outline-none focus:border-blue-500"
                   >
+<<<<<<< HEAD
                     <option value="Pemkot Semarang">Pemkot Semarang</option>
                     <option value="Pemkab Kendal">Pemkab Kendal</option>
                     <option value="Pemkot Salatiga">Pemkot Salatiga</option>
@@ -589,6 +594,21 @@ export function DocumentVault() {
                     <option value="Pemkab Brebes">Pemkab Brebes</option>
                     <option value="Provinsi Jawa Tengah">Provinsi Jawa Tengah</option>
                     <option value="Polda Jawa Tengah">Polda Jawa Tengah</option>
+=======
+                    <option value="Kota Semarang">Kota Semarang</option>
+                    <option value="Kab. Kendal">Kab. Kendal</option>
+                    <option value="Kota Salatiga">Kota Salatiga</option>
+                    <option value="Kab. Semarang">Kab. Semarang</option>
+                    <option value="Kab. Batang">Kab. Batang</option>
+                    <option value="Kota Pekalongan">Kota Pekalongan</option>
+                    <option value="Kab. Pekalongan">Kab. Pekalongan</option>
+                    <option value="Kab. Pemalang">Kab. Pemalang</option>
+                    <option value="Kota Tegal">Kota Tegal</option>
+                    <option value="Kab. Tegal">Kab. Tegal</option>
+                    <option value="Kab. Brebes">Kab. Brebes</option>
+                    <option value="Provinsi Jawa Tengah">Provinsi Jateng</option>
+                    <option value="Polda Jawa Tengah">Polda Jateng</option>
+>>>>>>> 6aa6fdd5c6590190ec52e0615772fa98f5081420
                   </select>
                 </div>
                 <div>
