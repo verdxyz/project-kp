@@ -1,4 +1,4 @@
-/**
+﻿/**
  * constants.ts — Master data, enum labels, dan konfigurasi statis
  */
 
@@ -13,7 +13,6 @@ import type {
 
 export const MASTER_INSTANSI = [
   { nama: 'Pemkot Salatiga', tipe: 'pemkot' as const, wilayah: 'Salatiga' },
-<<<<<<< HEAD
   { nama: 'Pemkab Semarang', tipe: 'pemkab' as const, wilayah: 'Semarang' },
   { nama: 'Pemkot Semarang', tipe: 'pemkot' as const, wilayah: 'Semarang' },
   { nama: 'Pemkab Kendal', tipe: 'pemkab' as const, wilayah: 'Kendal' },
@@ -22,16 +21,6 @@ export const MASTER_INSTANSI = [
   { nama: 'Pemkot Pekalongan', tipe: 'pemkot' as const, wilayah: 'Pekalongan' },
   { nama: 'Pemkab Pemalang', tipe: 'pemkab' as const, wilayah: 'Pemalang' },
   { nama: 'Pemkot Tegal', tipe: 'pemkot' as const, wilayah: 'Tegal' },
-=======
-  { nama: 'Kabupaten Semarang', tipe: 'pemkab' as const, wilayah: 'Semarang' },
-  { nama: 'Kota Semarang', tipe: 'pemkot' as const, wilayah: 'Semarang' },
-  { nama: 'Pemkab Kendal', tipe: 'pemkab' as const, wilayah: 'Kendal' },
-  { nama: 'Pemkab Batang', tipe: 'pemkab' as const, wilayah: 'Batang' },
-  { nama: 'Pemkab Pekalongan', tipe: 'pemkab' as const, wilayah: 'Pekalongan' },
-  { nama: 'Kota Pekalongan', tipe: 'pemkot' as const, wilayah: 'Pekalongan' },
-  { nama: 'Pemkab Pemalang', tipe: 'pemkab' as const, wilayah: 'Pemalang' },
-  { nama: 'Kota Tegal', tipe: 'pemkot' as const, wilayah: 'Tegal' },
->>>>>>> 6aa6fdd5c6590190ec52e0615772fa98f5081420
   { nama: 'Pemkab Tegal', tipe: 'pemkab' as const, wilayah: 'Tegal' },
   { nama: 'Pemkab Brebes', tipe: 'pemkab' as const, wilayah: 'Brebes' },
   { nama: 'Provinsi Jawa Tengah', tipe: 'provinsi' as const, wilayah: 'Semarang' },
@@ -40,7 +29,6 @@ export const MASTER_INSTANSI = [
 
 export const MASTER_INSTANSI_NAMES = MASTER_INSTANSI.map((agency) => agency.nama)
 
-<<<<<<< HEAD
 export const MASTER_DINAS = [
   'Dinas Komunikasi dan Informatika (Diskominfo)',
   'Badan Perencanaan Pembangunan Daerah (Bappeda)',
@@ -72,8 +60,6 @@ export const NGTMA_PRODUCTS = [
   'Lainnya',
 ] as const
 
-=======
->>>>>>> 6aa6fdd5c6590190ec52e0615772fa98f5081420
 // ═══════════════════════════════════════════════════════════════
 // JENIS LAYANAN
 // ═══════════════════════════════════════════════════════════════

@@ -1,4 +1,4 @@
-import { mkdir } from 'node:fs/promises'
+﻿import { mkdir } from 'node:fs/promises'
 import path from 'node:path'
 import { randomUUID } from 'node:crypto'
 import express from 'express'
@@ -10,16 +10,12 @@ import {
 import {
   listDocuments, uploadDocument, downloadDocument, deleteDocument,
 } from './controllers/documentController.js'
-<<<<<<< HEAD
 import {
   getServicePivot,
   importServicePoints,
   listServicePoints,
   batchUpdateServicePoints,
 } from './controllers/servicePointController.js'
-=======
-import { getServicePivot, importServicePoints, listServicePoints } from './controllers/servicePointController.js'
->>>>>>> 6aa6fdd5c6590190ec52e0615772fa98f5081420
 
 const app = express()
 const uploadDir = path.resolve(process.env.STORAGE_DIR || './storage/project-documents')
@@ -88,10 +84,7 @@ app.delete('/api/projects/:idLOP', deleteProject)
 app.get('/api/projects/:idLOP/documents', listDocuments)
 app.get('/api/reports/service-pivot', getServicePivot)
 app.get('/api/projects/:idLOP/service-points', listServicePoints)
-<<<<<<< HEAD
 app.put('/api/projects/:idLOP/service-points', batchUpdateServicePoints)
-=======
->>>>>>> 6aa6fdd5c6590190ec52e0615772fa98f5081420
 app.post(
   '/api/projects/:idLOP/service-points/import',
   (req, res, next) => upload.single('file')(req, res, (error) => {

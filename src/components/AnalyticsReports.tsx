@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react'
+﻿import React, { useState, useMemo, useEffect } from 'react'
 import {
   BarChart3,
   Filter,
@@ -22,23 +22,16 @@ import {
   Activity,
   FileText,
   Download,
-<<<<<<< HEAD
   Check,
   ChevronDown,
   Search,
-=======
->>>>>>> 6aa6fdd5c6590190ec52e0615772fa98f5081420
 } from 'lucide-react'
 import { cn, formatIDR, abbreviateIDR } from '../lib/utils'
 import { ProjectsDB, type ProjectEntry } from '../lib/db'
 import { MASTER_INSTANSI_NAMES } from '../lib/constants'
 import { ProjectDocumentsModal } from './ProjectDatabase'
 import { getProjectDocumentLabel, ProjectDocuments, type ProjectDocument } from '../lib/projectDocuments'
-<<<<<<< HEAD
 import { ServicePoints, type AgencyPivotRow } from '../lib/servicePoints'
-=======
-import { SERVICE_PRODUCTS, ServicePoints, type ServicePivotRow } from '../lib/servicePoints'
->>>>>>> 6aa6fdd5c6590190ec52e0615772fa98f5081420
 
 // Normalized Project interface
 export interface UnifiedProject {
@@ -91,17 +84,9 @@ export function AnalyticsReports() {
   const [allProjects, setAllProjects] = useState<UnifiedProject[]>([])
   const [loadError, setLoadError] = useState('')
   const [loading, setLoading] = useState(true)
-<<<<<<< HEAD
   const [agencyPivot, setAgencyPivot] = useState<AgencyPivotRow[]>([])
   const [pivotLoading, setPivotLoading] = useState(true)
   const [pivotError, setPivotError] = useState('')
-=======
-  const [pivotAgency, setPivotAgency] = useState('ALL')
-  const [servicePivot, setServicePivot] = useState<ServicePivotRow[]>([])
-  const [loadedPivotAgency, setLoadedPivotAgency] = useState<string | null>(null)
-  const [pivotError, setPivotError] = useState('')
-  const pivotLoading = loadedPivotAgency !== pivotAgency
->>>>>>> 6aa6fdd5c6590190ec52e0615772fa98f5081420
 
   useEffect(() => {
     ProjectsDB.getAll()
@@ -112,7 +97,6 @@ export function AnalyticsReports() {
 
   useEffect(() => {
     let active = true
-<<<<<<< HEAD
     setPivotLoading(true)
     ServicePoints.getPivot()
       .then((rows) => {
@@ -145,22 +129,6 @@ export function AnalyticsReports() {
     if (selectedPivotAgencies.length === 0) return agencyPivot
     return agencyPivot.filter((item) => selectedPivotAgencies.includes(item.agencyName))
   }, [agencyPivot, selectedPivotAgencies])
-=======
-    ServicePoints.getPivot(pivotAgency === 'ALL' ? undefined : pivotAgency)
-      .then((rows) => {
-        if (!active) return
-        setServicePivot(rows)
-        setPivotError('')
-        setLoadedPivotAgency(pivotAgency)
-      })
-      .catch((error: unknown) => {
-        if (!active) return
-        setPivotError(error instanceof Error ? error.message : 'Gagal memuat ringkasan layanan.')
-        setLoadedPivotAgency(pivotAgency)
-      })
-    return () => { active = false }
-  }, [pivotAgency])
->>>>>>> 6aa6fdd5c6590190ec52e0615772fa98f5081420
 
   // Filter States
   const [searchQuery, setSearchQuery] = useState('')
@@ -220,7 +188,6 @@ export function AnalyticsReports() {
     setSelectedStatus('ALL')
   }
 
-<<<<<<< HEAD
   const handleExportExcel = async () => {
     const XLSX = await import('xlsx')
     const wb = XLSX.utils.book_new()
@@ -351,36 +318,6 @@ export function AnalyticsReports() {
     // Write file with proper .xlsx format
     const dateStr = new Date().toISOString().slice(0, 10)
     XLSX.writeFile(wb, `Laporan_B2G_Telkom_${dateStr}.xlsx`)
-=======
-  const handleExportCSV = () => {
-    const headers = ['ID LOP', 'Nama Proyek', 'Instansi', 'Wilayah', 'Pagu Anggaran (Rp)', 'Tahap', 'Progres (%)', 'Kategori', 'Layanan', 'Status', 'PIC', 'Mulai', 'Selesai']
-    const escapeCSV = (value: string | number | null | undefined) => `"${String(value ?? '').replace(/"/g, '""')}"`
-    const rows = filteredProjects.map((project) => [
-      project.idLOP,
-      project.projectName,
-      project.agency,
-      project.region,
-      project.budget,
-      project.stage,
-      project.progress,
-      project.category,
-      project.serviceType,
-      project.status,
-      project.pic,
-      project.startDate,
-      project.endDate,
-    ])
-    const csvContent = `\uFEFF${[headers, ...rows].map((row) => row.map(escapeCSV).join(';')).join('\r\n')}`
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8' })
-    const url = URL.createObjectURL(blob)
-    const link = document.createElement('a')
-    link.setAttribute('href', url)
-    link.setAttribute('download', `Laporan_Pipeline_B2G_Telkom_${new Date().toISOString().slice(0, 10)}.csv`)
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
-    URL.revokeObjectURL(url)
->>>>>>> 6aa6fdd5c6590190ec52e0615772fa98f5081420
   }
 
   return (
@@ -401,7 +338,6 @@ export function AnalyticsReports() {
           </p>
         </div>
 
-<<<<<<< HEAD
         <div className="flex items-center gap-2 self-start sm:self-auto">
           <button
             onClick={handleExportExcel}
@@ -730,60 +666,6 @@ export function AnalyticsReports() {
                 <td className="px-5 py-3.5 text-right tabular-nums text-sm font-extrabold text-blue-800">
                   {pivotLoading ? '—' : `${displayedPivot.reduce((sum, r) => sum + r.totalBandwidthMbps, 0).toLocaleString('id-ID', { maximumFractionDigits: 3 })} Mbps`}
                 </td>
-=======
-        <button
-          onClick={handleExportCSV}
-          className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-white border border-slate-700 text-xs font-semibold shadow-md transition-all self-start sm:self-auto cursor-pointer"
-        >
-          <FileSpreadsheet size={15} className="text-emerald-400" />
-          <span>Export Laporan (.CSV)</span>
-        </button>
-      </div>
-
-      <section className="card bg-slate-900/90 border-slate-800 p-0 overflow-hidden">
-        <header className="flex flex-col gap-3 border-b border-slate-800 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <h3 className="text-sm font-bold text-white">Ringkasan Titik & Kapasitas Layanan</h3>
-            <p className="mt-1 text-xs text-slate-500">Total SID dan Mbps per produk</p>
-          </div>
-          <select
-            aria-label="Filter instansi pemda"
-            value={pivotAgency}
-            onChange={(event) => setPivotAgency(event.target.value)}
-            className="form-input w-full sm:w-auto"
-          >
-            <option value="ALL">Semua Instansi</option>
-            {MASTER_INSTANSI_NAMES.map((agency) => <option key={agency} value={agency}>{agency}</option>)}
-          </select>
-        </header>
-        {pivotError && <p role="alert" className="px-5 pt-3 text-xs text-red-400">{pivotError}</p>}
-        <div className="overflow-x-auto">
-          <table className="w-full min-w-[520px] text-left text-xs">
-            <thead className="bg-slate-950/70 text-[10px] uppercase text-slate-500">
-              <tr>
-                <th className="px-5 py-3">Produk</th>
-                <th className="px-5 py-3 text-right">Titik Layanan</th>
-                <th className="px-5 py-3 text-right">Kapasitas Total (Mbps)</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-800/70">
-              {SERVICE_PRODUCTS.map((product) => {
-                const row = servicePivot.find((item) => item.productType === product)
-                return (
-                  <tr key={product}>
-                    <th className="px-5 py-3 font-semibold text-slate-200">{product}</th>
-                    <td className="px-5 py-3 text-right tabular-nums text-slate-300">{pivotLoading ? '—' : (row?.pointCount ?? 0).toLocaleString('id-ID')}</td>
-                    <td className="px-5 py-3 text-right tabular-nums text-slate-300">{pivotLoading ? '—' : (row?.capacityMbps ?? 0).toLocaleString('id-ID', { maximumFractionDigits: 3 })}</td>
-                  </tr>
-                )
-              })}
-            </tbody>
-            <tfoot className="border-t border-slate-700 bg-slate-950/50 font-bold text-white">
-              <tr>
-                <th className="px-5 py-3">Total</th>
-                <td className="px-5 py-3 text-right tabular-nums">{pivotLoading ? '—' : servicePivot.reduce((sum, row) => sum + row.pointCount, 0).toLocaleString('id-ID')}</td>
-                <td className="px-5 py-3 text-right tabular-nums">{pivotLoading ? '—' : servicePivot.reduce((sum, row) => sum + row.capacityMbps, 0).toLocaleString('id-ID', { maximumFractionDigits: 3 })}</td>
->>>>>>> 6aa6fdd5c6590190ec52e0615772fa98f5081420
               </tr>
             </tfoot>
           </table>
@@ -921,11 +803,7 @@ export function AnalyticsReports() {
               className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-white focus:outline-none focus:border-blue-500"
             >
               <option value="ALL">Semua Kategori</option>
-<<<<<<< HEAD
               <option value="On Channel">Own Channel (Konektivitas)</option>
-=======
-              <option value="On Channel">On Channel (Konektivitas)</option>
->>>>>>> 6aa6fdd5c6590190ec52e0615772fa98f5081420
               <option value="GTMA">GTMA (CPE / Third-Party)</option>
               <option value="NGTMA">NGTMA</option>
             </select>

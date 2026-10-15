@@ -1,4 +1,4 @@
-import { randomUUID } from 'node:crypto'
+﻿import { randomUUID } from 'node:crypto'
 import { unlink } from 'node:fs/promises'
 import path from 'node:path'
 import { pool } from '../db.js'
@@ -11,11 +11,8 @@ const PROJECT_SELECT = `
          p.end_date::text AS "endDate", p.pic, p.category, p.service_type AS "serviceType",
          p.total_capacity_mbps::float8 AS "totalCapacityMbps", p.sid, p.status, p.notes,
          p.subsidiary_name AS "subsidiaryName",
-<<<<<<< HEAD
          p.customer_name AS "customerName",
          p.dinas_name AS "dinasName",
-=======
->>>>>>> 6aa6fdd5c6590190ec52e0615772fa98f5081420
          p.created_at AS "createdAt", p.updated_at AS "updatedAt"
     FROM projects p
     JOIN government_agencies a ON a.id = p.agency_id
@@ -73,11 +70,8 @@ function projectValues(body) {
     body.stage === 'F5' ? 'Completed' : body.stage === 'Loss' ? 'Lost' : body.stage === 'Cancel' ? 'Cancelled' : (body.status || 'Active'),
     typeof body.notes === 'string' ? body.notes : '',
     typeof body.subsidiaryName === 'string' && body.subsidiaryName.trim() ? body.subsidiaryName.trim() : null,
-<<<<<<< HEAD
     typeof body.customerName === 'string' && body.customerName.trim() ? body.customerName.trim() : null,
     typeof body.dinasName === 'string' && body.dinasName.trim() ? body.dinasName.trim() : null,
-=======
->>>>>>> 6aa6fdd5c6590190ec52e0615772fa98f5081420
   ]
 }
 
@@ -125,35 +119,22 @@ export async function saveProject(req, res, next) {
     if (values[5] === 'Loss') values[14] = 'Lost'
     if (values[5] === 'Cancel') values[14] = 'Cancelled'
     const id = req.params.id || randomUUID()
-<<<<<<< HEAD
     const params = [id, values[0], values[1], agency.rows[0].id, ...values.slice(3, 19)]
-=======
-    const params = [id, values[0], values[1], agency.rows[0].id, ...values.slice(3, 17)]
->>>>>>> 6aa6fdd5c6590190ec52e0615772fa98f5081420
     const result = await client.query(
       `INSERT INTO projects (
          id, id_lop, project_name, agency_id, budget, procurement_method, stage, progress,
          start_date, end_date, pic, category, service_type, total_capacity_mbps, sid, status, notes,
-<<<<<<< HEAD
          subsidiary_name, customer_name, dinas_name
        ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20)
-=======
-         subsidiary_name
-       ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18)
->>>>>>> 6aa6fdd5c6590190ec52e0615772fa98f5081420
        ON CONFLICT (id) DO UPDATE SET
          id_lop = EXCLUDED.id_lop, project_name = EXCLUDED.project_name, agency_id = EXCLUDED.agency_id,
          budget = EXCLUDED.budget, procurement_method = EXCLUDED.procurement_method, stage = EXCLUDED.stage,
          progress = EXCLUDED.progress, start_date = EXCLUDED.start_date, end_date = EXCLUDED.end_date,
          pic = EXCLUDED.pic, category = EXCLUDED.category, service_type = EXCLUDED.service_type,
          total_capacity_mbps = EXCLUDED.total_capacity_mbps, sid = EXCLUDED.sid, status = EXCLUDED.status,
-<<<<<<< HEAD
          notes = EXCLUDED.notes, subsidiary_name = EXCLUDED.subsidiary_name,
          customer_name = EXCLUDED.customer_name, dinas_name = EXCLUDED.dinas_name,
          updated_at = now()
-=======
-         notes = EXCLUDED.notes, subsidiary_name = EXCLUDED.subsidiary_name, updated_at = now()
->>>>>>> 6aa6fdd5c6590190ec52e0615772fa98f5081420
        RETURNING id_lop`,
       params,
     )

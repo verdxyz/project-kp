@@ -1,4 +1,4 @@
-/**
+﻿/**
  * db.ts — localStorage-based database for B2G Dashboard
  * Provides typed CRUD helpers for Services, Customers, and Projects.
  */
@@ -65,11 +65,8 @@ export interface ProjectEntry {
   totalCapacityMbps: number | null
   sid: string | null
   subsidiaryName?: string | null
-<<<<<<< HEAD
   customerName?: string | null
   dinasName?: string | null
-=======
->>>>>>> 6aa6fdd5c6590190ec52e0615772fa98f5081420
   status: 'Active' | 'At Risk' | 'Completed' | 'Lost' | 'Cancelled'
   notes?: string
   createdAt: string

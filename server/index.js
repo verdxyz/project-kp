@@ -1,4 +1,4 @@
-import 'dotenv/config'
+﻿import 'dotenv/config'
 import path from 'node:path'
 
 let pool
@@ -14,7 +14,6 @@ try {
   if (useEmbeddedDatabase) {
     const databasePort = Number(process.env.LOCAL_DATABASE_PORT || 5433)
     process.env.DATABASE_URL ||= `postgres://postgres:postgres@127.0.0.1:${databasePort}/postgres`
-<<<<<<< HEAD
     const [{ PGlite }, { PGLiteSocketServer }, { mkdir }] = await Promise.all([
       import('@electric-sql/pglite'),
       import('@electric-sql/pglite-socket'),
@@ -22,13 +21,6 @@ try {
     ])
     const dataDir = path.resolve(process.env.LOCAL_DATABASE_DIR || './storage/postgres')
     await mkdir(dataDir, { recursive: true })
-=======
-    const [{ PGlite }, { PGLiteSocketServer }] = await Promise.all([
-      import('@electric-sql/pglite'),
-      import('@electric-sql/pglite-socket'),
-    ])
-    const dataDir = path.resolve(process.env.LOCAL_DATABASE_DIR || './storage/postgres')
->>>>>>> 6aa6fdd5c6590190ec52e0615772fa98f5081420
     embeddedDatabase = new PGlite(dataDir)
     await embeddedDatabase.waitReady
     embeddedPostgresServer = new PGLiteSocketServer({
