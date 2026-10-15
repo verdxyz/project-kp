@@ -4,7 +4,6 @@ import {
   BarChart3,
   ChevronDown,
   Wifi,
-  LogOut,
   Menu,
   X,
   TrendingUp,
@@ -34,16 +33,12 @@ const NAV_ITEMS: NavItem[] = [
   },
 ]
 
-import type { AuthUser } from '../lib/auth'
-
 interface SidebarProps {
   activeNav: string
   onNavChange: (id: string) => void
-  currentUser?: AuthUser | null
-  onLogout?: () => void
 }
 
-export function Sidebar({ activeNav, onNavChange, currentUser, onLogout }: SidebarProps) {
+export function Sidebar({ activeNav, onNavChange }: SidebarProps) {
   const [collapsed, setCollapsed] = useState(false)
   const [expandedItem, setExpandedItem] = useState<string | null>(null)
   const [mobileOpen, setMobileOpen] = useState(false)
@@ -142,36 +137,6 @@ export function Sidebar({ activeNav, onNavChange, currentUser, onLogout }: Sideb
         ))}
       </nav>
 
-      {/* User Profile */}
-      <div className="p-3 border-t border-slate-700/50">
-        <div className={cn('flex items-center gap-3 p-2 rounded-lg hover:bg-slate-800/60 transition-colors', collapsed && 'justify-center')}>
-          <div className={cn(
-            'w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white flex-shrink-0 shadow-md',
-            'bg-gradient-to-br from-red-500 to-rose-700 ring-1 ring-red-400/50'
-          )}>
-            {currentUser?.nama.slice(0, 2).toUpperCase() || 'AS'}
-          </div>
-          {!collapsed && (
-            <div className="min-w-0 flex-1">
-              <p className="text-xs font-semibold text-white truncate">{currentUser?.nama || 'Pengguna Telkom'}</p>
-              <div className="flex items-center gap-1.5 mt-0.5">
-                <span className="text-[10px] font-semibold px-1.5 py-0.2 rounded uppercase tracking-wider bg-red-500/20 text-red-300">
-                  Admin Support
-                </span>
-              </div>
-            </div>
-          )}
-          {!collapsed && onLogout && (
-            <button
-              onClick={onLogout}
-              title="Keluar / Logout"
-              className="p-1 rounded text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition-colors ml-auto"
-            >
-              <LogOut size={15} />
-            </button>
-          )}
-        </div>
-      </div>
     </div>
   )
 

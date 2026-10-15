@@ -33,18 +33,12 @@ try {
     throw new Error('DATABASE_URL must be configured, or set LOCAL_DATABASE=embedded for local development.')
   }
 
-  if (!process.env.SESSION_SECRET || process.env.SESSION_SECRET.length < 32) {
-    throw new Error('SESSION_SECRET must contain at least 32 characters.')
-  }
-
-  const [{ seedGlobalAdmin }, database, { runMigrations }] = await Promise.all([
-    import('./auth.js'),
+  const [database, { runMigrations }] = await Promise.all([
     import('./db.js'),
     import('./migrate.js'),
   ])
   pool = database.pool
   await runMigrations()
-  await seedGlobalAdmin()
 
   const { default: app } = await import('./app.js')
   const port = Number(process.env.PORT || 3000)

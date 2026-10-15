@@ -1,0 +1,29 @@
+services:
+  - type: web
+    name: project-kp
+    runtime: node
+    plan: 0.5c-512mb
+    buildCommand: npm ci && npm run build
+    startCommand: npm start
+    healthCheckPath: /api/health
+    disk:
+      name: project-kp-documents
+      mountPath: /var/data
+      sizeGB: 1
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NODE_VERSION
+        value: 24.14.0
+      - key: DATABASE_URL
+        fromDatabase:
+          name: project-kp-db
+          property: connectionString
+      - key: STORAGE_DIR
+        value: /var/data/project-documents
+databases:
+  - name: project-kp-db
+    databaseName: b2g_dashboard
+    user: b2g
+    plan: 0.1c-256mb
+    postgresMajorVersion: '17'

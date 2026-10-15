@@ -1,11 +1,9 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { Sidebar, Topbar } from './components/Layout'
 import { ServicesCatalog } from './components/ServicesCatalog'
 import { CustomerDatabase } from './components/CustomerDatabase'
 import { ProjectDatabase } from './components/ProjectDatabase'
 import { AnalyticsReports } from './components/AnalyticsReports'
-import { LoginScreen } from './components/LoginScreen'
-import { AuthService, type AuthUser } from './lib/auth'
 
 // Section Header Component
 function SectionHeader({
@@ -45,42 +43,7 @@ const VIEW_MAP: Record<string, ViewKey> = {
 }
 
 export default function App() {
-  const [currentUser, setCurrentUser] = useState<AuthUser | null>(null)
-  const [authReady, setAuthReady] = useState(false)
   const [activeMenu, setActiveMenu] = useState('analytics')
-
-  useEffect(() => {
-    let mounted = true
-    AuthService.restoreSession()
-      .then((user) => {
-        if (mounted) setCurrentUser(user)
-      })
-      .catch((error: unknown) => {
-        console.error('Failed to restore admin session:', error)
-        if (mounted) setCurrentUser(null)
-      })
-      .finally(() => {
-        if (mounted) setAuthReady(true)
-      })
-    return () => { mounted = false }
-  }, [])
-
-  const handleLogout = async () => {
-    try {
-      await AuthService.logout()
-      setCurrentUser(null)
-    } catch (error) {
-      console.error('Failed to log out:', error)
-    }
-  }
-
-  // If user is not authenticated, show Login Screen
-  if (!authReady) {
-    return <div className="min-h-screen bg-slate-900 flex items-center justify-center text-slate-400">Memeriksa sesi admin...</div>
-  }
-  if (!currentUser) {
-    return <LoginScreen onLoginSuccess={setCurrentUser} />
-  }
 
   // Resolve which content view to render
   const activeView: ViewKey = VIEW_MAP[activeMenu] ?? 'analytics'
@@ -91,8 +54,6 @@ export default function App() {
       <Sidebar
         activeNav={activeMenu}
         onNavChange={setActiveMenu}
-        currentUser={currentUser}
-        onLogout={handleLogout}
       />
 
       {/* Main Content */}

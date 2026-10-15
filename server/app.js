@@ -2,13 +2,8 @@ import { mkdir } from 'node:fs/promises'
 import path from 'node:path'
 import { randomUUID } from 'node:crypto'
 import express from 'express'
-import session from 'express-session'
-import connectPgSimple from 'connect-pg-simple'
-import { rateLimit } from 'express-rate-limit'
 import multer from 'multer'
 import { pool } from './db.js'
-import { requireAdmin } from './auth.js'
-import { login, currentUser, logout } from './controllers/authController.js'
 import {
   listProjects, getProject, saveProject, deleteProject,
 } from './controllers/projectController.js'
@@ -18,26 +13,12 @@ import {
 import { getServicePivot, importServicePoints, listServicePoints } from './controllers/servicePointController.js'
 
 const app = express()
-const PgSession = connectPgSimple(session)
 const uploadDir = path.resolve(process.env.STORAGE_DIR || './storage/project-documents')
 await mkdir(uploadDir, { recursive: true })
 
 app.disable('x-powered-by')
 if (process.env.NODE_ENV === 'production') app.set('trust proxy', 1)
 app.use(express.json({ limit: '1mb' }))
-app.use(session({
-  name: 'b2g.sid',
-  store: new PgSession({ pool, createTableIfMissing: true }),
-  secret: process.env.SESSION_SECRET,
-  resave: false,
-  saveUninitialized: false,
-  cookie: {
-    httpOnly: true,
-    sameSite: 'strict',
-    secure: process.env.NODE_ENV === 'production',
-    maxAge: 8 * 60 * 60 * 1000,
-  },
-}))
 
 app.use('/api', (req, res, next) => {
   if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(req.method)) {
@@ -52,14 +33,6 @@ app.use('/api', (req, res, next) => {
   }
   next()
 })
-
-app.use('/api/auth/login', rateLimit({
-  windowMs: 15 * 60 * 1000,
-  limit: 8,
-  standardHeaders: 'draft-8',
-  legacyHeaders: false,
-  message: { message: 'Terlalu banyak percobaan login. Coba lagi dalam 15 menit.' },
-}))
 
 const allowedExtensions = new Set([
   '.pdf', '.doc', '.docx', '.xls', '.xlsx', '.png', '.jpg', '.jpeg',
@@ -87,11 +60,7 @@ app.get('/api/health', async (_req, res, next) => {
   }
 })
 
-app.post('/api/auth/login', login)
-app.get('/api/auth/me', requireAdmin, currentUser)
-app.post('/api/auth/logout', requireAdmin, logout)
-
-app.get('/api/agencies', requireAdmin, async (_req, res, next) => {
+app.get('/api/agencies', async (_req, res, next) => {
   try {
     const { rows } = await pool.query(
       'SELECT name, agency_type AS "agencyType", region FROM government_agencies ORDER BY name',
@@ -102,17 +71,16 @@ app.get('/api/agencies', requireAdmin, async (_req, res, next) => {
   }
 })
 
-app.get('/api/projects', requireAdmin, listProjects)
-app.post('/api/projects', requireAdmin, saveProject)
-app.get('/api/projects/:idLOP', requireAdmin, getProject)
-app.put('/api/projects/:id', requireAdmin, saveProject)
-app.delete('/api/projects/:idLOP', requireAdmin, deleteProject)
-app.get('/api/projects/:idLOP/documents', requireAdmin, listDocuments)
-app.get('/api/reports/service-pivot', requireAdmin, getServicePivot)
-app.get('/api/projects/:idLOP/service-points', requireAdmin, listServicePoints)
+app.get('/api/projects', listProjects)
+app.post('/api/projects', saveProject)
+app.get('/api/projects/:idLOP', getProject)
+app.put('/api/projects/:id', saveProject)
+app.delete('/api/projects/:idLOP', deleteProject)
+app.get('/api/projects/:idLOP/documents', listDocuments)
+app.get('/api/reports/service-pivot', getServicePivot)
+app.get('/api/projects/:idLOP/service-points', listServicePoints)
 app.post(
   '/api/projects/:idLOP/service-points/import',
-  requireAdmin,
   (req, res, next) => upload.single('file')(req, res, (error) => {
     if (error instanceof multer.MulterError && error.code === 'LIMIT_FILE_SIZE') {
       return res.status(413).json({ message: 'Ukuran file maksimal 10 MB.' })
@@ -124,7 +92,6 @@ app.post(
 )
 app.post(
   '/api/projects/:idLOP/documents/:documentType',
-  requireAdmin,
   (req, res, next) => upload.single('file')(req, res, (error) => {
     if (error instanceof multer.MulterError && error.code === 'LIMIT_FILE_SIZE') {
       return res.status(413).json({ message: 'Ukuran file maksimal 10 MB.' })
@@ -134,8 +101,8 @@ app.post(
   }),
   uploadDocument,
 )
-app.get('/api/projects/:idLOP/documents/:documentType/file', requireAdmin, downloadDocument)
-app.delete('/api/projects/:idLOP/documents/:documentType', requireAdmin, deleteDocument)
+app.get('/api/projects/:idLOP/documents/:documentType/file', downloadDocument)
+app.delete('/api/projects/:idLOP/documents/:documentType', deleteDocument)
 
 if (process.env.NODE_ENV === 'production') {
   const distDir = path.resolve('dist')
