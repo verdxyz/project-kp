@@ -1,4 +1,6 @@
-﻿/**
+import { readJsonResponse } from './apiResponse'
+
+/**
  * db.ts — localStorage-based database for B2G Dashboard
  * Provides typed CRUD helpers for Services, Customers, and Projects.
  */
@@ -202,7 +204,7 @@ export const CustomersDB = {
 export const ProjectsDB = {
   async getAll(): Promise<ProjectEntry[]> {
     const response = await fetch('/api/projects', { credentials: 'same-origin' })
-    const body = await response.json()
+    const body = await readJsonResponse(response)
     if (!response.ok) throw new Error(body.message || 'Gagal memuat data proyek.')
     return body.projects as ProjectEntry[]
   },
@@ -210,7 +212,7 @@ export const ProjectsDB = {
   async getById(idLOP: string): Promise<ProjectEntry | undefined> {
     const response = await fetch(`/api/projects/${encodeURIComponent(idLOP)}`, { credentials: 'same-origin' })
     if (response.status === 404) return undefined
-    const body = await response.json()
+    const body = await readJsonResponse(response)
     if (!response.ok) throw new Error(body.message || 'Gagal memuat proyek.')
     return body.project as ProjectEntry
   },
@@ -222,7 +224,7 @@ export const ProjectsDB = {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
     })
-    const body = await response.json()
+    const body = await readJsonResponse(response)
     if (!response.ok) throw new Error(body.message || 'Gagal menyimpan proyek.')
     return body.project as ProjectEntry
   },
@@ -234,7 +236,7 @@ export const ProjectsDB = {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
     })
-    const body = await response.json()
+    const body = await readJsonResponse(response)
     if (!response.ok) throw new Error(body.message || 'Gagal memperbarui proyek.')
     return body.project as ProjectEntry
   },
@@ -245,7 +247,7 @@ export const ProjectsDB = {
       credentials: 'same-origin',
     })
     if (!response.ok) {
-      const body = await response.json().catch(() => ({}))
+      const body = await readJsonResponse(response).catch(() => ({}))
       throw new Error(body.message || 'Gagal menghapus proyek.')
     }
   },

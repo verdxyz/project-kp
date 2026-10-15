@@ -1,4 +1,6 @@
-﻿export const SERVICE_PRODUCTS = ['HSI', 'WMS', 'Astinet', 'IP Transit', 'VPN', 'Metro Ethernet', 'POTS'] as const
+import { readJsonResponse } from './apiResponse'
+
+export const SERVICE_PRODUCTS = ['HSI', 'WMS', 'Astinet', 'IP Transit', 'VPN', 'Metro Ethernet', 'POTS'] as const
 
 export interface ProjectServicePoint {
   id?: string
@@ -32,7 +34,7 @@ export interface ServicePivotRow {
 }
 
 async function readJson(response: Response) {
-  const body = await response.json().catch(() => ({}))
+  const body = await readJsonResponse(response)
   if (!response.ok) throw new Error(body.message || 'Operasi titik layanan gagal.')
   return body
 }

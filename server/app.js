@@ -1,4 +1,4 @@
-﻿import { mkdir } from 'node:fs/promises'
+import { mkdir } from 'node:fs/promises'
 import path from 'node:path'
 import { randomUUID } from 'node:crypto'
 import express from 'express'
@@ -28,7 +28,9 @@ app.use(express.json({ limit: '1mb' }))
 app.use('/api', (req, res, next) => {
   if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(req.method)) {
     const origin = req.get('origin')
-    const sameOrigin = origin === `${req.protocol}://${req.get('host')}`
+    const forwardedHost = req.get('x-forwarded-host')
+    const requestHost = forwardedHost || req.get('host')
+    const sameOrigin = origin === `${req.protocol}://${requestHost}`
     const viteDevelopmentOrigin = process.env.NODE_ENV !== 'production' && (
       origin === 'http://localhost:5173' || origin === 'http://127.0.0.1:5173'
     )
@@ -109,6 +111,10 @@ app.post(
 )
 app.get('/api/projects/:idLOP/documents/:documentType/file', downloadDocument)
 app.delete('/api/projects/:idLOP/documents/:documentType', deleteDocument)
+
+app.use('/api', (_req, res) => {
+  res.status(404).json({ message: 'Endpoint API tidak ditemukan.' })
+})
 
 if (process.env.NODE_ENV === 'production') {
   const distDir = path.resolve('dist')

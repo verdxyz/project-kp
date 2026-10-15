@@ -1,3 +1,5 @@
+import { readJsonResponse } from './apiResponse'
+
 export interface AuthUser {
   id: string
   nama: string
@@ -12,7 +14,7 @@ interface AuthResponse {
 let currentUser: AuthUser | null = null
 
 async function readResponse(response: Response): Promise<AuthResponse> {
-  const body = await response.json().catch(() => ({})) as AuthResponse
+  const body = await readJsonResponse<AuthResponse>(response)
   if (!response.ok) {
     throw new Error(body.message || 'Permintaan autentikasi gagal.')
   }
@@ -66,7 +68,7 @@ export const AuthService = {
       credentials: 'same-origin',
     })
     if (!response.ok && response.status !== 401) {
-      const body = await response.json().catch(() => ({})) as AuthResponse
+      const body = await readJsonResponse(response).catch(() => ({})) as AuthResponse
       throw new Error(body.message || 'Gagal mengakhiri sesi.')
     }
     currentUser = null

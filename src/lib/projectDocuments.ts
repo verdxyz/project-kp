@@ -1,3 +1,5 @@
+import { readJsonResponse } from './apiResponse'
+
 export type ProjectDocumentType =
   | 'p0'
   | 'p1'
@@ -74,7 +76,7 @@ export function getProjectDocumentLabel(documentType: ProjectDocumentType, categ
 }
 
 async function responseJson(response: Response) {
-  const body = await response.json().catch(() => ({}))
+  const body = await readJsonResponse(response)
   if (!response.ok) throw new Error(body.message || 'Operasi dokumen gagal.')
   return body
 }
@@ -105,7 +107,7 @@ export const ProjectDocuments = {
       { credentials: 'same-origin' },
     )
     if (!response.ok) {
-      const body = await response.json().catch(() => ({}))
+      const body = await readJsonResponse(response).catch(() => ({}))
       throw new Error(body.message || 'Gagal mengunduh dokumen.')
     }
     const objectUrl = URL.createObjectURL(await response.blob())
