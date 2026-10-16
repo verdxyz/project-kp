@@ -40,6 +40,19 @@ function findColumn(headers, aliases) {
   return headers.find((header) => aliases.includes(normalizeHeader(header)))
 }
 
+function normalizeActiveDate(value) {
+  if (value === null || value === undefined || value === '') return null
+  if (typeof value === 'number') {
+    const date = XLSX.SSF.parse_date_code(value)
+    if (!date) return String(value)
+    return `${date.y}-${String(date.m).padStart(2, '0')}-${String(date.d).padStart(2, '0')}`
+  }
+  const text = String(value).trim()
+  const localDate = text.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/)
+  if (localDate) return `${localDate[3]}-${localDate[2].padStart(2, '0')}-${localDate[1].padStart(2, '0')}`
+  return text || null
+}
+
 export async function listServicePoints(req, res, next) {
   try {
     const { rows } = await pool.query(
@@ -95,7 +108,7 @@ export async function batchUpdateServicePoints(req, res, next) {
       if (!sid && !orderNo && !point.location && !point.productType) continue
 
       const actualSid = sid || (orderNo ? `ORD-${orderNo}` : `SID-${randomUUID().slice(0, 8)}`)
-      const productType = isPOTS ? 'POTS' : (point.productType ? normalizeProduct(point.productType) : 'Non-POTS')
+      const productType = isPOTS ? 'HSI' : (point.productType ? normalizeProduct(point.productType) : 'Non-POTS')
       const capacityMbps = isPOTS ? 0 : (parseCapacityMbps(point.capacityMbps ?? point.bandwidth) ?? 0)
 
       await client.query(
@@ -154,8 +167,14 @@ export async function importServicePoints(req, res, next) {
     )
     if (!project.rows[0]) return res.status(404).json({ message: 'Proyek tidak ditemukan.' })
 
+    const requestedGroup = String(req.body?.serviceGroup || '').trim()
+    if (requestedGroup && !['POTS', 'Non-POTS'].includes(requestedGroup)) {
+      return res.status(400).json({ message: 'Jenis file harus POTS atau Non-POTS.' })
+    }
     const workbook = XLSX.readFile(file.path, { cellDates: false })
-    const sheetName = workbook.SheetNames[0]
+    const sheetName = requestedGroup
+      ? workbook.SheetNames.find((name) => normalizeHeader(name) === normalizeHeader(requestedGroup)) || workbook.SheetNames[0]
+      : workbook.SheetNames[0]
     if (!sheetName) return res.status(400).json({ message: 'Workbook tidak memiliki sheet.' })
     const rows = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], { defval: '', raw: true })
     if (!rows.length) return res.status(400).json({ message: 'Sheet Excel tidak berisi data.' })
@@ -163,7 +182,7 @@ export async function importServicePoints(req, res, next) {
     const headers = Object.keys(rows[0])
     const sidColumn = findColumn(headers, ['sid', 'serviceid', 'nomorsid', 'nomorserviceid'])
     if (!sidColumn) return res.status(400).json({ message: 'Kolom SID tidak ditemukan. Gunakan header SID atau Service ID.' })
-    const productColumn = findColumn(headers, ['product', 'produk', 'service', 'layanan', 'producttype', 'tipeproduk', 'tipelayanan'])
+    const productColumn = findColumn(headers, ['product', 'produk', 'service', 'layanan', 'producttype', 'tipeproduk', 'tipelayanan', 'namalayanan'])
     const capacityColumn = findColumn(headers, ['capacitymbps', 'totalcapacitymbps', 'kapasitasmbps', 'kapasitas', 'bandwidth'])
     const orderColumn = findColumn(headers, ['noorder', 'nomororder', 'orderno', 'order'])
     const quoteColumn = findColumn(headers, ['quote', 'noquote', 'nomorquote'])
@@ -187,12 +206,12 @@ export async function importServicePoints(req, res, next) {
       const orderNo = orderColumn ? String(row[orderColumn] ?? '').trim() : ''
       const quote = quoteColumn ? String(row[quoteColumn] ?? '').trim() : ''
       const location = locationColumn ? String(row[locationColumn] ?? '').trim() : ''
-      const activeDate = activeDateColumn ? String(row[activeDateColumn] ?? '').trim() : null
-      const isPOTS = productType.toLowerCase() === 'pots'
+      const activeDate = activeDateColumn ? normalizeActiveDate(row[activeDateColumn]) : null
+      const isPOTS = requestedGroup ? requestedGroup === 'POTS' : productType.toLowerCase() === 'pots'
 
       importRows.set(sid, {
         sid,
-        productType: isPOTS ? 'POTS' : productType,
+        productType: isPOTS ? 'HSI' : productType,
         capacityMbps: isPOTS ? 0 : capacityMbps,
         serviceGroup: isPOTS ? 'POTS' : 'Non-POTS',
         orderNo: orderNo || null,

@@ -122,7 +122,7 @@ function blankForm(category: ProjectEntry['category'] = 'On Channel'): ProjectFo
     agencyType: '',
     region: '',
     budget: 0,
-    procurementMethod: 'Tender/e-Katalog',
+    procurementMethod: 'E-Katalog',
     stage: 'F0',
     progress: 0,
     startDate: '',
@@ -335,7 +335,7 @@ function ProjectModal({ mode, initial, fixedCategory, onSave, onClose, saving, s
             </div>
           )}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Field label="Instansi Pelanggan *" error={errors.agency}>
+            <Field label="Goverment Customer *" error={errors.agency}>
               <Select
                 value={form.agency}
                 onChange={(agency) => setForm((current) => ({ ...current, agency, ...agencyFields(agency) }))}
@@ -349,8 +349,11 @@ function ProjectModal({ mode, initial, fixedCategory, onSave, onClose, saving, s
                 value={form.procurementMethod}
                 onChange={(value) => set('procurementMethod', value as ProjectEntry['procurementMethod'])}
               >
-                <option>Tender/e-Katalog</option>
+                <option>E-Katalog</option>
+                <option>Pengadaan Langsung</option>
                 <option>Penunjukan Langsung</option>
+                <option>Tender Cepat</option>
+                <option>Tender</option>
               </Select>
             </Field>
           </div>
@@ -390,11 +393,22 @@ function ProjectModal({ mode, initial, fixedCategory, onSave, onClose, saving, s
                 ))}
               </Select>
             </Field>
-            <Field label="Status">
-              <Select value={form.status} onChange={(value) => set('status', value as ProjectEntry['status'])}>
-                {STATUSES.map((status) => <option key={status}>{status}</option>)}
-              </Select>
-            </Field>
+            {mode === 'add' ? (
+              <Field label="Nama Pelanggan">
+                <input
+                  value={form.customerName ?? ''}
+                  onChange={(event) => set('customerName', event.target.value)}
+                  placeholder="Masukkan nama pelanggan"
+                  className="form-input"
+                />
+              </Field>
+            ) : (
+              <Field label="Status">
+                <Select value={form.status} onChange={(value) => set('status', value as ProjectEntry['status'])}>
+                  {STATUSES.map((status) => <option key={status}>{status}</option>)}
+                </Select>
+              </Field>
+            )}
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Field label="Tanggal Mulai">

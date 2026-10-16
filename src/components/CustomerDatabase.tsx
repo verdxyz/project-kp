@@ -4,11 +4,20 @@ import { cn } from "../lib/utils"
 import { CustomersDB } from "../lib/db"
 import type { Customer } from "../lib/db"
 
-const SEED_CUSTOMERS = [
+const SEED_CUSTOMERS: Omit<Customer, 'id' | 'createdAt' | 'updatedAt'>[] = [
   { name: "Pemkot Semarang", agencyType: "Pemerintah Kota", region: "Semarang", address: "Jl. Pemuda No.148, Semarang", picName: "Agus Widodo", picPhone: "0812-1234-5678", picEmail: "agus.widodo@semarangkota.go.id", npwp: "00.123.456.7-501.000", activeServices: [], totalContract: 2520000000, status: "Aktif", notes: "Pelanggan lama sejak 2019. Loyal dan pembayaran lancar." },
   { name: "Pemkab Kendal", agencyType: "Pemerintah Kabupaten", region: "Kendal", address: "Jl. Soekarno-Hatta No.191, Kendal", picName: "Retno Wulandari", picPhone: "0822-9876-5432", picEmail: "retno.w@kendalkab.go.id", npwp: "00.234.567.8-502.000", activeServices: [], totalContract: 890000000, status: "Aktif", notes: "Sedang dalam proses perpanjangan kontrak VPN MPLS." },
-  { name: "Polda Jateng", agencyType: "Kepolisian Daerah", region: "Semarang", address: "Jl. Pahlawan No.1, Semarang", picName: "Kombes Hartono", picPhone: "0813-5555-6666", picEmail: "tik@poldajateng.go.id", npwp: "00.345.678.9-501.000", activeServices: [], totalContract: 3200000000, status: "Prospek", notes: "Proses negosiasi Google Workspace. Kompetitor: Indosat." },
+  { name: "Pemkab Demak", agencyType: "Pemerintah Kabupaten", region: "Demak", address: "", picName: "Naufal Hidayat", picPhone: "", picEmail: "", activeServices: [], totalContract: 0, status: "Prospek", notes: "Nama PIC contoh; ganti dengan data resmi." },
   { name: "Pemkot Salatiga", agencyType: "Pemerintah Kota", region: "Salatiga", address: "Jl. Sukowati No.51, Salatiga", picName: "Drs. Bambang Eko", picPhone: "0811-2233-4455", picEmail: "diskominfo@salatiagkota.go.id", npwp: "00.456.789.0-503.000", activeServices: [], totalContract: 450000000, status: "Aktif", notes: "Metro Ethernet sudah terpasang, puas dengan layanan." },
+  { name: "Pemkab Semarang", agencyType: "Pemerintah Kabupaten", region: "Semarang", address: "", picName: "Aditya Pranowo", picPhone: "", picEmail: "", activeServices: [], totalContract: 0, status: "Prospek", notes: "Nama PIC contoh; ganti dengan data resmi." },
+  { name: "Pemkab Batang", agencyType: "Pemerintah Kabupaten", region: "Batang", address: "", picName: "Nadia Kusumawardani", picPhone: "", picEmail: "", activeServices: [], totalContract: 0, status: "Prospek", notes: "Nama PIC contoh; ganti dengan data resmi." },
+  { name: "Pemkab Pekalongan", agencyType: "Pemerintah Kabupaten", region: "Pekalongan", address: "", picName: "Rizal Mahendra", picPhone: "", picEmail: "", activeServices: [], totalContract: 0, status: "Prospek", notes: "Nama PIC contoh; ganti dengan data resmi." },
+  { name: "Pemkot Pekalongan", agencyType: "Pemerintah Kota", region: "Pekalongan", address: "", picName: "Intan Permatasari", picPhone: "", picEmail: "", activeServices: [], totalContract: 0, status: "Prospek", notes: "Nama PIC contoh; ganti dengan data resmi." },
+  { name: "Pemkab Pemalang", agencyType: "Pemerintah Kabupaten", region: "Pemalang", address: "", picName: "Dimas Kurniawan", picPhone: "", picEmail: "", activeServices: [], totalContract: 0, status: "Prospek", notes: "Nama PIC contoh; ganti dengan data resmi." },
+  { name: "Pemkot Tegal", agencyType: "Pemerintah Kota", region: "Tegal", address: "", picName: "Citra Maharani", picPhone: "", picEmail: "", activeServices: [], totalContract: 0, status: "Prospek", notes: "Nama PIC contoh; ganti dengan data resmi." },
+  { name: "Pemkab Tegal", agencyType: "Pemerintah Kabupaten", region: "Tegal", address: "", picName: "Fikri Ramadhan", picPhone: "", picEmail: "", activeServices: [], totalContract: 0, status: "Prospek", notes: "Nama PIC contoh; ganti dengan data resmi." },
+  { name: "Pemkab Brebes", agencyType: "Pemerintah Kabupaten", region: "Brebes", address: "", picName: "Laras Puspitasari", picPhone: "", picEmail: "", activeServices: [], totalContract: 0, status: "Prospek", notes: "Nama PIC contoh; ganti dengan data resmi." },
+  { name: "Provinsi Jawa Tengah", agencyType: "Pemerintah Provinsi", region: "Semarang", address: "", picName: "Bagas Wicaksono", picPhone: "", picEmail: "", activeServices: [], totalContract: 0, status: "Prospek", notes: "Nama PIC contoh; ganti dengan data resmi." },
 ]
 
 function formatIDR(n: number) {
@@ -18,7 +27,7 @@ function formatIDR(n: number) {
   return `Rp ${n.toLocaleString("id-ID")}`
 }
 
-const AGENCY_TYPES = ["Pemerintah Kota", "Pemerintah Kabupaten", "Kepolisian Daerah", "Legislatif", "TNI", "BUMN", "Lainnya"]
+const AGENCY_TYPES = ["Pemerintah Kota", "Pemerintah Kabupaten", "Pemerintah Provinsi", "Kepolisian Daerah", "Legislatif", "TNI", "BUMN", "Lainnya"]
 const STATUS_COLORS: Record<string, string> = {
   "Aktif": "bg-emerald-500/20 text-emerald-400 border-emerald-500/30",
   "Prospek": "bg-amber-500/20 text-amber-400 border-amber-500/30",
@@ -149,9 +158,19 @@ function CustomerModal({ mode, initial, onSave, onClose }: ModalProps) {
   )
 }
 
-function CustomerRow({ item, onEdit, onDelete }: { item: Customer; onEdit: () => void; onDelete: () => void }) {
+function CustomerRow({ item, onEdit, onDelete, onOpenProfile }: { item: Customer; onEdit: () => void; onDelete: () => void; onOpenProfile?: (name: string) => void }) {
   return (
-    <tr className="border-b border-slate-700/30 hover:bg-slate-800/30 transition-colors group">
+    <tr
+      tabIndex={onOpenProfile ? 0 : undefined}
+      aria-label={onOpenProfile ? `Buka profil ${item.name}` : undefined}
+      onClick={onOpenProfile ? () => onOpenProfile(item.name) : undefined}
+      onKeyDown={onOpenProfile ? (event) => {
+        if (event.target !== event.currentTarget || (event.key !== 'Enter' && event.key !== ' ')) return
+        event.preventDefault()
+        onOpenProfile(item.name)
+      } : undefined}
+      className={`border-b border-slate-700/30 transition-colors group ${onOpenProfile ? 'cursor-pointer hover:bg-cyan-500/5 focus:bg-cyan-500/5 focus:outline-none focus:ring-1 focus:ring-inset focus:ring-cyan-500/40' : 'hover:bg-slate-800/30'}`}
+    >
       <td className="px-4 py-3">
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500/20 to-blue-600/10 border border-blue-500/20 flex items-center justify-center flex-shrink-0">
@@ -179,23 +198,23 @@ function CustomerRow({ item, onEdit, onDelete }: { item: Customer; onEdit: () =>
         <span className={cn("text-[10px] font-bold px-2.5 py-1 rounded-full border", STATUS_COLORS[item.status] ?? STATUS_COLORS["Tidak Aktif"])}>{item.status}</span>
       </td>
       <td className="px-4 py-3">
-        <div className="flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
-          <button onClick={onEdit} className="p-1.5 rounded-lg bg-slate-700/50 hover:bg-blue-500/20 text-slate-400 hover:text-blue-400 transition-colors"><Edit3 size={13} /></button>
-          <button onClick={onDelete} className="p-1.5 rounded-lg bg-slate-700/50 hover:bg-red-500/20 text-slate-400 hover:text-red-400 transition-colors"><Trash2 size={13} /></button>
+        <div className="flex items-center gap-1.5 opacity-100 transition-opacity sm:opacity-0 sm:group-hover:opacity-100" onClick={(event) => event.stopPropagation()}>
+          <button onClick={onEdit} aria-label={`Edit ${item.name}`} className="p-1.5 rounded-lg bg-slate-700/50 hover:bg-blue-500/20 text-slate-400 hover:text-blue-400 transition-colors"><Edit3 size={13} /></button>
+          <button onClick={onDelete} aria-label={`Hapus ${item.name}`} className="p-1.5 rounded-lg bg-slate-700/50 hover:bg-red-500/20 text-slate-400 hover:text-red-400 transition-colors"><Trash2 size={13} /></button>
         </div>
       </td>
     </tr>
   )
 }
 
-export function CustomerDatabase() {
+export function CustomerDatabase({ onOpenProfile }: { onOpenProfile?: (name: string) => void }) {
   const [customers, setCustomers] = useState<Customer[]>([])
   const [search, setSearch] = useState("")
   const [filterStatus, setFilterStatus] = useState("Semua")
   const [modal, setModal] = useState<{ open: boolean; mode: 'add' | 'edit'; editId?: string } | null>(null)
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null)
   const load = useCallback(() => setCustomers(CustomersDB.getAll()), [])
-  useEffect(() => { CustomersDB.seed(SEED_CUSTOMERS as any); load() }, [load])
+  useEffect(() => { CustomersDB.seed(SEED_CUSTOMERS); load() }, [load])
   const filtered = customers.filter(c => {
     const matchSearch = c.name.toLowerCase().includes(search.toLowerCase()) || c.picName.toLowerCase().includes(search.toLowerCase()) || c.region.toLowerCase().includes(search.toLowerCase())
     const matchStatus = filterStatus === "Semua" || c.status === filterStatus
@@ -261,7 +280,7 @@ export function CustomerDatabase() {
             {filtered.length === 0 ? (
               <tr><td colSpan={6} className="py-12 text-center"><p className="text-sm text-slate-500">Tidak ada data instansi</p><p className="text-xs text-slate-600 mt-1">Tambah instansi baru untuk memulai</p></td></tr>
             ) : (
-              filtered.map(c => <CustomerRow key={c.id} item={c} onEdit={() => setModal({ open: true, mode: "edit", editId: c.id })} onDelete={() => setDeleteConfirm(c.id)} />)
+              filtered.map(c => <CustomerRow key={c.id} item={c} onEdit={() => setModal({ open: true, mode: "edit", editId: c.id })} onDelete={() => setDeleteConfirm(c.id)} onOpenProfile={onOpenProfile} />)
             )}
           </tbody>
         </table>

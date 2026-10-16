@@ -29,6 +29,7 @@ export interface Customer {
   agencyType:
     | 'Pemerintah Kota'
     | 'Pemerintah Kabupaten'
+    | 'Pemerintah Provinsi'
     | 'Kepolisian Daerah'
     | 'Legislatif'
     | 'TNI'
@@ -56,7 +57,7 @@ export interface ProjectEntry {
   agencyType: string
   region: string
   budget: number
-  procurementMethod: 'Tender/e-Katalog' | 'Penunjukan Langsung'
+  procurementMethod: 'E-Katalog' | 'Pengadaan Langsung' | 'Penunjukan Langsung' | 'Tender Cepat' | 'Tender'
   stage: 'F0' | 'F1' | 'F2' | 'F3' | 'F4' | 'F5' | 'Loss' | 'Cancel'
   progress: number
   startDate: string
@@ -194,8 +195,15 @@ export const CustomersDB = {
   },
 
   seed(items: Omit<Customer, 'id' | 'createdAt' | 'updatedAt'>[]): void {
-    if (this.getAll().length > 0) return
-    items.forEach((item) => this.create(item))
+    const normalizeName = (name: string) => name.trim().toLocaleLowerCase('id-ID')
+      .replace(/\bpolda jateng\b/g, 'polda jawa tengah')
+    const existingNames = new Set(this.getAll().map((customer) => normalizeName(customer.name)))
+    for (const item of items) {
+      const name = normalizeName(item.name)
+      if (existingNames.has(name)) continue
+      this.create(item)
+      existingNames.add(name)
+    }
   },
 }
 

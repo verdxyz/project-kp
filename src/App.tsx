@@ -4,6 +4,7 @@ import { ServicesCatalog } from './components/ServicesCatalog'
 import { CustomerDatabase } from './components/CustomerDatabase'
 import { ProjectDatabase } from './components/ProjectDatabase'
 import { AnalyticsReports } from './components/AnalyticsReports'
+import { CustomerProfilePage } from './components/CustomerProfilePage'
 
 // Section Header Component
 function SectionHeader({
@@ -30,13 +31,14 @@ function SectionHeader({
 }
 
 // Map nav IDs to one of view buckets
-type ViewKey = 'contracts' | 'services-catalog' | 'customers-db' | 'projects-db' | 'analytics'
+type ViewKey = 'contracts' | 'services-catalog' | 'customers-db' | 'customer-profile' | 'projects-db' | 'analytics'
 
 const VIEW_MAP: Record<string, ViewKey> = {
   analytics: 'analytics',
   services: 'services-catalog',
   'services-catalog': 'services-catalog',
   'customers-db': 'customers-db',
+  'customer-profile': 'customer-profile',
   'projects-db': 'projects-db',
   gtma: 'projects-db',
   contracts: 'contracts',
@@ -44,6 +46,7 @@ const VIEW_MAP: Record<string, ViewKey> = {
 
 export default function App() {
   const [activeMenu, setActiveMenu] = useState('analytics')
+  const [selectedCustomerName, setSelectedCustomerName] = useState<string>()
 
   // Resolve which content view to render
   const activeView: ViewKey = VIEW_MAP[activeMenu] ?? 'analytics'
@@ -65,7 +68,9 @@ export default function App() {
               : activeView === 'services-catalog'
               ? 'Data Layanan'
               : activeView === 'customers-db'
-              ? 'Database Instansi Pemerintah'
+              ? 'Profile Instansi'
+              : activeView === 'customer-profile'
+              ? 'Detail Pelanggan'
               : activeView === 'projects-db'
               ? activeMenu === 'gtma' ? 'GTMA Services' : 'Input & Manajemen Proyek'
               : activeView === 'analytics'
@@ -80,7 +85,9 @@ export default function App() {
                 ? 'Data layanan dengan kategori GTMA'
                 : 'Kelola seluruh data layanan Own Channel, GTMA, dan NGTMA'
               : activeView === 'customers-db'
-              ? 'Manajemen data instansi pemerintah, PIC, dan nilai kontrak'
+              ? 'Pilih instansi untuk melihat detail profil pelanggan'
+              : activeView === 'customer-profile'
+              ? 'Profil strategis, layanan, kontrak, dan dokumen pelanggan'
               : activeView === 'projects-db'
               ? activeMenu === 'gtma'
                 ? 'Input proyek GTMA, SID, progres, dan dokumen yang terhubung ke laporan'
@@ -92,7 +99,7 @@ export default function App() {
         />
 
         {/* Scrollable Content */}
-        <main className="flex-1 overflow-y-auto px-6 py-5 space-y-6">
+        <main className={`flex-1 overflow-y-auto ${activeView === 'customer-profile' ? 'px-4 py-5 xl:px-6' : 'px-6 py-5'} space-y-6`}>
 
 
 
@@ -122,16 +129,26 @@ export default function App() {
           )}
 
           {/* ═══════════════════════════════════════════════════════════════════ */}
-          {/* VIEW: Database Instansi Pemerintah                                 */}
+          {/* VIEW: Profile Instansi                                             */}
           {/* ═══════════════════════════════════════════════════════════════════ */}
           {activeView === 'customers-db' && (
             <section>
               <SectionHeader
-                title="Database Instansi Pemerintah"
+                title="Profile Instansi"
                 subtitle="Kelola data pelanggan dan prospek instansi pemerintah"
               />
-              <CustomerDatabase />
+              <CustomerDatabase onOpenProfile={(name) => {
+                setSelectedCustomerName(name)
+                setActiveMenu('customer-profile')
+              }} />
             </section>
+          )}
+
+          {activeView === 'customer-profile' && (
+            <CustomerProfilePage
+              customerName={selectedCustomerName}
+              onBack={() => setActiveMenu('customers-db')}
+            />
           )}
 
           {/* ═══════════════════════════════════════════════════════════════════ */}

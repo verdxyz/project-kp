@@ -8,7 +8,6 @@ import {
   X,
   TrendingUp,
   Database,
-  FolderPlus,
 } from 'lucide-react'
 import { cn } from '../lib/utils'
 
@@ -27,10 +26,8 @@ const NAV_ITEMS: NavItem[] = [
     id: 'services',
     label: 'Data Layanan',
     icon: Wifi,
-    children: [
-      { id: 'customers-db', label: 'Database Instansi' },
-    ],
   },
+  { id: 'customers-db', label: 'Profile Instansi', icon: Database },
 ]
 
 interface SidebarProps {
@@ -84,6 +81,7 @@ export function Sidebar({ activeNav, onNavChange }: SidebarProps) {
               className={cn(
                 'nav-item w-full',
                 (activeNav === item.id ||
+                  (activeNav === 'customer-profile' && item.id === 'customers-db') ||
                   item.children?.some((c) => c.id === activeNav))
                   ? 'active'
                   : ''

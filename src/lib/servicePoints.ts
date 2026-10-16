@@ -63,9 +63,14 @@ export const ServicePoints = {
     return body
   },
 
-  async importExcel(idLOP: string, file: File): Promise<{ imported: number; skipped: number }> {
+  async importExcel(
+    idLOP: string,
+    file: File,
+    serviceGroup?: 'POTS' | 'Non-POTS'
+  ): Promise<{ imported: number; skipped: number }> {
     const formData = new FormData()
     formData.set('file', file)
+    if (serviceGroup) formData.set('serviceGroup', serviceGroup)
     const response = await fetch(`/api/projects/${encodeURIComponent(idLOP)}/service-points/import`, {
       method: 'POST',
       credentials: 'same-origin',

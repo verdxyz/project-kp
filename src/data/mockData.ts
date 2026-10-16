@@ -6,7 +6,7 @@ export interface Project {
   agencyType: string
   region: string
   budget: number
-  procurementMethod: 'Tender/e-Katalog' | 'Penunjukan Langsung'
+  procurementMethod: 'E-Katalog' | 'Pengadaan Langsung' | 'Penunjukan Langsung' | 'Tender Cepat' | 'Tender'
   stage: 'F0' | 'F1' | 'F2' | 'F3' | 'F4' | 'F5' | 'Loss' | 'Cancel'
   progress: number
   startDate: string
@@ -26,7 +26,7 @@ export const PROJECTS: Project[] = [
     agencyType: 'Pemerintah Kota',
     region: 'Semarang',
     budget: 2_400_000_000,
-    procurementMethod: 'Tender/e-Katalog',
+    procurementMethod: 'E-Katalog',
     stage: 'F2',
     progress: 45,
     startDate: '2024-01-10',
@@ -44,7 +44,7 @@ export const PROJECTS: Project[] = [
     agencyType: 'Pemerintah Kabupaten',
     region: 'Kendal',
     budget: 890_000_000,
-    procurementMethod: 'Tender/e-Katalog',
+    procurementMethod: 'E-Katalog',
     stage: 'F3',
     progress: 72,
     startDate: '2024-02-01',
@@ -62,7 +62,7 @@ export const PROJECTS: Project[] = [
     agencyType: 'Pemerintah Kota',
     region: 'Salatiga',
     budget: 450_000_000,
-    procurementMethod: 'Tender/e-Katalog',
+    procurementMethod: 'E-Katalog',
     stage: 'F5',
     progress: 100,
     startDate: '2024-01-20',
@@ -80,7 +80,7 @@ export const PROJECTS: Project[] = [
     agencyType: 'Kepolisian Daerah',
     region: 'Semarang',
     budget: 3_200_000_000,
-    procurementMethod: 'Tender/e-Katalog',
+    procurementMethod: 'E-Katalog',
     stage: 'F1',
     progress: 20,
     startDate: '2024-03-01',
@@ -116,7 +116,7 @@ export const PROJECTS: Project[] = [
     agencyType: 'Pemerintah Kabupaten',
     region: 'Grobogan',
     budget: 560_000_000,
-    procurementMethod: 'Tender/e-Katalog',
+    procurementMethod: 'E-Katalog',
     stage: 'F2',
     progress: 50,
     startDate: '2024-03-10',
@@ -152,7 +152,7 @@ export const PROJECTS: Project[] = [
     agencyType: 'Pemerintah Kabupaten',
     region: 'Blora',
     budget: 1_750_000_000,
-    procurementMethod: 'Tender/e-Katalog',
+    procurementMethod: 'E-Katalog',
     stage: 'F0',
     progress: 5,
     startDate: '2024-04-15',
@@ -170,7 +170,7 @@ export const PROJECTS: Project[] = [
     agencyType: 'Pemerintah Kabupaten',
     region: 'Kebumen',
     budget: 280_000_000,
-    procurementMethod: 'Tender/e-Katalog',
+    procurementMethod: 'E-Katalog',
     stage: 'Loss',
     progress: 0,
     startDate: '2024-01-05',
@@ -188,7 +188,7 @@ export const PROJECTS: Project[] = [
     agencyType: 'Pemerintah Kota',
     region: 'Purworejo',
     budget: 630_000_000,
-    procurementMethod: 'Tender/e-Katalog',
+    procurementMethod: 'E-Katalog',
     stage: 'F1',
     progress: 25,
     startDate: '2024-04-20',

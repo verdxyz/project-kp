@@ -4,9 +4,8 @@ import { ServicePoints, type ProjectServicePoint } from '../lib/servicePoints'
 
 export function ServicePointsModal({ idLOP, onClose }: { idLOP: string; onClose: () => void }) {
   const [points, setPoints] = useState<ProjectServicePoint[]>([])
-  const [file, setFile] = useState<File | null>(null)
   const [loading, setLoading] = useState(true)
-  const [importing, setImporting] = useState(false)
+  const [importingGroup, setImportingGroup] = useState<'POTS' | 'Non-POTS' | null>(null)
   const [error, setError] = useState('')
   const [message, setMessage] = useState('')
 
@@ -25,32 +24,48 @@ export function ServicePointsModal({ idLOP, onClose }: { idLOP: string; onClose:
     return () => { active = false }
   }, [idLOP])
 
-  const handleImport = async (event: React.FormEvent) => {
-    event.preventDefault()
-    if (!file) return
-    setImporting(true)
+  const handleImport = async (file: File, serviceGroup: 'POTS' | 'Non-POTS') => {
+    setImportingGroup(serviceGroup)
     setError('')
     setMessage('')
     try {
-      const result = await ServicePoints.importExcel(idLOP, file)
-      setMessage(`${result.imported} SID diimpor atau diperbarui${result.skipped ? `, ${result.skipped} baris dilewati` : ''}.`)
-      setFile(null)
+      const result = await ServicePoints.importExcel(idLOP, file, serviceGroup)
+      const destination = serviceGroup === 'POTS' ? ' ke layanan HSI (grup POTS)' : ' ke layanan Non-POTS'
+      setMessage(`${result.imported} SID berhasil diimpor atau diperbarui${destination}${result.skipped ? `, ${result.skipped} baris dilewati` : ''}.`)
       await loadPoints()
     } catch (importError) {
       setError(importError instanceof Error ? importError.message : 'Gagal mengimpor SID.')
     } finally {
-      setImporting(false)
+      setImportingGroup(null)
     }
   }
 
   const downloadTemplate = async () => {
-    const XLSX = await import('xlsx')
-    const worksheet = XLSX.utils.aoa_to_sheet([
-      ['SID', 'Produk', 'Kapasitas (Mbps)', 'No Order', 'Quote', 'Lokasi', 'Tanggal Aktif']
-    ])
-    const workbook = XLSX.utils.book_new()
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Data SID')
-    XLSX.writeFile(workbook, `template-titik-layanan-${idLOP}.xlsx`)
+    try {
+      setError('')
+      const XLSX = await import('xlsx')
+      const workbook = XLSX.utils.book_new()
+      const sheets = [
+        {
+          name: 'Non-POTS',
+          headers: ['NAMA LAYANAN', 'BANDWIDTH', 'LOKASI', 'QUOTE', 'NO ORDER', 'SID', 'TANGGAL AKTIF'],
+        },
+        {
+          name: 'POTS',
+          headers: ['NAMA LAYANAN', 'BANDWIDTH', 'LOKASI', 'NO ORDER', 'SID', 'TANGGAL AKTIF'],
+        },
+      ]
+      for (const { name, headers } of sheets) {
+        const worksheet = XLSX.utils.aoa_to_sheet([headers])
+        worksheet['!cols'] = headers.map((header) => ({ wch: Math.max(header.length + 2, 18) }))
+        worksheet['!freeze'] = { xSplit: 0, ySplit: 1, topLeftCell: 'A2', activePane: 'bottomLeft', state: 'frozen' }
+        worksheet['!autofilter'] = { ref: XLSX.utils.encode_range({ s: { r: 0, c: 0 }, e: { r: 0, c: headers.length - 1 } }) }
+        XLSX.utils.book_append_sheet(workbook, worksheet, name)
+      }
+      XLSX.writeFile(workbook, `template-titik-layanan-${idLOP}.xlsx`)
+    } catch (downloadError) {
+      setError(downloadError instanceof Error ? downloadError.message : 'Gagal mengunduh template Excel.')
+    }
   }
 
   return (
@@ -65,24 +80,32 @@ export function ServicePointsModal({ idLOP, onClose }: { idLOP: string; onClose:
           <button type="button" onClick={onClose} aria-label="Tutup" className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-800 hover:text-white"><X size={18} /></button>
         </header>
 
-        <form onSubmit={handleImport} className="flex flex-wrap items-end gap-3 border-b border-slate-800 p-5">
+        <div className="flex flex-wrap items-center gap-3 border-b border-slate-800 p-5">
           <button type="button" onClick={downloadTemplate} className="btn-secondary flex items-center gap-2">
             <Download size={14} />Unduh Template Excel
           </button>
-          <label className="min-w-0 flex-1 text-xs font-semibold text-slate-300">
-            File Excel Titik Layanan
-            <input
-              type="file"
-              accept=".xlsx,.xls"
-              onChange={(event) => setFile(event.target.files?.[0] ?? null)}
-              className="mt-1.5 block w-full text-xs text-slate-400 file:mr-3 file:rounded-md file:border-0 file:bg-slate-700 file:px-3 file:py-2 file:text-xs file:font-semibold file:text-slate-100"
-            />
-          </label>
-          <button type="submit" disabled={!file || importing} className="btn-primary flex items-center gap-2 disabled:cursor-not-allowed disabled:opacity-50">
-            <Upload size={14} />{importing ? 'Mengimpor...' : 'Import Excel'}
-          </button>
-          <p className="w-full text-xs text-slate-500">Mendukung input batch: SID, Produk (POTS/Non-POTS), Kapasitas (Mbps), No Order, Quote, Lokasi, dan Tanggal Aktif.</p>
-        </form>
+          {(['Non-POTS', 'POTS'] as const).map((serviceGroup) => (
+            <label
+              key={serviceGroup}
+              className={`btn-primary relative flex cursor-pointer items-center gap-2 ${importingGroup ? 'cursor-not-allowed opacity-50' : ''}`}
+            >
+              <Upload size={14} />
+              {importingGroup === serviceGroup ? `Mengimpor ${serviceGroup}...` : `Upload File ${serviceGroup}`}
+              <input
+                type="file"
+                accept=".xlsx,.xls"
+                disabled={importingGroup !== null}
+                onChange={(event) => {
+                  const selectedFile = event.target.files?.[0]
+                  event.target.value = ''
+                  if (selectedFile) void handleImport(selectedFile, serviceGroup)
+                }}
+                className="sr-only"
+              />
+            </label>
+          ))}
+          <p className="w-full text-xs text-slate-500">Gunakan tombol sesuai jenis file. Template berisi sheet Non-POTS dan POTS dengan kolom sesuai format layanan.</p>
+        </div>
 
         {(error || message) && (
           <p role={error ? 'alert' : 'status'} className={`px-5 pt-3 text-xs ${error ? 'text-red-400' : 'text-emerald-400'}`}>

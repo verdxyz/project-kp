@@ -20,7 +20,13 @@ const PROJECT_SELECT = `
 
 const STAGES = new Set(['F0', 'F1', 'F2', 'F3', 'F4', 'F5', 'Loss', 'Cancel'])
 const CATEGORIES = new Set(['On Channel', 'GTMA', 'NGTMA'])
-const PROCUREMENT_METHODS = new Set(['Tender/e-Katalog', 'Penunjukan Langsung'])
+const PROCUREMENT_METHODS = new Set([
+  'E-Katalog',
+  'Pengadaan Langsung',
+  'Penunjukan Langsung',
+  'Tender Cepat',
+  'Tender',
+])
 const STATUSES = new Set(['Active', 'At Risk', 'Completed', 'Lost', 'Cancelled'])
 
 function validateProject(body) {

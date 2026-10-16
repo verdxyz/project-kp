@@ -390,7 +390,7 @@ export function ServicesCatalog({ initialCategory = "Semua" }: ServicesCatalogPr
       const updated = { ...next[index], [field]: value }
       if (field === 'serviceGroup') {
         if (value === 'POTS') {
-          updated.productType = 'POTS'
+          updated.productType = 'HSI'
           updated.capacityMbps = 0
           updated.bandwidth = ''
         } else {
@@ -421,7 +421,7 @@ export function ServicesCatalog({ initialCategory = "Semua" }: ServicesCatalogPr
         id: r.id,
         idLOP: selectedIdLOP,
         serviceGroup: r.serviceGroup,
-        productType: r.serviceGroup === 'POTS' ? 'POTS' : r.productType,
+        productType: r.serviceGroup === 'POTS' ? 'HSI' : r.productType,
         capacityMbps: r.serviceGroup === 'POTS' ? 0 : r.capacityMbps,
         bandwidth: r.serviceGroup === 'POTS' ? null : r.bandwidth,
         location: r.serviceGroup === 'POTS' ? null : r.location,
