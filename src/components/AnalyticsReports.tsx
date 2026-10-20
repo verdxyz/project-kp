@@ -32,6 +32,7 @@ import { MASTER_INSTANSI_NAMES } from '../lib/constants'
 import { ProjectDocumentsModal } from './ProjectDatabase'
 import { getProjectDocumentLabel, ProjectDocuments, type ProjectDocument } from '../lib/projectDocuments'
 import { ServicePoints, type AgencyPivotRow } from '../lib/servicePoints'
+import { ProjectSummaryTable } from './ProjectSummaryTable'
 
 // Normalized Project interface
 export interface UnifiedProject {
@@ -39,9 +40,13 @@ export interface UnifiedProject {
   idLOP: string
   projectName: string
   agency: string
+  pemdaName: string
   agencyType: string
   region: string
   budget: number
+  servicePrice: number
+  servicePointCount?: number
+  servicePointTotalPrice?: number
   procurementMethod: string
   stage: ProjectEntry['stage']
   progress: number
@@ -53,6 +58,7 @@ export interface UnifiedProject {
   totalCapacityMbps: number | null
   sid: string | null
   subsidiaryName?: string | null
+  dinasName?: string | null
   status: ProjectEntry['status']
   notes?: string
 }
@@ -186,6 +192,11 @@ export function AnalyticsReports() {
     setSelectedAgency('Semua Instansi')
     setSelectedCategory('ALL')
     setSelectedStatus('ALL')
+  }
+
+  const handleSummaryProjectOpen = (idLOP: string) => {
+    const project = allProjects.find((item) => item.idLOP === idLOP)
+    if (project) setDetailProject(project)
   }
 
   const handleExportExcel = async () => {
@@ -324,6 +335,7 @@ export function AnalyticsReports() {
     <div className="space-y-6">
       {loadError && <div role="alert" className="rounded-xl border border-red-500/30 bg-red-500/10 p-3 text-sm text-red-300">{loadError}</div>}
       {loading && <div className="text-sm text-slate-400">Memuat laporan proyek...</div>}
+      {!loading && <ProjectSummaryTable projects={allProjects} onOpenProject={handleSummaryProjectOpen} />}
       {/* ─── Header & Quick Actions ─── */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-800">
         <div>
@@ -1137,7 +1149,8 @@ function ProjectDetailModal({ project, onClose }: ProjectDetailModalProps) {
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
             <div className="p-3 rounded-xl bg-slate-900 border border-slate-800">
               <span className="text-slate-500 text-[10px] block">Instansi Pelanggan</span>
-              <span className="text-slate-200 font-semibold mt-0.5 block truncate">{project.agency}</span>
+              <span className="text-slate-200 font-semibold mt-0.5 block truncate">{project.pemdaName || project.agency}</span>
+              {project.dinasName && <span className="mt-1 block truncate text-[10px] text-slate-400">{project.dinasName}</span>}
               <span className="text-slate-500 text-[10px]">{project.agencyType}</span>
             </div>
 
@@ -1145,6 +1158,16 @@ function ProjectDetailModal({ project, onClose }: ProjectDetailModalProps) {
               <span className="text-slate-500 text-[10px] block">Nilai Pagu Anggaran</span>
               <span className="text-emerald-400 font-bold text-sm mt-0.5 block">{formatIDR(project.budget)}</span>
               <span className="text-slate-500 text-[10px]">{abbreviateIDR(project.budget)}</span>
+            </div>
+
+            <div className="p-3 rounded-xl bg-slate-900 border border-slate-800">
+              <span className="text-slate-500 text-[10px] block">Harga Layanan / Nilai Kontrak</span>
+              <span className="text-emerald-400 font-bold text-sm mt-0.5 block">{formatIDR(project.servicePrice)}</span>
+              {(project.servicePointTotalPrice ?? 0) > 0 && (
+                <span className="mt-0.5 block text-[10px] text-slate-500">
+                  Total harga SID: {formatIDR(project.servicePointTotalPrice ?? 0)}
+                </span>
+              )}
             </div>
 
             <div className="p-3 rounded-xl bg-slate-900 border border-slate-800">

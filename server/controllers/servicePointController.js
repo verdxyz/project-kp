@@ -36,6 +36,16 @@ function parseCapacityMbps(value) {
   return Number((amount * multiplier).toFixed(3))
 }
 
+function parseServicePrice(value) {
+  if (value === null || value === undefined || value === '') return null
+  if (typeof value === 'number') return Number.isFinite(value) && value > 0 ? value : null
+  let amount = String(value).trim().replace(/^rp\s*/i, '').replace(/\s/g, '')
+  if (amount.includes(',')) amount = amount.replace(/\./g, '').replace(',', '.')
+  else amount = amount.replace(/\./g, '')
+  const parsed = Number(amount)
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : null
+}
+
 function findColumn(headers, aliases) {
   return headers.find((header) => aliases.includes(normalizeHeader(header)))
 }
@@ -65,6 +75,7 @@ export async function listServicePoints(req, res, next) {
               location,
               active_date::text AS "activeDate",
               bandwidth,
+              service_price::float8 AS "servicePrice",
               created_at AS "createdAt", updated_at AS "updatedAt"
          FROM project_service_points WHERE id_lop = $1 ORDER BY created_at ASC, id ASC`,
       [req.params.idLOP],
@@ -106,15 +117,26 @@ export async function batchUpdateServicePoints(req, res, next) {
       const sid = String(point.sid || '').trim()
       const orderNo = String(point.orderNo || '').trim()
       if (!sid && !orderNo && !point.location && !point.productType) continue
+      if (!sid) {
+        const error = new Error('SID wajib diisi untuk setiap titik layanan.')
+        error.status = 400
+        throw error
+      }
 
-      const actualSid = sid || (orderNo ? `ORD-${orderNo}` : `SID-${randomUUID().slice(0, 8)}`)
+      const actualSid = sid
       const productType = isPOTS ? 'HSI' : (point.productType ? normalizeProduct(point.productType) : 'Non-POTS')
       const capacityMbps = isPOTS ? 0 : (parseCapacityMbps(point.capacityMbps ?? point.bandwidth) ?? 0)
+      const servicePrice = parseServicePrice(point.servicePrice)
+      if (servicePrice === null) {
+        const error = new Error('Harga layanan wajib diisi dan harus lebih dari nol untuk setiap SID.')
+        error.status = 400
+        throw error
+      }
 
       await client.query(
         `INSERT INTO project_service_points (
-           id, id_lop, sid, product_type, capacity_mbps, service_group, order_no, quote, location, active_date, bandwidth
-         ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`,
+           id, id_lop, sid, product_type, capacity_mbps, service_group, order_no, quote, location, active_date, bandwidth, service_price
+         ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)`,
         [
           randomUUID(),
           idLOP,
@@ -127,6 +149,7 @@ export async function batchUpdateServicePoints(req, res, next) {
           point.location ? String(point.location).trim() : null,
           point.activeDate || null,
           point.bandwidth ? String(point.bandwidth).trim() : (capacityMbps ? `${capacityMbps} Mbps` : null),
+          servicePrice,
         ],
       )
     }
@@ -143,6 +166,7 @@ export async function batchUpdateServicePoints(req, res, next) {
               location,
               active_date::text AS "activeDate",
               bandwidth,
+              service_price::float8 AS "servicePrice",
               created_at AS "createdAt", updated_at AS "updatedAt"
          FROM project_service_points WHERE id_lop = $1 ORDER BY created_at ASC, id ASC`,
       [idLOP],
@@ -188,6 +212,8 @@ export async function importServicePoints(req, res, next) {
     const quoteColumn = findColumn(headers, ['quote', 'noquote', 'nomorquote'])
     const locationColumn = findColumn(headers, ['lokasi', 'location', 'alamat'])
     const activeDateColumn = findColumn(headers, ['tanggalaktif', 'tglaktif', 'activedate', 'startdate'])
+    const servicePriceColumn = findColumn(headers, ['hargalayanan', 'price', 'amount', 'nilaikontrak'])
+    if (!servicePriceColumn) return res.status(400).json({ message: 'Kolom Harga Layanan wajib tersedia pada template POTS maupun Non-POTS.' })
 
     const importRows = new Map()
     let skippedRows = 0
@@ -198,7 +224,8 @@ export async function importServicePoints(req, res, next) {
         continue
       }
       const capacityMbps = parseCapacityMbps(capacityColumn ? row[capacityColumn] : 0)
-      if (capacityMbps === null) {
+      const servicePrice = parseServicePrice(row[servicePriceColumn])
+      if (capacityMbps === null || servicePrice === null) {
         skippedRows += 1
         continue
       }
@@ -219,6 +246,7 @@ export async function importServicePoints(req, res, next) {
         location: location || null,
         activeDate: activeDate || null,
         bandwidth: capacityMbps ? `${capacityMbps} Mbps` : null,
+        servicePrice,
       })
     }
     if (!importRows.size) return res.status(400).json({ message: 'Tidak ada baris SID valid untuk diimpor.' })
@@ -237,8 +265,8 @@ export async function importServicePoints(req, res, next) {
     for (const point of importRows.values()) {
       await client.query(
         `INSERT INTO project_service_points (
-           id, id_lop, sid, product_type, capacity_mbps, service_group, order_no, quote, location, active_date, bandwidth
-         ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+           id, id_lop, sid, product_type, capacity_mbps, service_group, order_no, quote, location, active_date, bandwidth, service_price
+         ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
          ON CONFLICT (id_lop, sid) DO UPDATE SET
            product_type = EXCLUDED.product_type,
            capacity_mbps = EXCLUDED.capacity_mbps,
@@ -248,6 +276,7 @@ export async function importServicePoints(req, res, next) {
            location = COALESCE(EXCLUDED.location, project_service_points.location),
            active_date = COALESCE(EXCLUDED.active_date, project_service_points.active_date),
            bandwidth = COALESCE(EXCLUDED.bandwidth, project_service_points.bandwidth),
+           service_price = EXCLUDED.service_price,
            updated_at = now()`,
         [
           randomUUID(),
@@ -261,6 +290,7 @@ export async function importServicePoints(req, res, next) {
           point.location,
           point.activeDate,
           point.bandwidth,
+          point.servicePrice,
         ],
       )
     }

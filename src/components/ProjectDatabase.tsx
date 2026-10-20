@@ -16,7 +16,7 @@ import {
 import { cn } from '../lib/utils'
 import { CustomersDB, ProjectsDB, ServicesDB, type Customer, type ProjectEntry, type ServiceItem } from '../lib/db'
 import { ServicePointsModal } from './ServicePointsModal'
-import { MASTER_INSTANSI, MASTER_DINAS } from '../lib/constants'
+import { MASTER_INSTANSI } from '../lib/constants'
 import {
   getProjectDocumentTypes,
   ProjectDocuments,
@@ -119,9 +119,11 @@ function blankForm(category: ProjectEntry['category'] = 'On Channel'): ProjectFo
     idLOP: '',
     projectName: '',
     agency: '',
+    pemdaName: '',
     agencyType: '',
     region: '',
     budget: 0,
+    servicePrice: 0,
     procurementMethod: 'E-Katalog',
     stage: 'F0',
     progress: 0,
@@ -161,7 +163,7 @@ function ProjectModal({ mode, initial, fixedCategory, onSave, onClose, saving, s
   const [services] = useState<ServiceItem[]>(() => ServicesDB.getAll())
   const [customers] = useState<Customer[]>(() => CustomersDB.getAll())
   const [selectedCatalogServiceId, setSelectedCatalogServiceId] = useState('')
-  const [budgetInput, setBudgetInput] = useState(() => formatBudget(initial.budget))
+  const [servicePriceInput, setServicePriceInput] = useState(() => formatBudget(initial.servicePrice))
   const [documents, setDocuments] = useState<ProjectDocument[]>([])
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [documentError, setDocumentError] = useState('')
@@ -201,6 +203,8 @@ function ProjectModal({ mode, initial, fixedCategory, onSave, onClose, saving, s
       nextErrors.subsidiaryName = 'Nama anak perusahaan wajib diisi untuk NGTMA'
     }
     if (!form.agency) nextErrors.agency = 'Instansi wajib dipilih'
+    if (!form.pemdaName.trim()) nextErrors.pemdaName = 'Nama Pemda wajib diisi'
+    if (!form.servicePrice || form.servicePrice <= 0) nextErrors.servicePrice = 'Harga layanan wajib diisi dan harus lebih dari nol'
     if (!form.pic.trim()) nextErrors.pic = 'PIC wajib diisi'
     setErrors(nextErrors)
     return Object.keys(nextErrors).length === 0
@@ -230,12 +234,13 @@ function ProjectModal({ mode, initial, fixedCategory, onSave, onClose, saving, s
       if (!service) return
       const budget = Math.round((service.priceMonthly + (service.priceOTC ?? 0)) * 100) / 100
       setSelectedCatalogServiceId(service.id)
-      setBudgetInput(formatBudget(budget))
+      setServicePriceInput(formatBudget(budget))
       setForm((current) => ({
         ...current,
         serviceType: service.serviceType,
         totalCapacityMbps: bandwidthToMbps(service.bandwidth),
         budget,
+        servicePrice: budget,
       }))
       return
     }
@@ -284,6 +289,40 @@ function ProjectModal({ mode, initial, fixedCategory, onSave, onClose, saving, s
           <Field label="Nama Proyek *" error={errors.projectName}>
             <input value={form.projectName} onChange={(event) => set('projectName', event.target.value)} className="form-input" />
           </Field>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Field label="Nama Pemda *" error={errors.pemdaName}>
+              <input
+                value={form.pemdaName}
+                onChange={(event) => set('pemdaName', event.target.value)}
+                placeholder="Contoh: Pemkot Pekalongan"
+                className="form-input"
+              />
+            </Field>
+            <Field label="Nama Dinas">
+              <input
+                value={form.dinasName ?? ''}
+                onChange={(event) => set('dinasName', event.target.value)}
+                placeholder="Contoh: Kominfo atau Dukcapil"
+                className="form-input"
+              />
+            </Field>
+          </div>
+          <Field label="Harga Layanan / Nilai Kontrak *" error={errors.servicePrice}>
+            <div className="relative">
+              <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-xs text-slate-500">Rp</span>
+              <input
+                inputMode="decimal"
+                value={servicePriceInput}
+                onChange={(event) => {
+                  const formatted = formatBudgetInput(event.target.value)
+                  setServicePriceInput(formatted)
+                  set('servicePrice', parseBudgetInput(formatted))
+                }}
+                placeholder="Contoh: 10.000.000"
+                className="form-input pl-9"
+              />
+            </div>
+          </Field>
           {form.category === 'NGTMA' && (
             <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/30 space-y-4">
               <div className="flex items-center gap-2">
@@ -308,21 +347,6 @@ function ProjectModal({ mode, initial, fixedCategory, onSave, onClose, saving, s
                     ))}
                   </Select>
                 </Field>
-                <Field label="Nama Dinas (Terpisah) *">
-                  <input
-                    type="text"
-                    list="project-dinas-options"
-                    value={form.dinasName ?? ''}
-                    onChange={(event) => set('dinasName', event.target.value)}
-                    placeholder="Contoh: Dinas Komunikasi dan Informatika"
-                    className="form-input"
-                  />
-                  <datalist id="project-dinas-options">
-                    {MASTER_DINAS.map((d) => (
-                      <option key={d} value={d} />
-                    ))}
-                  </datalist>
-                </Field>
               </div>
               <Field label="Nama Anak Perusahaan Telkom *" error={errors.subsidiaryName}>
                 <input
@@ -335,7 +359,7 @@ function ProjectModal({ mode, initial, fixedCategory, onSave, onClose, saving, s
             </div>
           )}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Field label="Goverment Customer *" error={errors.agency}>
+            <Field label="Instansi Referensi *" error={errors.agency}>
               <Select
                 value={form.agency}
                 onChange={(agency) => setForm((current) => ({ ...current, agency, ...agencyFields(agency) }))}
@@ -612,12 +636,14 @@ export function ProjectDatabase({
   const filtered = projects.filter((project) => (
     (project.projectName.toLowerCase().includes(search.toLowerCase()) ||
       project.agency.toLowerCase().includes(search.toLowerCase()) ||
+      project.pemdaName.toLowerCase().includes(search.toLowerCase()) ||
+      (project.dinasName ?? '').toLowerCase().includes(search.toLowerCase()) ||
       project.idLOP.toLowerCase().includes(search.toLowerCase())) &&
     (filterStage === 'Semua' || project.stage === filterStage) &&
     (filterAgency === 'Semua Instansi' || project.agency === filterAgency) &&
     (initialCategory ? project.category === initialCategory : filterCategory === 'Semua' || project.category === filterCategory)
   ))
-  const totalBudget = filtered.reduce((total, project) => total + project.budget, 0)
+  const totalServicePrice = filtered.reduce((total, project) => total + project.servicePrice, 0)
   const wins = filtered.filter((project) => project.stage === 'F5').length
   const atRisk = filtered.filter((project) => project.status === 'At Risk').length
 
@@ -629,7 +655,7 @@ export function ProjectDatabase({
       const mode = modal.mode
       const baseForm = {
         ...form,
-        budget: form.budget && form.budget > 0 ? form.budget : 1,
+        budget: form.budget && form.budget > 0 ? form.budget : form.servicePrice,
       }
       const projectForm = initialCategory ? { ...baseForm, category: initialCategory } : baseForm
       const saved = mode === 'add'
@@ -671,9 +697,11 @@ export function ProjectDatabase({
         idLOP: editing.idLOP,
         projectName: editing.projectName,
         agency: editing.agency,
+        pemdaName: editing.pemdaName || editing.agency,
         agencyType: editing.agencyType,
         region: editing.region,
         budget: editing.budget,
+        servicePrice: editing.servicePrice,
         procurementMethod: editing.procurementMethod,
         stage: editing.stage,
         progress: editing.progress,
@@ -698,7 +726,7 @@ export function ProjectDatabase({
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           {[
             { label: 'Total Proyek', value: filtered.length, color: 'text-blue-400' },
-            { label: 'Total Anggaran', value: formatIDR(totalBudget), color: 'text-emerald-400' },
+            { label: 'Total Harga Layanan', value: formatIDR(totalServicePrice), color: 'text-emerald-400' },
             { label: 'Tahap F5', value: wins, color: 'text-violet-400' },
             { label: 'At Risk', value: atRisk, color: 'text-red-400' },
           ].map((stat) => (
@@ -742,7 +770,7 @@ export function ProjectDatabase({
         <table className="w-full">
           <thead>
             <tr className="border-b border-slate-700/50">
-              {['Proyek / ID LOP', 'Instansi', 'Kategori / SID', 'Anggaran', 'Tahap', 'Kapasitas', 'Status', 'Aksi'].map((heading) => (
+              {['Proyek / ID LOP', 'Nama Pemda / Dinas', 'Kategori / SID', 'Harga Layanan', 'Tahap', 'Kapasitas', 'Status', 'Aksi'].map((heading) => (
                 <th key={heading} className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-slate-500">{heading}</th>
               ))}
             </tr>
@@ -761,14 +789,15 @@ export function ProjectDatabase({
                   <p className="mt-1 max-w-xs truncate text-sm font-semibold text-white">{project.projectName}</p>
                 </td>
                 <td className="px-4 py-3">
-                  <span className="flex items-center gap-1.5 text-xs text-slate-300"><Building2 size={11} />{project.agency}</span>
+                  <span className="flex items-center gap-1.5 text-xs text-slate-300"><Building2 size={11} />{project.pemdaName || project.agency}</span>
+                  {project.dinasName && <span className="mt-1 block text-[11px] text-slate-500">{project.dinasName}</span>}
                 </td>
                 <td className="px-4 py-3 text-xs text-slate-300">
                   <div>{project.category === 'On Channel' ? 'Own Channel' : project.category}</div>
                   {project.subsidiaryName && <div className="mt-1 text-slate-400">{project.subsidiaryName}</div>}
                   <div className="mt-1 text-slate-500">{project.sid || 'SID belum diisi'}</div>
                 </td>
-                <td className="px-4 py-3 text-sm font-semibold text-emerald-400">{formatIDR(project.budget)}</td>
+                <td className="px-4 py-3 text-sm font-semibold text-emerald-400">{formatIDR(project.servicePrice)}</td>
                 <td className="px-4 py-3"><span className={cn('rounded-full border px-2.5 py-1 text-[10px] font-bold', STAGE_COLORS[project.stage])}>{project.stage}</span></td>
                 <td className="px-4 py-3 text-xs text-slate-300">{project.totalCapacityMbps === null ? '—' : `${project.totalCapacityMbps} Mbps`}</td>
                 <td className="px-4 py-3"><span className={cn('rounded-full border px-2.5 py-1 text-[10px] font-bold', STATUS_COLORS[project.status])}>{project.status}</span></td>

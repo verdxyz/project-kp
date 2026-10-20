@@ -7,12 +7,15 @@ const PROJECT_SELECT = `
   SELECT p.id, p.id_lop AS "idLOP", p.project_name AS "projectName",
          a.name AS agency, a.agency_type AS "agencyType", a.region,
          p.budget::float8 AS budget, p.procurement_method AS "procurementMethod",
+         p.service_price::float8 AS "servicePrice", p.pemda_name AS "pemdaName",
          p.stage, p.progress, p.start_date::text AS "startDate",
          p.end_date::text AS "endDate", p.pic, p.category, p.service_type AS "serviceType",
          p.total_capacity_mbps::float8 AS "totalCapacityMbps", p.sid, p.status, p.notes,
          p.subsidiary_name AS "subsidiaryName",
          p.customer_name AS "customerName",
          p.dinas_name AS "dinasName",
+         (SELECT COUNT(*)::int FROM project_service_points sp WHERE sp.id_lop = p.id_lop) AS "servicePointCount",
+         COALESCE((SELECT SUM(sp.service_price) FROM project_service_points sp WHERE sp.id_lop = p.id_lop), 0)::float8 AS "servicePointTotalPrice",
          p.created_at AS "createdAt", p.updated_at AS "updatedAt"
     FROM projects p
     JOIN government_agencies a ON a.id = p.agency_id
@@ -35,6 +38,8 @@ function validateProject(body) {
   if (typeof body.projectName !== 'string' || !body.projectName.trim()) errors.push('Nama proyek wajib diisi.')
   if (typeof body.agency !== 'string' || !body.agency.trim()) errors.push('Instansi wajib dipilih.')
   if (!Number.isFinite(Number(body.budget)) || Number(body.budget) <= 0) errors.push('Anggaran harus lebih dari nol.')
+  if (!Number.isFinite(Number(body.servicePrice)) || Number(body.servicePrice) <= 0) errors.push('Harga layanan wajib diisi dan harus lebih dari nol.')
+  if (typeof body.pemdaName !== 'string' || !body.pemdaName.trim()) errors.push('Nama Pemda wajib diisi.')
   if (!STAGES.has(body.stage)) errors.push('Tahap proyek tidak valid.')
   if (!CATEGORIES.has(body.category)) errors.push('Kategori kontrak tidak valid.')
   if (!PROCUREMENT_METHODS.has(body.procurementMethod)) errors.push('Metode pengadaan tidak valid.')
@@ -78,6 +83,8 @@ function projectValues(body) {
     typeof body.subsidiaryName === 'string' && body.subsidiaryName.trim() ? body.subsidiaryName.trim() : null,
     typeof body.customerName === 'string' && body.customerName.trim() ? body.customerName.trim() : null,
     typeof body.dinasName === 'string' && body.dinasName.trim() ? body.dinasName.trim() : null,
+    body.pemdaName.trim(),
+    Number(body.servicePrice),
   ]
 }
 
@@ -125,13 +132,13 @@ export async function saveProject(req, res, next) {
     if (values[5] === 'Loss') values[14] = 'Lost'
     if (values[5] === 'Cancel') values[14] = 'Cancelled'
     const id = req.params.id || randomUUID()
-    const params = [id, values[0], values[1], agency.rows[0].id, ...values.slice(3, 19)]
+    const params = [id, values[0], values[1], agency.rows[0].id, ...values.slice(3, 21)]
     const result = await client.query(
       `INSERT INTO projects (
          id, id_lop, project_name, agency_id, budget, procurement_method, stage, progress,
          start_date, end_date, pic, category, service_type, total_capacity_mbps, sid, status, notes,
-         subsidiary_name, customer_name, dinas_name
-       ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20)
+         subsidiary_name, customer_name, dinas_name, pemda_name, service_price
+       ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22)
        ON CONFLICT (id) DO UPDATE SET
          id_lop = EXCLUDED.id_lop, project_name = EXCLUDED.project_name, agency_id = EXCLUDED.agency_id,
          budget = EXCLUDED.budget, procurement_method = EXCLUDED.procurement_method, stage = EXCLUDED.stage,
@@ -140,6 +147,7 @@ export async function saveProject(req, res, next) {
          total_capacity_mbps = EXCLUDED.total_capacity_mbps, sid = EXCLUDED.sid, status = EXCLUDED.status,
          notes = EXCLUDED.notes, subsidiary_name = EXCLUDED.subsidiary_name,
          customer_name = EXCLUDED.customer_name, dinas_name = EXCLUDED.dinas_name,
+         pemda_name = EXCLUDED.pemda_name, service_price = EXCLUDED.service_price,
          updated_at = now()
        RETURNING id_lop`,
       params,

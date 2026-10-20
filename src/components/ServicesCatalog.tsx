@@ -230,6 +230,7 @@ interface ServicePointInputRow {
   quote: string
   orderNo: string
   sid: string
+  servicePrice: number
   activeDate: string
 }
 
@@ -243,6 +244,7 @@ function emptyServicePointRow(defaultProduct = 'HSI'): ServicePointInputRow {
     quote: '',
     orderNo: '',
     sid: '',
+    servicePrice: 0,
     activeDate: new Date().toISOString().slice(0, 10),
   }
 }
@@ -339,6 +341,7 @@ export function ServicesCatalog({ initialCategory = "Semua" }: ServicesCatalogPr
             quote: pt.quote || '',
             orderNo: pt.orderNo || '',
             sid: pt.sid || '',
+            servicePrice: pt.servicePrice ?? 0,
             activeDate: pt.activeDate || '',
           }))
           setServiceRows(mapped)
@@ -354,6 +357,7 @@ export function ServicesCatalog({ initialCategory = "Semua" }: ServicesCatalogPr
               quote: '',
               orderNo: '',
               sid: proj?.sid || '',
+              servicePrice: proj?.servicePrice ?? 0,
               activeDate: proj?.startDate || new Date().toISOString().slice(0, 10),
             },
           ])
@@ -417,6 +421,11 @@ export function ServicesCatalog({ initialCategory = "Semua" }: ServicesCatalogPr
     setPointsError("")
 
     try {
+      if (serviceRows.some((row) => !Number.isFinite(row.servicePrice) || row.servicePrice <= 0)) {
+        setPointsError("Harga layanan wajib diisi dan harus lebih dari nol untuk setiap titik.")
+        setSavingPoints(false)
+        return
+      }
       const payload: ProjectServicePoint[] = serviceRows.map((r) => ({
         id: r.id,
         idLOP: selectedIdLOP,
@@ -428,6 +437,7 @@ export function ServicesCatalog({ initialCategory = "Semua" }: ServicesCatalogPr
         quote: r.serviceGroup === 'POTS' ? null : r.quote,
         orderNo: r.orderNo || null,
         sid: r.sid || (r.orderNo ? `ORD-${r.orderNo}` : ''),
+        servicePrice: r.servicePrice,
         activeDate: r.activeDate || null,
       }))
 
@@ -796,7 +806,7 @@ export function ServicesCatalog({ initialCategory = "Semua" }: ServicesCatalogPr
                         {/* Row Form Fields based on POTS vs Non-POTS */}
                         {isPOTS ? (
                           /* POTS FIELDS: Hanya Nomor Order dan SID (Revisi 1) */
-                          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
+                          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-1">
                             <div>
                               <label className="block text-[11px] font-semibold text-violet-300 mb-1">
                                 Nomor Order (POTS) *
@@ -834,10 +844,25 @@ export function ServicesCatalog({ initialCategory = "Semua" }: ServicesCatalogPr
                                 className="form-input text-xs"
                               />
                             </div>
+                            <div>
+                              <label className="block text-[11px] font-semibold text-violet-300 mb-1">
+                                Harga Layanan (Rp) *
+                              </label>
+                              <input
+                                type="number"
+                                min="0.01"
+                                step="0.01"
+                                value={row.servicePrice || ''}
+                                onChange={(e) => handleRowChange(idx, 'servicePrice', Number(e.target.value))}
+                                placeholder="Contoh: 1500000"
+                                className="form-input text-xs"
+                                required
+                              />
+                            </div>
                           </div>
                         ) : (
                           /* Non-POTS FIELDS: Nama Produk, Bandwidth, Lokasi, Quote, Nomor Order, SID (Revisi 1) */
-                          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3 pt-1">
+                          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-7 gap-3 pt-1">
                             {/* 1. Nama Produk */}
                             <div className="lg:col-span-1">
                               <label className="block text-[11px] font-semibold text-slate-300 mb-1">
@@ -924,6 +949,22 @@ export function ServicesCatalog({ initialCategory = "Semua" }: ServicesCatalogPr
                                 onChange={(e) => handleRowChange(idx, 'sid', e.target.value)}
                                 placeholder="1029384756"
                                 className="form-input text-xs font-mono text-emerald-400"
+                                required
+                              />
+                            </div>
+                            <div className="lg:col-span-1">
+                              <label className="block text-[11px] font-semibold text-slate-300 mb-1">
+                                Harga Layanan (Rp) *
+                              </label>
+                              <input
+                                type="number"
+                                min="0.01"
+                                step="0.01"
+                                value={row.servicePrice || ''}
+                                onChange={(e) => handleRowChange(idx, 'servicePrice', Number(e.target.value))}
+                                placeholder="1500000"
+                                className="form-input text-xs"
+                                required
                               />
                             </div>
                           </div>

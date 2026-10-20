@@ -48,11 +48,11 @@ export function ServicePointsModal({ idLOP, onClose }: { idLOP: string; onClose:
       const sheets = [
         {
           name: 'Non-POTS',
-          headers: ['NAMA LAYANAN', 'BANDWIDTH', 'LOKASI', 'QUOTE', 'NO ORDER', 'SID', 'TANGGAL AKTIF'],
+          headers: ['NAMA LAYANAN', 'HARGA LAYANAN', 'BANDWIDTH', 'LOKASI', 'QUOTE', 'NO ORDER', 'SID', 'TANGGAL AKTIF'],
         },
         {
           name: 'POTS',
-          headers: ['NAMA LAYANAN', 'BANDWIDTH', 'LOKASI', 'NO ORDER', 'SID', 'TANGGAL AKTIF'],
+          headers: ['NAMA LAYANAN', 'HARGA LAYANAN', 'BANDWIDTH', 'LOKASI', 'NO ORDER', 'SID', 'TANGGAL AKTIF'],
         },
       ]
       for (const { name, headers } of sheets) {
@@ -104,7 +104,7 @@ export function ServicePointsModal({ idLOP, onClose }: { idLOP: string; onClose:
               />
             </label>
           ))}
-          <p className="w-full text-xs text-slate-500">Gunakan tombol sesuai jenis file. Template berisi sheet Non-POTS dan POTS dengan kolom sesuai format layanan.</p>
+          <p className="w-full text-xs text-slate-500">Gunakan tombol sesuai jenis file. Isi Harga Layanan untuk setiap SID pada template Non-POTS maupun POTS.</p>
         </div>
 
         {(error || message) && (
@@ -127,6 +127,7 @@ export function ServicePointsModal({ idLOP, onClose }: { idLOP: string; onClose:
                   <th className="px-3 py-2">Kondisi</th>
                   <th className="px-3 py-2">Produk</th>
                   <th className="px-3 py-2">SID</th>
+                  <th className="px-3 py-2 text-right">Harga Layanan</th>
                   <th className="px-3 py-2">No. Order</th>
                   <th className="px-3 py-2">Lokasi</th>
                   <th className="px-3 py-2 text-right">Kapasitas</th>
@@ -142,6 +143,7 @@ export function ServicePointsModal({ idLOP, onClose }: { idLOP: string; onClose:
                     </td>
                     <td className="px-3 py-2 text-slate-200">{point.productType}</td>
                     <td className="px-3 py-2 font-mono text-emerald-400">{point.sid}</td>
+                    <td className="px-3 py-2 text-right tabular-nums text-emerald-300">{point.servicePrice ? `Rp ${point.servicePrice.toLocaleString('id-ID')}` : '—'}</td>
                     <td className="px-3 py-2 text-slate-300">{point.orderNo || '—'}</td>
                     <td className="px-3 py-2 text-slate-400 truncate max-w-xs">{point.location || '—'}</td>
                     <td className="px-3 py-2 text-right tabular-nums text-slate-300">{point.capacityMbps > 0 ? `${point.capacityMbps.toLocaleString('id-ID')} Mbps` : '—'}</td>

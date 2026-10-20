@@ -54,9 +54,13 @@ export interface ProjectEntry {
   idLOP: string
   projectName: string
   agency: string
+  pemdaName: string
   agencyType: string
   region: string
   budget: number
+  servicePrice: number
+  servicePointCount?: number
+  servicePointTotalPrice?: number
   procurementMethod: 'E-Katalog' | 'Pengadaan Langsung' | 'Penunjukan Langsung' | 'Tender Cepat' | 'Tender'
   stage: 'F0' | 'F1' | 'F2' | 'F3' | 'F4' | 'F5' | 'Loss' | 'Cancel'
   progress: number

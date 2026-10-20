@@ -14,6 +14,7 @@ export interface ProjectServicePoint {
   location?: string | null
   activeDate?: string | null
   bandwidth?: string | null
+  servicePrice?: number | null
   createdAt?: string
   updatedAt?: string
 }
