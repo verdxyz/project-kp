@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Download, FileSpreadsheet, Upload, X } from 'lucide-react'
 import { ServicePoints, type ProjectServicePoint } from '../lib/servicePoints'
 
@@ -49,15 +49,21 @@ export function ServicePointsModal({ idLOP, onClose }: { idLOP: string; onClose:
         {
           name: 'Non-POTS',
           headers: ['NAMA LAYANAN', 'HARGA LAYANAN', 'BANDWIDTH', 'LOKASI', 'QUOTE', 'NO ORDER', 'SID', 'TANGGAL AKTIF'],
+          rows: [
+            ['Astinet', 15000000, '100 Mbps', 'Kantor Diskominfo Lt. 2', 'Q-2026-001', 'ORD-2026-NP-001', 'SID-SMG-001', '2026-01-15'],
+          ],
         },
         {
           name: 'POTS',
           headers: ['NAMA LAYANAN', 'HARGA LAYANAN', 'BANDWIDTH', 'LOKASI', 'NO ORDER', 'SID', 'TANGGAL AKTIF'],
+          rows: [
+            ['HSI', 1500000, '50 Mbps', 'Ruang Pelayanan', 'ORD-2026-POTS-001', 'SID-POTS-001', '2026-01-15'],
+          ],
         },
       ]
-      for (const { name, headers } of sheets) {
-        const worksheet = XLSX.utils.aoa_to_sheet([headers])
-        worksheet['!cols'] = headers.map((header) => ({ wch: Math.max(header.length + 2, 18) }))
+      for (const { name, headers, rows } of sheets) {
+        const worksheet = XLSX.utils.aoa_to_sheet([headers, ...rows])
+        worksheet['!cols'] = headers.map((header) => ({ wch: Math.max(header.length + 4, 18) }))
         worksheet['!freeze'] = { xSplit: 0, ySplit: 1, topLeftCell: 'A2', activePane: 'bottomLeft', state: 'frozen' }
         worksheet['!autofilter'] = { ref: XLSX.utils.encode_range({ s: { r: 0, c: 0 }, e: { r: 0, c: headers.length - 1 } }) }
         XLSX.utils.book_append_sheet(workbook, worksheet, name)

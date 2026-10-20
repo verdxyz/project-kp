@@ -1,4 +1,4 @@
-﻿import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import {
   AlertCircle,
   Building2,
@@ -51,7 +51,6 @@ const STATUS_COLORS: Record<ProjectEntry['status'], string> = {
   Cancelled: 'bg-slate-700 text-slate-300 border-slate-600',
 }
 const CATEGORIES: ProjectEntry['category'][] = ['On Channel', 'GTMA', 'NGTMA']
-const SERVICE_TYPES = ['Astinet', 'VPN IP', 'Metro Ethernet', 'SD-WAN', 'Google Workspace', 'Mikrotik', 'CPE', 'Lainnya']
 const AGENCY_BY_NAME = new Map<string, (typeof MASTER_INSTANSI)[number]>(
   MASTER_INSTANSI.map((agency) => [agency.nama, agency]),
 )
@@ -78,24 +77,6 @@ function parseBudgetInput(value: string) {
   const [integerPart, fractionalPart] = value.replace(/\./g, '').split(',', 2)
   const amount = Number(`${integerPart || '0'}${fractionalPart ? `.${fractionalPart}` : ''}`)
   return Number.isFinite(amount) ? amount : 0
-}
-
-function cursorAfterDigits(value: string, digitCount: number) {
-  if (!digitCount) return 0
-  let digitsSeen = 0
-  for (let index = 0; index < value.length; index += 1) {
-    if (/\d/.test(value[index])) digitsSeen += 1
-    if (digitsSeen === digitCount) return index + 1
-  }
-  return value.length
-}
-
-function cursorAfterBudgetInput(value: string, integerDigits: number, hasDecimal: boolean, fractionalDigits: number) {
-  if (hasDecimal) {
-    const separatorIndex = value.indexOf(',')
-    return separatorIndex < 0 ? value.length : Math.min(value.length, separatorIndex + 1 + fractionalDigits)
-  }
-  return cursorAfterDigits(value, integerDigits)
 }
 
 function bandwidthToMbps(bandwidth?: string) {
@@ -162,7 +143,6 @@ function ProjectModal({ mode, initial, fixedCategory, onSave, onClose, saving, s
   const [files, setFiles] = useState<SelectedFiles>({})
   const [services] = useState<ServiceItem[]>(() => ServicesDB.getAll())
   const [customers] = useState<Customer[]>(() => CustomersDB.getAll())
-  const [selectedCatalogServiceId, setSelectedCatalogServiceId] = useState('')
   const [servicePriceInput, setServicePriceInput] = useState(() => formatBudget(initial.servicePrice))
   const [documents, setDocuments] = useState<ProjectDocument[]>([])
   const [errors, setErrors] = useState<Record<string, string>>({})
@@ -204,7 +184,9 @@ function ProjectModal({ mode, initial, fixedCategory, onSave, onClose, saving, s
     }
     if (!form.agency) nextErrors.agency = 'Instansi wajib dipilih'
     if (!form.pemdaName.trim()) nextErrors.pemdaName = 'Nama Pemda wajib diisi'
-    if (!form.servicePrice || form.servicePrice <= 0) nextErrors.servicePrice = 'Harga layanan wajib diisi dan harus lebih dari nol'
+    if (mode === 'edit' && (!form.servicePrice || form.servicePrice < 0)) {
+      nextErrors.servicePrice = 'Harga layanan tidak boleh negatif'
+    }
     if (!form.pic.trim()) nextErrors.pic = 'PIC wajib diisi'
     setErrors(nextErrors)
     return Object.keys(nextErrors).length === 0
@@ -228,26 +210,7 @@ function ProjectModal({ mode, initial, fixedCategory, onSave, onClose, saving, s
     })
   }
 
-  const handleServiceSelection = (value: string) => {
-    if (value.startsWith('catalog:')) {
-      const service = matchingServices.find((item) => item.id === value.slice('catalog:'.length))
-      if (!service) return
-      const budget = Math.round((service.priceMonthly + (service.priceOTC ?? 0)) * 100) / 100
-      setSelectedCatalogServiceId(service.id)
-      setServicePriceInput(formatBudget(budget))
-      setForm((current) => ({
-        ...current,
-        serviceType: service.serviceType,
-        totalCapacityMbps: bandwidthToMbps(service.bandwidth),
-        budget,
-        servicePrice: budget,
-      }))
-      return
-    }
 
-    setSelectedCatalogServiceId('')
-    if (value.startsWith('manual:')) set('serviceType', value.slice('manual:'.length))
-  }
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -274,7 +237,6 @@ function ProjectModal({ mode, initial, fixedCategory, onSave, onClose, saving, s
             {!fixedCategory && (
               <Field label="Kategori Kontrak">
                 <Select value={form.category} onChange={(value) => {
-                  setSelectedCatalogServiceId('')
                   set('category', value as ProjectEntry['category'])
                 }}>
                   {CATEGORIES.map((category) => (
@@ -307,22 +269,26 @@ function ProjectModal({ mode, initial, fixedCategory, onSave, onClose, saving, s
               />
             </Field>
           </div>
-          <Field label="Harga Layanan / Nilai Kontrak *" error={errors.servicePrice}>
-            <div className="relative">
-              <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-xs text-slate-500">Rp</span>
-              <input
-                inputMode="decimal"
-                value={servicePriceInput}
-                onChange={(event) => {
-                  const formatted = formatBudgetInput(event.target.value)
-                  setServicePriceInput(formatted)
-                  set('servicePrice', parseBudgetInput(formatted))
-                }}
-                placeholder="Contoh: 10.000.000"
-                className="form-input pl-9"
-              />
-            </div>
-          </Field>
+          {mode === 'edit' && (
+            <Field label="Harga Layanan / Nilai Kontrak" error={errors.servicePrice}>
+              <div className="flex items-center gap-2">
+                <span className="flex h-[38px] items-center rounded-lg border border-slate-700 bg-slate-800/80 px-3 text-xs font-semibold text-slate-300 select-none">
+                  Rp
+                </span>
+                <input
+                  inputMode="decimal"
+                  value={servicePriceInput}
+                  onChange={(event) => {
+                    const formatted = formatBudgetInput(event.target.value)
+                    setServicePriceInput(formatted)
+                    set('servicePrice', parseBudgetInput(formatted))
+                  }}
+                  placeholder="Contoh: 10.000.000"
+                  className="form-input flex-1"
+                />
+              </div>
+            </Field>
+          )}
           {form.category === 'NGTMA' && (
             <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/30 space-y-4">
               <div className="flex items-center gap-2">
@@ -434,14 +400,16 @@ function ProjectModal({ mode, initial, fixedCategory, onSave, onClose, saving, s
               </Field>
             )}
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Field label="Tanggal Mulai">
-              <input type="date" value={form.startDate} onChange={(event) => set('startDate', event.target.value)} className="form-input" />
-            </Field>
-            <Field label="Tanggal Selesai">
-              <input type="date" value={form.endDate} onChange={(event) => set('endDate', event.target.value)} className="form-input" />
-            </Field>
-          </div>
+          {mode === 'edit' && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Field label="Tanggal Mulai">
+                <input type="date" value={form.startDate} onChange={(event) => set('startDate', event.target.value)} className="form-input" />
+              </Field>
+              <Field label="Tanggal Selesai">
+                <input type="date" value={form.endDate} onChange={(event) => set('endDate', event.target.value)} className="form-input" />
+              </Field>
+            </div>
+          )}
           <Field label="Catatan">
             <textarea value={form.notes ?? ''} onChange={(event) => set('notes', event.target.value)} rows={2} className="form-input resize-none" />
           </Field>

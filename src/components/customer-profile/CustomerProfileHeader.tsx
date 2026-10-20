@@ -1,20 +1,24 @@
 import { Building2, Download, Mail, MapPin, Phone, UserRound } from 'lucide-react'
 import type { CustomerProfile } from '../../data/customerProfiles'
 
+import { downloadPdf } from '../../lib/pdfGenerator'
+
 function downloadSlaReport(customer: CustomerProfile) {
-  const report = [
-    `LAPORAN SERVICE LEVEL AGREEMENT`,
+  const lines = [
     `Instansi: ${customer.name}`,
     `NIPNAS: ${customer.nipnas}`,
+    `Wilayah: ${customer.region}`,
     `Periode: Tahun 2026`,
-    `Target SLG: 99%`,
-    `Status: Dalam pemenuhan`,
-  ].join('\n')
-  const link = document.createElement('a')
-  link.href = URL.createObjectURL(new Blob([report], { type: 'text/plain;charset=utf-8' }))
-  link.download = `Laporan-SLG-${customer.region.replace(/\s+/g, '-')}.txt`
-  link.click()
-  URL.revokeObjectURL(link.href)
+    `Target Service Level Guarantee (SLG): 99%`,
+    `Status Operasional: Dalam Pemenuhan Standar SLG`,
+    '',
+    'Ringkasan Layanan Aktif:',
+    ...customer.services.slice(0, 8).map((s) => `- ${s.name} (${s.serviceNumber}) : Status ${s.status}`),
+    '',
+    'Catatan:',
+    'Dokumen ini merupakan laporan SLG resmi segmen B2G Telkom Indonesia.',
+  ]
+  downloadPdf(`Laporan-SLG-${customer.region.replace(/\s+/g, '-')}.pdf`, 'LAPORAN SERVICE LEVEL AGREEMENT (SLG)', lines)
 }
 
 function ContactCard({

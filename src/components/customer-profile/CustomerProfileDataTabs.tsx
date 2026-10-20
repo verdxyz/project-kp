@@ -18,14 +18,7 @@ const contractStatusStyles: Record<string, string> = {
   Resume: 'border-emerald-500/20 bg-emerald-500/10 text-emerald-300',
 }
 
-function downloadTextFile(name: string, contents: string) {
-  const url = URL.createObjectURL(new Blob([contents], { type: 'text/plain;charset=utf-8' }))
-  const link = document.createElement('a')
-  link.href = url
-  link.download = name
-  link.click()
-  URL.revokeObjectURL(url)
-}
+import { downloadPdf } from '../../lib/pdfGenerator'
 
 function ServiceList({ customer }: { customer: CustomerProfile }) {
   const [filter, setFilter] = useState<ServiceFilter>('Semua')
@@ -130,8 +123,26 @@ function DocumentList({ customer }: { customer: CustomerProfile }) {
             <div className="min-w-0 flex-1">
               <p className="truncate text-xs font-semibold text-slate-200">{document.name}</p>
               <p className="mt-1 text-[10px] text-slate-500">{document.type} · Diperbarui {document.updatedAt}</p>
-              <button type="button" onClick={() => downloadTextFile(document.name.replace(/\.pdf$/i, '.txt'), `${document.type}\n${customer.name}\nDokumen contoh untuk tampilan dashboard.`)} className="mt-3 inline-flex items-center gap-1.5 text-[10px] font-semibold text-cyan-300 hover:text-cyan-200">
-                <Download size={12} />Unduh
+              <button
+                type="button"
+                onClick={() =>
+                  downloadPdf(
+                    document.name,
+                    document.name.replace(/\.pdf$/i, ''),
+                    [
+                      `Tipe Dokumen: ${document.type}`,
+                      `Nama Instansi: ${customer.name}`,
+                      `Wilayah: ${customer.region}`,
+                      `Terakhir Diperbarui: ${document.updatedAt}`,
+                      '',
+                      'Keterangan:',
+                      'Dokumen ini merupakan arsip resmi B2G Telkom Indonesia.',
+                    ]
+                  )
+                }
+                className="mt-3 inline-flex items-center gap-1.5 text-[10px] font-semibold text-cyan-300 hover:text-cyan-200"
+              >
+                <Download size={12} />Unduh PDF
               </button>
             </div>
           </article>

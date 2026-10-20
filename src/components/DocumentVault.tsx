@@ -1,4 +1,4 @@
-﻿import React, { useState, useRef, useEffect } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import {
   Upload,
   FileCheck,
@@ -25,6 +25,7 @@ import {
 } from 'lucide-react'
 import { cn } from '../lib/utils'
 import { AuthService } from '../lib/auth'
+import { downloadPdf } from '../lib/pdfGenerator'
 
 export interface VaultDocument {
   id: string
@@ -828,14 +829,21 @@ function DocumentPreviewModal({ doc, onClose }: DocumentPreviewModalProps) {
       a.click()
       document.body.removeChild(a)
     } else {
-      // Simulate download for seeded documents
-      const blob = new Blob([`Dokumen Resmi B2G Telkom Indonesia\nJudul: ${doc.name}\nNomor: ${doc.nomorSurat || '-'}\nInstansi: ${doc.instansi || '-'}`], { type: 'text/plain' })
-      const url = URL.createObjectURL(blob)
-      const a = document.createElement('a')
-      a.href = url
-      a.download = doc.name.replace(/\.pdf$/, '.txt')
-      a.click()
-      URL.revokeObjectURL(url)
+      // Generate PDF for seeded documents
+      downloadPdf(
+        doc.name,
+        doc.name.replace(/\.[^/.]+$/, ''),
+        [
+          `Nomor Dokumen/Surat: ${doc.nomorSurat || '-'}`,
+          `Instansi: ${doc.instansi || '-'}`,
+          `Kategori: ${doc.category === 'mandatori' ? 'Dokumen Mandatori' : 'Dokumen Pendukung'}`,
+          `Status: ${doc.status === 'verified' ? 'Terverifikasi' : 'Tersimpan'}`,
+          `Diupload oleh: ${doc.uploadedBy || 'Sistem B2G'}`,
+          '',
+          'Keterangan:',
+          'Dokumen resmi arsip pengadaan B2G Telkom Indonesia.',
+        ]
+      )
     }
   }
 

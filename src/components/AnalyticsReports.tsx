@@ -1,30 +1,21 @@
-﻿import React, { useState, useMemo, useEffect } from 'react'
+import React, { useState, useMemo, useEffect } from 'react'
 import {
-  BarChart3,
   Filter,
   RotateCcw,
   CheckCircle2,
-  Clock,
   AlertTriangle,
   TrendingUp,
   FolderOpen,
   DollarSign,
   Eye,
   FileSpreadsheet,
-  Layers,
-  Wifi,
-  User,
-  Building2,
-  Calendar,
   X,
-  ChevronRight,
-  Percent,
-  Activity,
   FileText,
   Download,
   Check,
   ChevronDown,
   Search,
+  Activity,
 } from 'lucide-react'
 import { cn, formatIDR, abbreviateIDR } from '../lib/utils'
 import { ProjectsDB, type ProjectEntry } from '../lib/db'
