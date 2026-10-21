@@ -1,16 +1,13 @@
 -- 1. Standarisasi Penamaan Instansi (Revisi 5)
 -- Format diseragamkan menjadi "Pemkot" untuk Pemerintah Kota dan "Pemkab" untuk Pemerintah Kabupaten
-UPDATE government_agencies SET name = 'Pemkab Semarang' WHERE name = 'Kabupaten Semarang';
-UPDATE government_agencies SET name = 'Pemkot Semarang' WHERE name = 'Kota Semarang';
-UPDATE government_agencies SET name = 'Pemkot Pekalongan' WHERE name = 'Kota Pekalongan';
-UPDATE government_agencies SET name = 'Pemkot Tegal' WHERE name = 'Kota Tegal';
-
 INSERT INTO government_agencies (name, agency_type, region) VALUES
   ('Pemkot Semarang', 'Pemerintah Kota', 'Semarang'),
   ('Pemkab Semarang', 'Pemerintah Kabupaten', 'Semarang'),
   ('Pemkot Pekalongan', 'Pemerintah Kota', 'Pekalongan'),
   ('Pemkot Tegal', 'Pemerintah Kota', 'Tegal')
 ON CONFLICT (name) DO NOTHING;
+
+DELETE FROM government_agencies WHERE name IN ('Kabupaten Semarang', 'Kota Semarang', 'Kota Pekalongan', 'Kota Tegal');
 
 -- 2. Penambahan Field NGTMA pada Projects (Revisi 1)
 -- Field "Nama Pelanggan" (customer_name) & opsi "Nama Dinas" (dinas_name) terpisah
