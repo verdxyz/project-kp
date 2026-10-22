@@ -45,10 +45,7 @@ const allowedExtensions = new Set([
   '.pdf', '.doc', '.docx', '.xls', '.xlsx', '.png', '.jpg', '.jpeg',
 ])
 const upload = multer({
-  storage: multer.diskStorage({
-    destination: (_req, _file, callback) => callback(null, uploadDir),
-    filename: (_req, file, callback) => callback(null, `${randomUUID()}${path.extname(file.originalname).toLowerCase()}`),
-  }),
+  storage: multer.memoryStorage(),
   limits: { fileSize: 10 * 1024 * 1024, files: 1 },
   fileFilter: (_req, file, callback) => {
     if (!allowedExtensions.has(path.extname(file.originalname).toLowerCase())) {
@@ -123,6 +120,10 @@ if (process.env.NODE_ENV === 'production') {
     res.sendFile(path.join(distDir, 'index.html'), (error) => {
       if (error) next(error)
     })
+  })
+} else {
+  app.get('/', (_req, res) => {
+    res.redirect('http://localhost:5173')
   })
 }
 

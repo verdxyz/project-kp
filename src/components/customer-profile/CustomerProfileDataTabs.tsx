@@ -3,6 +3,7 @@ import { Download, FileText, Search, Trash2, Pencil, Plus, Upload } from 'lucide
 import type { CustomerProfile, CustomerProfileService } from '../../data/customerProfiles'
 import { EditableRecordModal, EditableTable, type TableRow } from './CustomerProfileMaps'
 import { ProjectsDB, type ProjectEntry } from '../../lib/db'
+import { downloadPdf } from '../../lib/pdfGenerator'
 
 const serviceFilters = ['Semua', 'Aktif', 'Suspend', 'Non Aktif'] as const
 type ServiceFilter = (typeof serviceFilters)[number]

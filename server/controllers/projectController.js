@@ -1,4 +1,4 @@
-﻿import { randomUUID } from 'node:crypto'
+import { randomUUID } from 'node:crypto'
 import { unlink } from 'node:fs/promises'
 import path from 'node:path'
 import { pool } from '../db.js'
@@ -37,8 +37,8 @@ function validateProject(body) {
   if (typeof body.idLOP !== 'string' || !body.idLOP.trim()) errors.push('ID LOP wajib diisi.')
   if (typeof body.projectName !== 'string' || !body.projectName.trim()) errors.push('Nama proyek wajib diisi.')
   if (typeof body.agency !== 'string' || !body.agency.trim()) errors.push('Instansi wajib dipilih.')
-  if (!Number.isFinite(Number(body.budget)) || Number(body.budget) <= 0) errors.push('Anggaran harus lebih dari nol.')
-  if (!Number.isFinite(Number(body.servicePrice)) || Number(body.servicePrice) <= 0) errors.push('Harga layanan wajib diisi dan harus lebih dari nol.')
+  if (!Number.isFinite(Number(body.budget)) || Number(body.budget) < 0) errors.push('Anggaran tidak boleh negatif.')
+  if (!Number.isFinite(Number(body.servicePrice)) || Number(body.servicePrice) < 0) errors.push('Harga layanan tidak boleh negatif.')
   if (typeof body.pemdaName !== 'string' || !body.pemdaName.trim()) errors.push('Nama Pemda wajib diisi.')
   if (!STAGES.has(body.stage)) errors.push('Tahap proyek tidak valid.')
   if (!CATEGORIES.has(body.category)) errors.push('Kategori kontrak tidak valid.')
