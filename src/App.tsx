@@ -5,6 +5,7 @@ import { CustomerDatabase } from './components/CustomerDatabase'
 import { ProjectDatabase } from './components/ProjectDatabase'
 import { AnalyticsReports } from './components/AnalyticsReports'
 import { CustomerProfilePage } from './components/CustomerProfilePage'
+import type { AnalyticsFocus } from './components/AnalyticsReports'
 
 // Section Header Component
 function SectionHeader({
@@ -47,6 +48,7 @@ const VIEW_MAP: Record<string, ViewKey> = {
 export default function App() {
   const [activeMenu, setActiveMenu] = useState('analytics')
   const [selectedCustomerName, setSelectedCustomerName] = useState<string>()
+  const [analyticsFocus, setAnalyticsFocus] = useState<AnalyticsFocus>()
 
   // Resolve which content view to render
   const activeView: ViewKey = VIEW_MAP[activeMenu] ?? 'analytics'
@@ -56,7 +58,10 @@ export default function App() {
       {/* Sidebar */}
       <Sidebar
         activeNav={activeMenu}
-        onNavChange={setActiveMenu}
+        onNavChange={(menu) => {
+          if (VIEW_MAP[menu] === 'analytics') setAnalyticsFocus(undefined)
+          setActiveMenu(menu)
+        }}
       />
 
       {/* Main Content */}
@@ -148,6 +153,10 @@ export default function App() {
             <CustomerProfilePage
               customerName={selectedCustomerName}
               onBack={() => setActiveMenu('customers-db')}
+              onOpenAnalytics={(pemdaName, serviceName) => {
+                setAnalyticsFocus({ pemdaName, serviceName })
+                setActiveMenu('analytics')
+              }}
             />
           )}
 
@@ -171,7 +180,7 @@ export default function App() {
           {/* ═══════════════════════════════════════════════════════════════════ */}
           {activeView === 'analytics' && (
             <section>
-              <AnalyticsReports />
+              <AnalyticsReports focus={analyticsFocus} onClearFocus={() => setAnalyticsFocus(undefined)} />
             </section>
           )}
 

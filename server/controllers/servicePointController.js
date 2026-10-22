@@ -18,7 +18,7 @@ function normalizeProduct(value, fallback = '') {
   return product
 }
 
-function parseCapacityMbps(value) {
+export function parseCapacityMbps(value) {
   if (value === null || value === undefined || value === '') return 0
   if (typeof value === 'number') return Number.isFinite(value) && value >= 0 ? value : null
   const match = String(value).trim().match(/^([\d.,]+)\s*(kbps|mbps|gbps)?$/i)
@@ -50,17 +50,41 @@ function findColumn(headers, aliases) {
   return headers.find((header) => aliases.includes(normalizeHeader(header)))
 }
 
-function normalizeActiveDate(value) {
+export function normalizeActiveDate(value, sid) {
   if (value === null || value === undefined || value === '') return null
+  const invalidDate = () => {
+    const error = new Error(`Tanggal Aktif untuk SID ${sid} tidak valid ("${value}"). Gunakan tanggal Excel atau format DD/MM/YYYY.`)
+    error.status = 400
+    throw error
+  }
+  const formatDate = (year, month, day) => {
+    const date = new Date(Date.UTC(year, month - 1, day))
+    if (
+      date.getUTCFullYear() !== year
+      || date.getUTCMonth() !== month - 1
+      || date.getUTCDate() !== day
+    ) return null
+    return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`
+  }
   if (typeof value === 'number') {
     const date = XLSX.SSF.parse_date_code(value)
-    if (!date) return String(value)
-    return `${date.y}-${String(date.m).padStart(2, '0')}-${String(date.d).padStart(2, '0')}`
+    const formatted = date && formatDate(date.y, date.m, date.d)
+    return formatted || invalidDate()
   }
   const text = String(value).trim()
+  const isoDate = text.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/)
+  if (isoDate) {
+    const formatted = formatDate(Number(isoDate[1]), Number(isoDate[2]), Number(isoDate[3]))
+    return formatted || invalidDate()
+  }
   const localDate = text.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/)
-  if (localDate) return `${localDate[3]}-${localDate[2].padStart(2, '0')}-${localDate[1].padStart(2, '0')}`
-  return text || null
+  if (localDate) {
+    const formatted = formatDate(Number(localDate[3]), Number(localDate[2]), Number(localDate[1]))
+    return formatted || invalidDate()
+  }
+  if (/^\d+(?:[.,]\d+)?$/.test(text)) return invalidDate()
+  const parsed = Date.parse(text)
+  return Number.isNaN(parsed) ? invalidDate() : new Date(parsed).toISOString().slice(0, 10)
 }
 
 export async function listServicePoints(req, res, next) {
@@ -77,7 +101,7 @@ export async function listServicePoints(req, res, next) {
               bandwidth,
               service_price::float8 AS "servicePrice",
               created_at AS "createdAt", updated_at AS "updatedAt"
-         FROM project_service_points WHERE id_lop = $1 ORDER BY created_at ASC, id ASC`,
+         FROM project_service_points WHERE id_lop = $1 ORDER BY updated_at DESC, created_at DESC, id DESC`,
       [req.params.idLOP],
     )
     res.json({ servicePoints: rows })
@@ -168,7 +192,7 @@ export async function batchUpdateServicePoints(req, res, next) {
               bandwidth,
               service_price::float8 AS "servicePrice",
               created_at AS "createdAt", updated_at AS "updatedAt"
-         FROM project_service_points WHERE id_lop = $1 ORDER BY created_at ASC, id ASC`,
+         FROM project_service_points WHERE id_lop = $1 ORDER BY updated_at DESC, created_at DESC, id DESC`,
       [idLOP],
     )
     res.json({ message: 'Data titik layanan berhasil diperbarui.', servicePoints: rows })
@@ -207,7 +231,14 @@ export async function importServicePoints(req, res, next) {
     const sidColumn = findColumn(headers, ['sid', 'serviceid', 'nomorsid', 'nomorserviceid'])
     if (!sidColumn) return res.status(400).json({ message: 'Kolom SID tidak ditemukan. Gunakan header SID atau Service ID.' })
     const productColumn = findColumn(headers, ['product', 'produk', 'service', 'layanan', 'producttype', 'tipeproduk', 'tipelayanan', 'namalayanan'])
-    const capacityColumn = findColumn(headers, ['capacitymbps', 'totalcapacitymbps', 'kapasitasmbps', 'kapasitas', 'bandwidth'])
+    const capacityColumn = findColumn(headers, [
+      'capacitymbps',
+      'totalcapacitymbps',
+      'kapasitasmbps',
+      'kapasitas',
+      'bandwidth',
+      'bandwith',
+    ])
     const orderColumn = findColumn(headers, ['noorder', 'nomororder', 'orderno', 'order'])
     const quoteColumn = findColumn(headers, ['quote', 'noquote', 'nomorquote'])
     const locationColumn = findColumn(headers, ['lokasi', 'location', 'alamat'])
@@ -217,29 +248,37 @@ export async function importServicePoints(req, res, next) {
 
     const importRows = new Map()
     let skippedRows = 0
+    let duplicateRows = 0
+    let invalidRows = 0
     for (const row of rows) {
       const sid = String(row[sidColumn] ?? '').trim()
       if (!sid) {
-        skippedRows += 1
-        continue
-      }
-      const capacityMbps = parseCapacityMbps(capacityColumn ? row[capacityColumn] : 0)
-      const servicePrice = parseServicePrice(row[servicePriceColumn])
-      if (capacityMbps === null || servicePrice === null) {
-        skippedRows += 1
+        if (Object.values(row).some((value) => String(value ?? '').trim() !== '')) {
+          invalidRows += 1
+        } else {
+          skippedRows += 1
+        }
         continue
       }
       const productType = normalizeProduct(productColumn ? row[productColumn] : '', project.rows[0].service_type)
+      const isPOTS = requestedGroup ? requestedGroup === 'POTS' : productType.toLowerCase() === 'pots'
+      const parsedCapacityMbps = parseCapacityMbps(capacityColumn ? row[capacityColumn] : 0)
+      const capacityMbps = isPOTS ? (parsedCapacityMbps ?? 0) : parsedCapacityMbps
+      const servicePrice = parseServicePrice(row[servicePriceColumn])
+      if ((!isPOTS && capacityMbps === null) || servicePrice === null) {
+        invalidRows += 1
+        continue
+      }
       const orderNo = orderColumn ? String(row[orderColumn] ?? '').trim() : ''
       const quote = quoteColumn ? String(row[quoteColumn] ?? '').trim() : ''
       const location = locationColumn ? String(row[locationColumn] ?? '').trim() : ''
-      const activeDate = activeDateColumn ? normalizeActiveDate(row[activeDateColumn]) : null
-      const isPOTS = requestedGroup ? requestedGroup === 'POTS' : productType.toLowerCase() === 'pots'
+      const activeDate = activeDateColumn ? normalizeActiveDate(row[activeDateColumn], sid) : null
 
+      if (importRows.has(sid)) duplicateRows += 1
       importRows.set(sid, {
         sid,
         productType: isPOTS ? 'HSI' : productType,
-        capacityMbps: isPOTS ? 0 : capacityMbps,
+        capacityMbps,
         serviceGroup: isPOTS ? 'POTS' : 'Non-POTS',
         orderNo: orderNo || null,
         quote: quote || null,
@@ -247,6 +286,11 @@ export async function importServicePoints(req, res, next) {
         activeDate: activeDate || null,
         bandwidth: capacityMbps ? `${capacityMbps} Mbps` : null,
         servicePrice,
+      })
+    }
+    if (invalidRows) {
+      return res.status(400).json({
+        message: `${invalidRows} baris SID memiliki Harga Layanan atau Kapasitas yang tidak valid. Data lama tidak diubah; perbaiki file lalu unggah kembali.`,
       })
     }
     if (!importRows.size) return res.status(400).json({ message: 'Tidak ada baris SID valid untuk diimpor.' })
@@ -262,6 +306,13 @@ export async function importServicePoints(req, res, next) {
       return res.status(404).json({ message: 'Proyek tidak ditemukan.' })
     }
 
+    const removed = requestedGroup
+      ? await client.query(
+        'DELETE FROM project_service_points WHERE id_lop = $1 AND service_group = $2',
+        [req.params.idLOP, requestedGroup],
+      )
+      : { rowCount: 0 }
+
     for (const point of importRows.values()) {
       await client.query(
         `INSERT INTO project_service_points (
@@ -271,11 +322,11 @@ export async function importServicePoints(req, res, next) {
            product_type = EXCLUDED.product_type,
            capacity_mbps = EXCLUDED.capacity_mbps,
            service_group = EXCLUDED.service_group,
-           order_no = COALESCE(EXCLUDED.order_no, project_service_points.order_no),
-           quote = COALESCE(EXCLUDED.quote, project_service_points.quote),
-           location = COALESCE(EXCLUDED.location, project_service_points.location),
-           active_date = COALESCE(EXCLUDED.active_date, project_service_points.active_date),
-           bandwidth = COALESCE(EXCLUDED.bandwidth, project_service_points.bandwidth),
+           order_no = EXCLUDED.order_no,
+           quote = EXCLUDED.quote,
+           location = EXCLUDED.location,
+           active_date = EXCLUDED.active_date,
+           bandwidth = EXCLUDED.bandwidth,
            service_price = EXCLUDED.service_price,
            updated_at = now()`,
         [
@@ -295,7 +346,12 @@ export async function importServicePoints(req, res, next) {
       )
     }
     await client.query('COMMIT')
-    res.status(200).json({ imported: importRows.size, skipped: skippedRows })
+    res.status(200).json({
+      imported: importRows.size,
+      replaced: removed.rowCount,
+      skipped: skippedRows,
+      duplicateRows,
+    })
   } catch (error) {
     await client?.query('ROLLBACK').catch(() => {})
     if (error.status) return res.status(error.status).json({ message: error.message })

@@ -30,8 +30,16 @@ export function ServicePointsModal({ idLOP, onClose }: { idLOP: string; onClose:
     setMessage('')
     try {
       const result = await ServicePoints.importExcel(idLOP, file, serviceGroup)
-      const destination = serviceGroup === 'POTS' ? ' ke layanan HSI (grup POTS)' : ' ke layanan Non-POTS'
-      setMessage(`${result.imported} SID berhasil diimpor atau diperbarui${destination}${result.skipped ? `, ${result.skipped} baris dilewati` : ''}.`)
+      const groupName = serviceGroup === 'POTS' ? 'POTS / HSI' : 'Non-POTS'
+      const duplicateNote = result.duplicateRows
+        ? `, ${result.duplicateRows} baris SID duplikat digabung (data terakhir dipakai)`
+        : ''
+      const skippedNote = result.skipped
+        ? `, ${result.skipped} baris kosong tanpa SID diabaikan`
+        : ''
+      setMessage(
+        `Upload ${groupName} selesai: ${result.imported} SID unik tersimpan; ${result.replaced} data lama grup ${groupName} diganti${duplicateNote}${skippedNote}.`,
+      )
       await loadPoints()
     } catch (importError) {
       setError(importError instanceof Error ? importError.message : 'Gagal mengimpor SID.')
@@ -104,7 +112,7 @@ export function ServicePointsModal({ idLOP, onClose }: { idLOP: string; onClose:
               />
             </label>
           ))}
-          <p className="w-full text-xs text-slate-500">Gunakan tombol sesuai jenis file. Isi Harga Layanan untuk setiap SID pada template Non-POTS maupun POTS.</p>
+          <p className="w-full text-xs text-slate-500">Gunakan tombol sesuai jenis file. Isi Harga Layanan untuk setiap SID; kapasitas POTS boleh dikosongkan jika tidak tersedia.</p>
         </div>
 
         {(error || message) && (
@@ -146,7 +154,11 @@ export function ServicePointsModal({ idLOP, onClose }: { idLOP: string; onClose:
                     <td className="px-3 py-2 text-right tabular-nums text-emerald-300">{point.servicePrice ? `Rp ${point.servicePrice.toLocaleString('id-ID')}` : '—'}</td>
                     <td className="px-3 py-2 text-slate-300">{point.orderNo || '—'}</td>
                     <td className="px-3 py-2 text-slate-400 truncate max-w-xs">{point.location || '—'}</td>
-                    <td className="px-3 py-2 text-right tabular-nums text-slate-300">{point.capacityMbps > 0 ? `${point.capacityMbps.toLocaleString('id-ID')} Mbps` : '—'}</td>
+                    <td className="px-3 py-2 text-right tabular-nums text-slate-300">
+                      {point.capacityMbps > 0
+                        ? `${point.capacityMbps.toLocaleString('id-ID')} Mbps`
+                        : point.bandwidth || '—'}
+                    </td>
                   </tr>
                 ))}
               </tbody>

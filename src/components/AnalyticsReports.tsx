@@ -86,7 +86,45 @@ const STAGE_OPTIONS = [
   { value: 'Cancel', label: 'Cancel (Batal)' },
 ]
 
-export function AnalyticsReports() {
+export interface AnalyticsFocus {
+  pemdaName: string
+  serviceName: string
+}
+
+function normalizePemdaName(value: string) {
+  return value.trim().toLocaleLowerCase('id-ID').replace(/\s+/g, ' ')
+    .replace(/^pemkot\b/, 'pemerintah kota')
+    .replace(/^kota\b/, 'pemerintah kota')
+    .replace(/^pemkab\b/, 'pemerintah kabupaten')
+    .replace(/^kabupaten\b/, 'pemerintah kabupaten')
+    .replace(/^pemprov\b/, 'pemerintah provinsi')
+    .replace(/^provinsi\b/, 'pemerintah provinsi')
+}
+
+function matchesAnalyticsFocus(
+  project: Pick<UnifiedProject, 'pemdaName' | 'agency' | 'dinasName' | 'serviceType'>,
+  focus: AnalyticsFocus,
+) {
+  const pemda = normalizePemdaName(focus.pemdaName)
+  const projectPemdaNames = [project.pemdaName, project.agency, project.dinasName]
+    .filter((name): name is string => Boolean(name))
+  const matchesPemda = projectPemdaNames.some((name) => normalizePemdaName(name) === pemda)
+  const service = focus.serviceName.toLocaleLowerCase('id-ID')
+  const serviceKey = service.includes('astinet') ? 'astinet'
+    : service.includes('wifi') ? 'wifi'
+      : service.includes('vpn') ? 'vpn'
+        : service.includes('metro') ? 'metro'
+          : service.replace(/[^a-z0-9]/g, '')
+  return matchesPemda && project.serviceType.toLocaleLowerCase('id-ID').replace(/[^a-z0-9]/g, '').includes(serviceKey)
+}
+
+export function AnalyticsReports({
+  focus,
+  onClearFocus,
+}: {
+  focus?: AnalyticsFocus
+  onClearFocus: () => void
+}) {
   const [allProjects, setAllProjects] = useState<UnifiedProject[]>([])
   const [loadError, setLoadError] = useState('')
   const [loading, setLoading] = useState(true)
@@ -150,6 +188,8 @@ export function AnalyticsReports() {
   // Filter Logic
   const filteredProjects = useMemo(() => {
     return allProjects.filter((p) => {
+      if (focus && !matchesAnalyticsFocus(p, focus)) return false
+
       // Search
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase()
@@ -174,7 +214,7 @@ export function AnalyticsReports() {
 
       return true
     })
-  }, [allProjects, searchQuery, selectedStage, selectedAgency, selectedCategory, selectedStatus])
+  }, [allProjects, focus, searchQuery, selectedStage, selectedAgency, selectedCategory, selectedStatus])
 
   // Computed summary metrics based on filtered set
   const totalValue = filteredProjects.reduce((sum, p) => sum + p.budget, 0)
@@ -335,7 +375,24 @@ export function AnalyticsReports() {
     <div className="space-y-6">
       {loadError && <div role="alert" className="rounded-xl border border-red-500/30 bg-red-500/10 p-3 text-sm text-red-300">{loadError}</div>}
       {loading && <div className="text-sm text-slate-400">Memuat laporan proyek...</div>}
-      {!loading && <ProjectSummaryTable projects={allProjects} onOpenProject={handleSummaryProjectOpen} />}
+      {!loading && (
+        <>
+          {focus && (
+            <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-blue-500/25 bg-blue-500/10 px-4 py-3">
+              <p className="text-xs text-blue-100">
+                Ringkasan layanan <strong>{focus.serviceName}</strong> untuk <strong>{focus.pemdaName}</strong>
+              </p>
+              <button type="button" onClick={onClearFocus} className="text-xs font-semibold text-blue-300 hover:text-white hover:underline">
+                Tampilkan semua analitik
+              </button>
+            </div>
+          )}
+          <ProjectSummaryTable
+            projects={focus ? allProjects.filter((project) => matchesAnalyticsFocus(project, focus)) : allProjects}
+            onOpenProject={handleSummaryProjectOpen}
+          />
+        </>
+      )}
       {/* ─── Header & Quick Actions ─── */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-800">
         <div>

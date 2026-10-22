@@ -1,49 +1,64 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import {
-  BadgeCheck, Building2, Check, CloudUpload, Pencil, Plus, Save, Trash2, X,
-  Lightbulb, MessageSquareText, Network, Target, Users,
+  Check, CloudUpload, Pencil, Plus, Save, Trash2, X,
 } from 'lucide-react'
 import type { FormEvent, ReactNode } from 'react'
 import type { CustomerProfile, MapsSection } from '../../data/customerProfiles'
+import { CountryPhoneInput } from './CountryPhoneInput'
+import { ProjectsDB, type ProjectEntry } from '../../lib/db'
 
-const MAPS_SECTIONS: { label: MapsSection; icon: typeof Building2; complete: boolean }[] = [
-  { label: 'Customer Profile', icon: Building2, complete: true },
-  { label: 'Strategic Highlight', icon: Target, complete: true },
-  { label: 'Management Profile', icon: Users, complete: true },
-  { label: 'Institution Profile', icon: Network, complete: true },
-  { label: 'Benchmark Best Practices', icon: BadgeCheck, complete: true },
-  { label: 'Customer Value Innovation', icon: Lightbulb, complete: true },
-  { label: 'Revenue and Wallet Shared', icon: Network, complete: false },
-  { label: 'Business Prospect', icon: Target, complete: false },
-  { label: 'Complaint and Solution', icon: MessageSquareText, complete: false },
+const MAPS_SECTIONS: MapsSection[] = [
+  'Customer Profile',
+  'Strategic Highlight',
+  'Management Profile',
+  'Institution Profile',
+  'Benchmark Best Practices and TOWS Analysis',
+  'Customer Value Innovation',
+  'Revenue and Wallet Shared',
+  'Business Prospect',
+  'Complaint and Solution',
+  'Courtesy Visit',
 ]
+
+export type TableRow = Record<string, string>
+export type TableColumn = { key: string; label: string; type?: 'text' | 'number' | 'date' | 'currency' | 'image' | 'select'; options?: readonly string[] }
+
+function formatRupiah(value: number | string) {
+  const amount = typeof value === 'number' ? value : Number(value.replace(/\D/g, '')) || 0
+  return `Rp ${new Intl.NumberFormat('id-ID').format(amount)}`
+}
+
+function parseRupiah(value: string) {
+  return Number(value.replace(/\D/g, '')) || 0
+}
 
 function MapsSidebar({ active, onChange }: { active: MapsSection; onChange: (section: MapsSection) => void }) {
   return (
     <aside className="rounded-2xl border border-slate-700/70 bg-slate-900/80 p-3">
       <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/5 p-3">
         <div className="flex items-center justify-between">
-          <p className="text-xs font-bold text-white">6/6 Kriteria Terpenuhi</p>
-          <span className="text-[10px] font-bold text-emerald-300">100%</span>
+          <p className="text-xs font-bold text-white">Progres Anda</p>
+          <span className="text-[10px] font-bold text-emerald-300">6/6</span>
         </div>
+        <p className="mt-2 text-xs text-slate-300"><strong className="text-base text-white">6/6</strong> Kriteria Terpenuhi.</p>
         <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-slate-800">
-          <div className="h-full w-full rounded-full bg-gradient-to-r from-emerald-500 to-teal-300" />
+          <div className="h-full w-full rounded-full bg-emerald-500" />
         </div>
-        <p className="mt-2 text-[10px] text-slate-500">Kelengkapan profil pelanggan</p>
+        <a href="#maps-sections" className="mt-3 inline-block text-xs font-semibold text-slate-300 underline hover:text-white">Lihat Kriteria</a>
       </div>
-      <nav className="mt-3 space-y-1" aria-label="Submenu MAPS">
-        {MAPS_SECTIONS.map(({ label, icon: Icon, complete }) => (
+      <nav id="maps-sections" className="mt-3 space-y-1" aria-label="Submenu MAPS">
+        {MAPS_SECTIONS.map((label) => (
           <button
             key={label}
             type="button"
             onClick={() => onChange(label)}
-            className={`flex w-full items-center gap-2.5 rounded-xl px-3 py-2.5 text-left text-[11px] font-medium transition ${
-              active === label ? 'bg-cyan-500/10 text-cyan-200 ring-1 ring-cyan-500/20' : 'text-slate-400 hover:bg-slate-800 hover:text-slate-200'
+            className={`flex w-full items-center gap-2.5 rounded-lg px-3 py-2.5 text-left text-xs transition ${
+              active === label ? 'bg-blue-500/15 text-slate-100' : 'text-slate-300 hover:bg-slate-800'
             }`}
           >
-            <Icon size={14} className="shrink-0" />
+            <Check size={14} className="shrink-0 text-emerald-400" />
             <span className="flex-1">{label}</span>
-            {complete && <Check size={13} className="shrink-0 text-emerald-400" />}
+            <span className="text-blue-400">›</span>
           </button>
         ))}
       </nav>
@@ -51,368 +66,569 @@ function MapsSidebar({ active, onChange }: { active: MapsSection; onChange: (sec
   )
 }
 
-function PanelTitle({ title, subtitle }: { title: string; subtitle: string }) {
+function PanelTitle({ title, subtitle }: { title: string; subtitle?: string }) {
   return (
     <div className="mb-5">
-      <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-cyan-400">Customer Intelligence</p>
-      <h3 className="mt-1 text-lg font-bold text-white">{title}</h3>
-      <p className="mt-1 text-xs text-slate-500">{subtitle}</p>
+      <h3 className="text-base font-semibold text-slate-100">{title}</h3>
+      {subtitle && <p className="mt-1 text-xs text-slate-400">{subtitle}</p>}
     </div>
   )
 }
 
-function DataCard({ label, value, icon: Icon }: { label: string; value: string; icon?: typeof Building2 }) {
-  return (
-    <div className="rounded-xl border border-slate-700/60 bg-slate-950/40 p-3">
-      <p className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wide text-slate-500">
-        {Icon && <Icon size={12} className="text-cyan-400" />}{label}
-      </p>
-      <p className="mt-1.5 break-words text-sm font-semibold text-slate-100">{value}</p>
-    </div>
-  )
-}
-
-function CustomerOverview({ customer }: { customer: CustomerProfile }) {
-  return (
-    <div>
-      <PanelTitle title="Customer Profile" subtitle="Informasi utama dan cakupan organisasi pelanggan." />
-      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-        <DataCard label="Telepon" value={customer.phone} />
-        <DataCard label="Email" value={customer.email} />
-        <DataCard label="Website" value={customer.website} />
-        <DataCard label="Jumlah Pegawai" value={`${customer.employeeCount.toLocaleString('id-ID')} pegawai`} />
-        <DataCard label="Alamat" value={customer.address} icon={Building2} />
-      </div>
-      <div className="mt-5 overflow-hidden rounded-xl border border-slate-700/60">
-        <div className="flex items-center justify-between border-b border-slate-700/60 bg-slate-800/60 px-4 py-3">
-          <h4 className="text-xs font-bold text-white">Satuan Kerja</h4>
-          <span className="text-[10px] text-slate-500">{customer.organizationUnits.length} kategori</span>
-        </div>
-        <div className="grid grid-cols-2 gap-px bg-slate-700/50 sm:grid-cols-3">
-          {customer.organizationUnits.map(({ label, count }) => (
-            <div key={label} className="bg-slate-900 p-4">
-              <p className="text-[10px] text-slate-500">{label}</p>
-              <p className="mt-1 text-xl font-bold tabular-nums text-white">{count.toLocaleString('id-ID')}</p>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  )
-}
-
-function StrategicHighlight({ customer }: { customer: CustomerProfile }) {
-  return (
-    <div>
-      <PanelTitle title="Strategic Highlight" subtitle="Arah strategis dan prioritas pembangunan daerah." />
-      <div className="rounded-2xl border border-cyan-500/20 bg-gradient-to-br from-cyan-500/10 to-blue-500/5 p-5">
-        <p className="text-[10px] font-bold uppercase tracking-widest text-cyan-300">Visi</p>
-        <p className="mt-2 text-base font-semibold leading-relaxed text-white">“{customer.vision}”</p>
-      </div>
-      <div className="mt-4 grid gap-4 lg:grid-cols-2">
-        <ListPanel title="Misi" items={customer.missions} />
-        <ListPanel title="Strategi Jangka Menengah" items={customer.mediumTermStrategy} />
-        <div className="lg:col-span-2"><ListPanel title="Strategi Jangka Panjang" items={customer.longTermStrategy} /></div>
-      </div>
-    </div>
-  )
-}
-
-function ListPanel({ title, items }: { title: string; items: string[] }) {
-  return (
-    <section className="rounded-xl border border-slate-700/60 bg-slate-950/35 p-4">
-      <h4 className="text-xs font-bold text-white">{title}</h4>
-      <ul className="mt-3 space-y-2">
-        {items.map((item) => <li key={item} className="flex gap-2 text-xs leading-relaxed text-slate-300"><Check size={13} className="mt-0.5 shrink-0 text-emerald-400" />{item}</li>)}
-      </ul>
-    </section>
-  )
-}
-
-function ManagementProfile({ customer }: { customer: CustomerProfile }) {
-  const [fileName, setFileName] = useState('')
-  const inputRef = useRef<HTMLInputElement>(null)
-  return (
-    <div>
-      <PanelTitle title="Management Profile" subtitle="Struktur organisasi dan kontak utama pelanggan." />
-      <input ref={inputRef} type="file" accept=".pdf,.png,.jpg,.jpeg,.ppt,.pptx" className="hidden" onChange={(event) => setFileName(event.target.files?.[0]?.name ?? '')} />
-      <button
-        type="button"
-        onClick={() => inputRef.current?.click()}
-        onDragOver={(event) => event.preventDefault()}
-        onDrop={(event) => {
-          event.preventDefault()
-          setFileName(event.dataTransfer.files[0]?.name ?? '')
-        }}
-        className="flex min-h-36 w-full flex-col items-center justify-center rounded-2xl border border-dashed border-slate-600 bg-slate-950/30 px-5 text-center transition hover:border-cyan-500/50 hover:bg-cyan-500/5"
-      >
-        <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-cyan-500/10 text-cyan-300"><CloudUpload size={20} /></span>
-        <span className="mt-3 text-xs font-semibold text-slate-200">{fileName || 'Drag and drop Struktur Organisasi di sini'}</span>
-        <span className="mt-1 text-[10px] text-slate-500">Klik untuk memilih file · PDF, PNG, JPG, PPT</span>
-      </button>
-      <DataTable
-        title="Daftar Kontak Pelanggan"
-        columns={['Nama', 'Role', 'Jabatan', 'Telepon']}
-        rows={customer.contacts.map((contact) => [contact.name, contact.role, contact.position, contact.phone])}
-      />
-    </div>
-  )
-}
-
-function InstitutionProfile({ customer }: { customer: CustomerProfile }) {
-  return (
-    <div>
-      <PanelTitle title="Institution Profile" subtitle="Industry Value Chain Analysis (IVCA)." />
-      <DataTable title="Industry Value Chain Analysis (IVCA)" columns={['Kategori', 'Analisis Rantai Nilai']} rows={customer.ivca.map((item) => [item.category, item.description])} />
-    </div>
-  )
-}
-
-function Benchmark({ customer }: { customer: CustomerProfile }) {
-  return (
-    <div>
-      <PanelTitle title="Benchmark Best Practices" subtitle="Ringkasan praktik baik dan area pengembangan." />
-      <div className="grid gap-3 md:grid-cols-3">
-        {customer.benchmarks.map((item, index) => (
-          <article key={item} className="rounded-2xl border border-slate-700/60 bg-slate-950/40 p-4">
-            <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-emerald-500/10 text-sm font-bold text-emerald-300">0{index + 1}</span>
-            <p className="mt-4 text-sm leading-relaxed text-slate-200">{item}</p>
-          </article>
-        ))}
-      </div>
-    </div>
-  )
-}
-
-type EditableField = { key: string; label: string; type?: 'text' | 'number' }
-
-function EditableRecordModal({
+function EditableCard({
   title,
-  fields,
+  value,
+  onSave,
+  className = '',
+}: {
+  title: string
+  value: string
+  onSave: (value: string) => boolean
+  className?: string
+}) {
+  const [draft, setDraft] = useState(value)
+  const [saveStatus, setSaveStatus] = useState('')
+  const save = () => {
+    if (draft === value) return
+    setSaveStatus(onSave(draft) ? 'Tersimpan' : 'Gagal menyimpan')
+  }
+
+  return (
+    <article className={`overflow-hidden rounded-xl border border-slate-700/60 bg-slate-950/35 ${className}`}>
+      <h4 className={`border-b border-slate-700/50 bg-emerald-500/10 px-3 py-2.5 text-center text-xs font-semibold text-slate-200 ${className.includes('currency-card') ? 'text-base' : ''}`}>{title}</h4>
+      <textarea
+        aria-label={title}
+        value={draft}
+        onChange={(event) => {
+          setDraft(event.target.value)
+          setSaveStatus('')
+        }}
+        onBlur={save}
+        placeholder={`Buat ${title} Disini`}
+        rows={Math.max(2, Math.min(6, draft.split('\n').length))}
+        className={`min-h-20 w-full resize-y bg-transparent px-3 py-3 text-sm leading-relaxed text-slate-200 outline-none focus:bg-cyan-500/5 ${className.includes('currency-card') ? 'text-xl font-bold' : ''}`}
+      />
+      {saveStatus && <p aria-live="polite" className="px-3 pb-2 text-right text-[10px] text-slate-500">{saveStatus}</p>}
+    </article>
+  )
+}
+
+export function EditableRecordModal({
+  title,
+  columns,
   initial,
   onClose,
   onSave,
 }: {
   title: string
-  fields: EditableField[]
-  initial: Record<string, string>
+  columns: TableColumn[]
+  initial: TableRow
   onClose: () => void
-  onSave: (record: Record<string, string>) => void
+  onSave: (row: TableRow) => void
 }) {
   const [values, setValues] = useState(initial)
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const [uploadError, setUploadError] = useState('')
+  const submit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     onSave(values)
   }
   return (
-    <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm" onMouseDown={(event) => {
+    <div className="fixed inset-0 z-[80] flex items-center justify-center bg-black/70 p-4" onMouseDown={(event) => {
       if (event.target === event.currentTarget) onClose()
     }}>
-      <form onSubmit={handleSubmit} className="w-full max-w-lg space-y-4 rounded-2xl border border-slate-700 bg-slate-900 p-5 shadow-2xl">
+      <form onSubmit={submit} className="max-h-[90vh] w-full max-w-xl space-y-4 overflow-y-auto rounded-2xl border border-slate-700 bg-slate-900 p-5">
         <div className="flex items-center justify-between">
           <h4 className="text-sm font-bold text-white">{title}</h4>
-          <button type="button" onClick={onClose} aria-label="Tutup" className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-800 hover:text-white"><X size={16} /></button>
+          <button type="button" onClick={onClose} aria-label="Tutup" className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-800"><X size={16} /></button>
         </div>
-        {fields.map((field) => (
-          <label key={field.key} className="block text-xs font-semibold text-slate-300">
-            {field.label}
-            <input
-              type={field.type ?? 'text'}
-              min={field.type === 'number' ? 0 : undefined}
-              value={values[field.key] ?? ''}
-              onChange={(event) => setValues((current) => ({ ...current, [field.key]: event.target.value }))}
-              required
-              className="form-input mt-1.5"
-            />
+        {columns.map((column) => (
+          <label key={column.key} className="block text-xs font-semibold text-slate-300">
+            {column.label}
+            {column.type === 'image'
+              ? <input type="file" accept="image/png,image/jpeg" aria-label={`Upload ${column.label}`} className="form-input mt-1.5" onChange={(event) => {
+                  const file = event.target.files?.[0]
+                  if (!file) return
+                  if (!['image/png', 'image/jpeg'].includes(file.type)) {
+                    setUploadError('Logo harus berupa PNG, JPG, atau JPEG.')
+                    return
+                  }
+                  const reader = new FileReader()
+                  reader.onload = () => {
+                    if (typeof reader.result === 'string') setValues((current) => ({ ...current, [column.key]: reader.result as string }))
+                  }
+                  reader.onerror = () => {
+                    console.error('Gagal membaca file logo benchmark.', reader.error)
+                    setUploadError('Logo gagal dibaca. Silakan pilih file lain.')
+                  }
+                  setUploadError('')
+                  reader.readAsDataURL(file)
+                }} />
+              : column.type === 'select'
+                ? <select value={values[column.key] ?? ''} onChange={(event) => setValues((current) => ({ ...current, [column.key]: event.target.value }))} className="form-input mt-1.5">
+                    <option value="">Pilih {column.label}</option>
+                    {column.options?.map((option) => <option key={option} value={option}>{option}</option>)}
+                  </select>
+              : column.key === 'description' || column.key === 'notes' || column.key === 'solution' || column.key === 'objective' || column.key === 'comparator' || column.key === 'challenges'
+              ? <textarea value={values[column.key] ?? ''} onChange={(event) => setValues((current) => ({ ...current, [column.key]: event.target.value }))} placeholder={`Buat ${column.label} Disini`} rows={3} className="form-input mt-1.5" />
+              : <input type={column.type === 'currency' ? 'text' : column.type ?? 'text'} inputMode={column.type === 'currency' ? 'numeric' : undefined} value={column.type === 'currency' ? formatRupiah(values[column.key] ?? '') : values[column.key] ?? ''} onChange={(event) => setValues((current) => ({ ...current, [column.key]: column.type === 'currency' ? String(parseRupiah(event.target.value)) : event.target.value }))} placeholder={`Buat ${column.label} Disini`} className="form-input mt-1.5" />}
           </label>
         ))}
-        <div className="flex justify-end gap-2 pt-1">
+        {uploadError && <p role="alert" className="text-xs text-amber-300">{uploadError}</p>}
+        <div className="flex justify-end gap-2">
           <button type="button" onClick={onClose} className="btn-secondary">Batal</button>
-          <button type="submit" className="btn-primary flex items-center gap-2"><Save size={14} />Simpan</button>
+          <button type="submit" disabled={Boolean(uploadError)} className="btn-primary flex items-center gap-2"><Save size={14} />Simpan</button>
         </div>
       </form>
     </div>
   )
 }
 
-function CustomerInnovations({ customer }: { customer: CustomerProfile }) {
-  const [innovations, setInnovations] = useState(customer.innovations)
-  const [editingIndex, setEditingIndex] = useState<number | null>(null)
-
-  const saveInnovation = (record: Record<string, string>) => {
-    if (editingIndex === null) return
-    setInnovations((current) => current.map((item, index) => index === editingIndex
-      ? { name: record.name, description: record.description, status: item.status }
-      : item))
-    setEditingIndex(null)
+export function EditableTable({
+  title,
+  columns,
+  rows,
+  onChange,
+  addLabel,
+  emptyMessage = 'Belum ada data.',
+}: {
+  title: string
+  columns: TableColumn[]
+  rows: TableRow[]
+  onChange: (rows: TableRow[]) => void
+  addLabel: string
+  emptyMessage?: string
+}) {
+  const [editing, setEditing] = useState<{ index: number | null; row: TableRow } | null>(null)
+  const openEditor = (index: number | null) => setEditing({
+    index,
+    row: index === null ? {} : { ...rows[index] },
+  })
+  const save = (row: TableRow) => {
+    const updated = [...rows]
+    if (editing?.index === null) updated.push(row)
+    else if (editing?.index !== undefined) updated[editing.index] = row
+    onChange(updated)
+    setEditing(null)
   }
 
   return (
-    <div>
-      <PanelTitle title="Customer Value Innovation" subtitle="Daftar inisiatif inovasi nilai pelanggan." />
-      <section className="overflow-hidden rounded-xl border border-slate-700/60">
-        <div className="flex items-center justify-between border-b border-slate-700/60 bg-slate-800/50 px-4 py-3">
-          <h4 className="text-xs font-bold text-white">Daftar Inovasi</h4>
-          <span className="text-[10px] text-slate-500">{innovations.length} inovasi</span>
-        </div>
-        <div className="overflow-x-auto">
-          <table className="w-full min-w-[600px] text-left">
-            <thead><tr className="border-b border-slate-700/50 bg-slate-950/50">{['Nama Inovasi', 'Deskripsi', 'Aksi'].map((heading) => <th key={heading} className="px-4 py-3 text-[9px] font-bold uppercase tracking-wider text-slate-500">{heading}</th>)}</tr></thead>
-            <tbody className="divide-y divide-slate-800/80">
-              {innovations.map((item, index) => (
-                <tr key={`${item.name}-${index}`} className="hover:bg-slate-800/30">
-                  <td className="px-4 py-3 text-xs font-semibold text-slate-200">{item.name}</td>
-                  <td className="px-4 py-3 text-xs leading-relaxed text-slate-300">{item.description}</td>
-                  <td className="px-4 py-3">
-                    <div className="flex items-center gap-1.5">
-                      <button type="button" aria-label={`Edit ${item.name}`} onClick={() => setEditingIndex(index)} className="rounded-lg bg-slate-800 p-2 text-slate-400 hover:bg-blue-500/15 hover:text-blue-300"><Pencil size={13} /></button>
-                      <button type="button" aria-label={`Hapus ${item.name}`} onClick={() => setInnovations((current) => current.filter((_, rowIndex) => rowIndex !== index))} className="rounded-lg bg-slate-800 p-2 text-slate-400 hover:bg-red-500/15 hover:text-red-300"><Trash2 size={13} /></button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-              {innovations.length === 0 && <tr><td colSpan={3} className="px-4 py-10 text-center text-xs text-slate-500">Belum ada data inovasi.</td></tr>}
-            </tbody>
-          </table>
-        </div>
-      </section>
-      {editingIndex !== null && (
-        <EditableRecordModal
-          title="Edit Inovasi"
-          fields={[{ key: 'name', label: 'Nama Inovasi' }, { key: 'description', label: 'Deskripsi' }]}
-          initial={{ name: innovations[editingIndex].name, description: innovations[editingIndex].description }}
-          onClose={() => setEditingIndex(null)}
-          onSave={saveInnovation}
-        />
-      )}
-    </div>
-  )
-}
-
-function RevenueWallet({ customer }: { customer: CustomerProfile }) {
-  const [walletSpend, setWalletSpend] = useState(customer.walletSpend)
-  const [editingWalletIndex, setEditingWalletIndex] = useState<number | null>(null)
-  const revenueCards = [
-    { label: 'Revenue Shared Telkom · 2026', amount: 0 },
-    { label: 'Revenue Shared Telkom · 2025', amount: 0 },
-    { label: 'Revenue Growth', amount: 0 },
-  ]
-
-  const saveWalletSpend = (record: Record<string, string>) => {
-    if (editingWalletIndex === null) return
-    const updated = {
-      product: record.product,
-      amount: Number(record.amount),
-      institution: record.institution,
-    }
-    setWalletSpend((current) => editingWalletIndex === current.length
-      ? [...current, updated]
-      : current.map((item, index) => index === editingWalletIndex ? updated : item))
-    setEditingWalletIndex(null)
-  }
-
-  return (
-    <div>
-      <PanelTitle title="Revenue and Wallet Shared" subtitle="Potensi dan realisasi nilai bisnis pelanggan." />
-      <div className="grid gap-3 sm:grid-cols-3">
-        {revenueCards.map((item, index) => (
-          <div key={item.label} className={`rounded-2xl border p-4 ${index === 0 ? 'border-cyan-500/20 bg-cyan-500/5' : 'border-slate-700/60 bg-slate-950/40'}`}>
-            <p className="text-xs text-slate-400">{item.label}</p>
-            <p className="mt-2 text-xl font-bold text-white">Rp {item.amount.toLocaleString('id-ID')}</p>
-          </div>
-        ))}
+    <section className="overflow-hidden rounded-xl border border-slate-700/60">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-700/60 px-4 py-3">
+        <h4 className="text-sm font-semibold text-slate-200">{title}</h4>
+        <button type="button" onClick={() => openEditor(null)} className="btn-primary flex items-center gap-1.5 px-3 py-2 text-[10px]"><Plus size={13} />{addLabel.replace(/^\+\s*/, '')}</button>
       </div>
-      <DataTable title="Daftar Produk" columns={['Produk', 'Revenue', 'Subsidiaries']} rows={[]} emptyMessage="Belum ada data revenue produk." />
-      <section className="mt-5 overflow-hidden rounded-xl border border-slate-700/60">
-        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-700/60 bg-slate-800/50 px-4 py-3">
-          <div>
-            <h4 className="text-xs font-bold text-white">Wallet Shared</h4>
-            <p className="mt-1 text-[10px] text-slate-400">Daftar belanja pelanggan di luar Telkom</p>
-          </div>
-          <button type="button" onClick={() => setEditingWalletIndex(walletSpend.length)} className="btn-primary flex items-center gap-1.5 px-3 py-2 text-[10px]"><Plus size={13} />Tambah Daftar Belanja</button>
-        </div>
-        <div className="overflow-x-auto">
-          <table className="w-full min-w-[660px] text-left">
-            <thead><tr className="border-b border-slate-700/50 bg-slate-950/50">{['Produk', 'Nominal Belanja', 'Perusahaan/Institusi', 'Aksi'].map((heading) => <th key={heading} className="px-4 py-3 text-[9px] font-bold uppercase tracking-wider text-slate-500">{heading}</th>)}</tr></thead>
-            <tbody className="divide-y divide-slate-800/80">
-              {walletSpend.map((item, index) => (
-                <tr key={`${item.product}-${index}`} className="hover:bg-slate-800/30">
-                  <td className="px-4 py-3 text-xs font-semibold text-slate-200">{item.product}</td>
-                  <td className="px-4 py-3 text-xs tabular-nums text-slate-300">Rp {item.amount.toLocaleString('id-ID')}</td>
-                  <td className="px-4 py-3 text-xs text-slate-300">{item.institution}</td>
-                  <td className="px-4 py-3">
-                    <div className="flex items-center gap-1.5">
-                      <button type="button" aria-label={`Edit ${item.product}`} onClick={() => setEditingWalletIndex(index)} className="rounded-lg bg-slate-800 p-2 text-slate-400 hover:bg-blue-500/15 hover:text-blue-300"><Pencil size={13} /></button>
-                      <button type="button" aria-label={`Hapus ${item.product}`} onClick={() => setWalletSpend((current) => current.filter((_, rowIndex) => rowIndex !== index))} className="rounded-lg bg-slate-800 p-2 text-slate-400 hover:bg-red-500/15 hover:text-red-300"><Trash2 size={13} /></button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-              {walletSpend.length === 0 && <tr><td colSpan={4} className="px-4 py-10 text-center text-xs text-slate-500">Belum ada daftar belanja pelanggan di luar Telkom.</td></tr>}
-            </tbody>
-          </table>
-        </div>
-      </section>
-      {editingWalletIndex !== null && (
-        <EditableRecordModal
-          title={editingWalletIndex === walletSpend.length ? 'Tambah Daftar Belanja' : 'Edit Daftar Belanja'}
-          fields={[{ key: 'product', label: 'Produk' }, { key: 'amount', label: 'Nominal Belanja (Rp)', type: 'number' }, { key: 'institution', label: 'Perusahaan/Institusi' }]}
-          initial={walletSpend[editingWalletIndex]
-            ? { product: walletSpend[editingWalletIndex].product, amount: String(walletSpend[editingWalletIndex].amount), institution: walletSpend[editingWalletIndex].institution }
-            : { product: '', amount: '', institution: '' }}
-          onClose={() => setEditingWalletIndex(null)}
-          onSave={saveWalletSpend}
-        />
-      )}
-    </div>
-  )
-}
-
-function BusinessProspect({ customer }: { customer: CustomerProfile }) {
-  return <><PanelTitle title="Business Prospect" subtitle="Peluang proyek dan pipeline bisnis." /><DataTable title="Daftar Business Opportunity" columns={['Proyek / LOP ID', 'Kategori Proyek', 'Proses', 'Nilai Penawaran', 'Kategori']} rows={customer.opportunities.map((item) => [item.projectId, item.projectCategory, item.process, `Rp ${item.offer.toLocaleString('id-ID')}`, item.category])} /></>
-}
-
-function ComplaintSolution({ customer }: { customer: CustomerProfile }) {
-  return <><PanelTitle title="Complaint and Solution" subtitle="Riwayat kendala pelanggan dan tindak lanjut." /><DataTable title="Daftar Komplain dan Solusi" columns={['Tanggal', 'Kendala', 'Solusi / Tindak Lanjut', 'Status']} rows={customer.complaints.map((item) => [item.date, item.issue, item.solution, item.status])} /></>
-}
-
-function DataTable({ title, columns, rows, emptyMessage }: { title: string; columns: string[]; rows: string[][]; emptyMessage?: string }) {
-  return (
-    <section className="mt-5 overflow-hidden rounded-xl border border-slate-700/60">
-      <div className="border-b border-slate-700/60 bg-slate-800/50 px-4 py-3"><h4 className="text-xs font-bold text-white">{title}</h4></div>
       <div className="overflow-x-auto">
-        <table className="w-full min-w-[540px] text-left">
-          <thead><tr className="border-b border-slate-700/50 bg-slate-950/50">{columns.map((column) => <th key={column} className="px-4 py-3 text-[9px] font-bold uppercase tracking-wider text-slate-500">{column}</th>)}</tr></thead>
+        <table className="w-full min-w-[650px] text-left">
+          <thead><tr className="border-b border-slate-700/50 bg-slate-950/50">
+            {columns.map((column) => <th key={column.key} className="px-3 py-3 text-[10px] font-bold text-slate-400">{column.label}</th>)}
+            <th className="px-3 py-3 text-[10px] font-bold text-slate-400">Aksi</th>
+          </tr></thead>
           <tbody className="divide-y divide-slate-800/80">
-            {rows.map((row, rowIndex) => <tr key={`${row[0]}-${rowIndex}`} className="hover:bg-slate-800/30">{row.map((cell, cellIndex) => <td key={`${cellIndex}-${cell}`} className="px-4 py-3 text-xs leading-relaxed text-slate-300">{cell}</td>)}</tr>)}
-            {rows.length === 0 && emptyMessage && <tr><td colSpan={columns.length} className="px-4 py-8 text-center text-xs text-slate-500">{emptyMessage}</td></tr>}
+            {rows.map((row, index) => (
+              <tr key={`${row[columns[0]?.key] ?? 'row'}-${index}`} className="hover:bg-slate-800/30">
+                {columns.map((column) => <td key={column.key} className="max-w-sm px-3 py-3 text-xs leading-relaxed text-slate-300">{column.type === 'image' && row[column.key]
+                  ? <img src={row[column.key]} alt={`${row.institution ?? title} logo`} className="h-10 w-10 rounded object-contain" />
+                  : row[column.key] ? column.type === 'currency' ? formatRupiah(row[column.key]) : row[column.key] : <span className="text-slate-600">-</span>}</td>)}
+                <td className="px-3 py-3">
+                  <div className="flex items-center gap-1">
+                    <button type="button" aria-label={`Edit ${row[columns[0]?.key] ?? title}`} onClick={() => openEditor(index)} className="rounded-lg p-2 text-slate-400 hover:bg-blue-500/15 hover:text-blue-300"><Pencil size={13} /></button>
+                    <button type="button" aria-label={`Hapus ${row[columns[0]?.key] ?? title}`} onClick={() => onChange(rows.filter((_, rowIndex) => rowIndex !== index))} className="rounded-lg p-2 text-slate-400 hover:bg-blue-500/15 hover:text-blue-300"><Trash2 size={13} /></button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+            {rows.length === 0 && <tr><td colSpan={columns.length + 1} className="px-4 py-8 text-center text-xs text-slate-500">{emptyMessage}</td></tr>}
           </tbody>
         </table>
       </div>
+      {editing && <EditableRecordModal title={editing.index === null ? addLabel : `Edit ${title}`} columns={columns} initial={editing.row} onClose={() => setEditing(null)} onSave={save} />}
     </section>
   )
 }
 
-export function CustomerProfileMaps({ customer }: { customer: CustomerProfile }) {
+function CustomerOverview({ customer, onUpdate }: { customer: CustomerProfile; onUpdate: (updates: Partial<CustomerProfile>) => boolean }) {
+  const saveString = (key: 'phone' | 'email' | 'website' | 'address', value: string) => onUpdate({ [key]: value })
+  return (
+    <div>
+      <PanelTitle title="Customer Profile" />
+      <div className="grid gap-4 sm:grid-cols-2">
+        <article className="overflow-hidden rounded-xl border border-slate-700/60 bg-slate-950/35">
+          <h4 className="border-b border-slate-700/50 bg-emerald-500/10 px-3 py-2.5 text-center text-xs font-semibold text-slate-200">Telepon</h4>
+          <div className="px-3 py-3"><CountryPhoneInput label="Telepon" value={customer.phone} onSave={(value) => saveString('phone', value)} /></div>
+        </article>
+        <EditableCard title="Jumlah Pegawai" value={customer.employeeCount.toLocaleString('id-ID')} onSave={(value) => onUpdate({ employeeCount: Number(value.replace(/\./g, '')) || 0 })} />
+        <EditableCard title="Email" value={customer.email} onSave={(value) => saveString('email', value)} />
+        <EditableCard title="Alamat Website" value={customer.website} onSave={(value) => saveString('website', value)} />
+      </div>
+      <div className="mt-4">
+        <EditableCard
+          title="Satuan Kerja"
+          value={customer.organizationUnits.map((unit) => unit.label).join(', ')}
+          onSave={(value) => onUpdate({
+            organizationUnits: value.split(/[,\n]/).map((label) => label.trim()).filter(Boolean).map((label) => ({
+              label,
+              count: customer.organizationUnits.find((unit) => unit.label === label)?.count ?? 0,
+            })),
+          })}
+        />
+      </div>
+    </div>
+  )
+}
+
+function StrategicHighlight({ customer, onUpdate }: { customer: CustomerProfile; onUpdate: (updates: Partial<CustomerProfile>) => boolean }) {
+  return (
+    <div>
+      <PanelTitle title="Strategic Highlight" />
+      <div className="grid gap-4 lg:grid-cols-2">
+        <EditableCard title="Visi" value={customer.vision} onSave={(vision) => onUpdate({ vision })} />
+        <EditableCard title="Misi" value={customer.missions.join('\n')} onSave={(text) => onUpdate({ missions: text.split('\n') })} />
+        <EditableCard title="Strategi Jangka Menengah" value={customer.mediumTermStrategy.join('\n')} onSave={(text) => onUpdate({ mediumTermStrategy: text.split('\n') })} />
+        <EditableCard title="Strategi Jangka Panjang" value={customer.longTermStrategy.join('\n')} onSave={(text) => onUpdate({ longTermStrategy: text.split('\n') })} />
+      </div>
+    </div>
+  )
+}
+
+function ManagementProfile({ customer, onUpdate }: { customer: CustomerProfile; onUpdate: (updates: Partial<CustomerProfile>) => boolean }) {
+  const inputRef = useRef<HTMLInputElement>(null)
+  const contacts = customer.contacts.map((contact) => ({ ...contact }))
+  return (
+    <div>
+      <PanelTitle title="Management Profile" />
+      <div className="mb-5">
+        <h4 className="mb-2 text-sm font-medium text-slate-300">Struktur Organisasi</h4>
+        <input ref={inputRef} type="file" accept=".png,.jpeg,.jpg,.webp,.pdf" className="hidden" onChange={(event) => {
+          const fileName = event.target.files?.[0]?.name
+          if (fileName) onUpdate({ organizationChart: fileName })
+        }} />
+        <button type="button" onClick={() => inputRef.current?.click()} onDragOver={(event) => event.preventDefault()} onDrop={(event) => {
+          event.preventDefault()
+          const file = event.dataTransfer.files[0]
+          if (file) onUpdate({ organizationChart: file.name })
+        }} className="flex min-h-16 w-full items-center justify-between gap-3 rounded-xl border border-dashed border-slate-600 px-4 py-3 text-left text-xs text-slate-400 hover:border-cyan-500/50">
+          <span className="flex items-center gap-3"><CloudUpload size={18} className="text-cyan-400" />{customer.organizationChart || 'Letakkan dokumen di sini atau klik tombol unggah'}</span>
+          <span className="rounded-full border border-slate-600 px-4 py-2 font-semibold text-slate-200">Unggah Dokumen</span>
+        </button>
+        <p className="mt-1 text-[10px] italic text-slate-500">Format PNG/JPEG/JPG/WEBP, ukuran maks. 25 MB, jumlah maks. 3.</p>
+      </div>
+      <EditableTable
+        title="Daftar Kontak Pelanggan"
+        columns={[
+          { key: 'name', label: 'Nama' },
+          { key: 'role', label: 'Role' },
+          { key: 'position', label: 'Jabatan' },
+          { key: 'phone', label: 'Telepon' },
+        ]}
+        rows={contacts}
+        addLabel="Atur Kontak Pelanggan"
+        onChange={(rows) => onUpdate({ contacts: rows.map((row) => ({ name: row.name ?? '', role: row.role ?? '', position: row.position ?? '', phone: row.phone ?? '' })) })}
+      />
+    </div>
+  )
+}
+
+function InstitutionProfile({ customer, onUpdate }: { customer: CustomerProfile; onUpdate: (updates: Partial<CustomerProfile>) => boolean }) {
+  const market = customer.marketAnalysis
+  const productRows = customer.institutionProducts.map((item) => ({ ...item }))
+  const renderIvcacard = (category: string) => {
+    const itemIndex = customer.ivca.findIndex((item) => item.category === category)
+    const item = customer.ivca[itemIndex] ?? { category, description: '' }
+    return (
+      <EditableCard
+        key={`${customer.id}-${category}`}
+        title={category}
+        value={item.description}
+        onSave={(description) => {
+          const ivca = itemIndex === -1
+            ? [...customer.ivca, { category, description }]
+            : customer.ivca.map((entry, entryIndex) => entryIndex === itemIndex ? { ...entry, description } : entry)
+          return onUpdate({ ivca })
+        }}
+      />
+    )
+  }
+  return (
+    <div className="space-y-6">
+      <PanelTitle title="Institution Profile" />
+      <section>
+        <h4 className="mb-3 text-sm font-medium text-slate-300">Industry Value Chain Analysis (IVCA)</h4>
+        <div className="grid gap-3 lg:grid-cols-6">
+          <div className="lg:col-span-1">{renderIvcacard('Supporting Industry')}</div>
+          <div className="lg:col-span-4">{renderIvcacard('Complement Institution')}</div>
+          <div className="lg:col-span-1">{renderIvcacard('Customer')}</div>
+        </div>
+        <div className="mt-3 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+          {['Firm Infrastructure', 'HR Management', 'Tech Development', 'Procurement'].map(renderIvcacard)}
+        </div>
+        <div className="mt-3 grid gap-3 sm:grid-cols-3">
+          {['Operation', 'Sosialisasi Layanan', 'Service'].map(renderIvcacard)}
+        </div>
+        <div className="mt-3">{renderIvcacard('Related Industry')}</div>
+      </section>
+      <EditableTable
+        title="Daftar Layanan"
+        columns={[{ key: 'name', label: 'Nama Produk' }, { key: 'status', label: 'Status' }]}
+        rows={productRows}
+        addLabel="+ Tambah Produk"
+        onChange={(rows) => onUpdate({ institutionProducts: rows.map((row) => ({ name: row.name ?? '', status: row.status ?? '' })) })}
+      />
+      <section className="space-y-3 border-t border-slate-700/60 pt-5">
+        <h4 className="text-sm font-semibold text-slate-200">Market Issues (Framework 3C)</h4>
+        <EditableCard title="Comparator" value={market.comparator} onSave={(comparator) => onUpdate({ marketAnalysis: { ...market, comparator } })} />
+        <EditableCard title="Key Challenges / Watch-outs" value={market.challenges} onSave={(challenges) => onUpdate({ marketAnalysis: { ...market, challenges } })} />
+        <EditableCard title="Customer" value={market.customer} onSave={(customerText) => onUpdate({ marketAnalysis: { ...market, customer: customerText } })} />
+      </section>
+    </div>
+  )
+}
+
+function Benchmark({ customer, onUpdate }: { customer: CustomerProfile; onUpdate: (updates: Partial<CustomerProfile>) => boolean }) {
+  const practiceRows = customer.benchmarkPractices.map((item) => ({ ...item }))
+  const tows = customer.towsAnalysis
+  const towsCards: { key: keyof typeof tows; title: string }[] = [
+    { key: 'opportunity', title: 'Opportunity (O)' },
+    { key: 'threats', title: 'Threats (T)' },
+    { key: 'strength', title: 'Strength (S)' },
+    { key: 'strategySO', title: 'Strategy (S-O)' },
+    { key: 'strategyST', title: 'Strategy (S-T)' },
+    { key: 'weakness', title: 'Weakness (W)' },
+    { key: 'strategyWO', title: 'Strategy (W-O)' },
+    { key: 'strategyWT', title: 'Strategy (W-T)' },
+  ]
+  return (
+    <div className="space-y-5">
+      <PanelTitle title="Benchmark Best Practices and TOWS Analysis" />
+      <EditableTable
+        title="Benchmark Best Practice"
+        columns={[{ key: 'logo', label: 'Logo', type: 'image' }, { key: 'institution', label: 'Nama Instansi' }, { key: 'description', label: 'Deskripsi' }]}
+        rows={practiceRows}
+        addLabel="+ Tambah Best Practice"
+        onChange={(rows) => onUpdate({ benchmarkPractices: rows.map((row) => ({ logo: row.logo ?? '', institution: row.institution ?? '', description: row.description ?? '' })) })}
+      />
+      <section>
+        <h4 className="mb-3 text-sm font-medium text-slate-300">TOWS Analysis</h4>
+        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+          <div className="flex min-h-32 items-center justify-center rounded-xl border border-slate-700/60 bg-slate-800/70 p-4 text-center text-xs font-semibold text-slate-300">Internal Factors <span className="mx-2 text-slate-500">／</span> External Factors</div>
+          {towsCards.map(({ key, title }) => (
+            <EditableCard key={key} title={title} value={tows[key]} onSave={(value) => onUpdate({ towsAnalysis: { ...tows, [key]: value } })} />
+          ))}
+        </div>
+      </section>
+    </div>
+  )
+}
+
+function CustomerInnovations({ customer, onUpdate }: { customer: CustomerProfile; onUpdate: (updates: Partial<CustomerProfile>) => boolean }) {
+  return (
+    <div>
+      <PanelTitle title="Customer Value Innovation" />
+      <EditableTable
+        title="Daftar Inovasi"
+        columns={[{ key: 'name', label: 'Inovasi' }, { key: 'description', label: 'Deskripsi' }]}
+        rows={customer.innovations.map((item) => ({ name: item.name, description: item.description, status: item.status }))}
+        addLabel="+ Tambah Inovasi Baru"
+        onChange={(rows) => onUpdate({ innovations: rows.map((row) => ({ name: row.name ?? '', description: row.description ?? '', status: row.status ?? '' })) })}
+      />
+    </div>
+  )
+}
+
+function RevenueWallet({ customer, onUpdate }: { customer: CustomerProfile; onUpdate: (updates: Partial<CustomerProfile>) => boolean }) {
+  const walletRows = customer.walletSpend.map((item) => ({ product: item.product, amount: String(item.amount), institution: item.institution }))
+  return (
+    <div className="space-y-5">
+      <PanelTitle title="Revenue and Wallet Shared" />
+      <section>
+        <h4 className="mb-3 text-sm font-medium text-slate-300">Revenue Shared</h4>
+        <div className="grid gap-3 md:grid-cols-3">
+          {customer.revenueSummary.map((item, index) => (
+            <EditableCard
+              key={item.label}
+              title={item.label}
+              value={formatRupiah(item.amount)}
+              className="currency-card"
+              onSave={(amount) => onUpdate({ revenueSummary: customer.revenueSummary.map((entry, entryIndex) => entryIndex === index ? { ...entry, amount: parseRupiah(amount) } : entry) })}
+            />
+          ))}
+        </div>
+      </section>
+      <EditableTable
+        title="Daftar Produk"
+        columns={[{ key: 'name', label: 'Produk' }, { key: 'revenue', label: 'Revenue', type: 'currency' }, { key: 'subsidiary', label: 'Subsidiaries' }]}
+        rows={customer.revenueProducts.map((item) => ({ name: item.name, revenue: String(item.revenue), subsidiary: item.subsidiary }))}
+        addLabel="+ Tambah Produk"
+        onChange={(rows) => onUpdate({ revenueProducts: rows.map((row) => ({ name: row.name ?? '', revenue: parseRupiah(row.revenue ?? ''), subsidiary: row.subsidiary ?? '' })) })}
+      />
+      <EditableTable
+        title="Wallet Shared — Daftar Belanja Pelanggan di luar Telkom"
+        columns={[{ key: 'product', label: 'Produk' }, { key: 'amount', label: 'Nominal Belanja', type: 'currency' }, { key: 'institution', label: 'Perusahaan/Institusi' }]}
+        rows={walletRows}
+        addLabel="+ Tambah Daftar Belanja"
+        onChange={(rows) => onUpdate({ walletSpend: rows.map((row) => ({ product: row.product ?? '', amount: parseRupiah(row.amount ?? ''), institution: row.institution ?? '' })) })}
+      />
+      <section className="rounded-xl border border-slate-700/60 p-4">
+        <h4 className="text-sm font-semibold text-slate-200">Wallet Shared Telkom</h4>
+        <div className="mt-4 grid gap-3 sm:grid-cols-3">
+          {[
+            { title: 'Total Belanja Pelanggan (Non Telkom)', key: 'walletNonTelkom' as const },
+            { title: 'Total Belanja Pelanggan (Telkom)', key: 'walletTelkom' as const },
+            { title: 'Presentasi Wallet Shared Telkom', key: 'walletShare' as const },
+          ].map(({ title, key }) => (
+            <EditableCard key={key} title={title} value={customer.walletSummary[key]} onSave={(value) => onUpdate({ walletSummary: { ...customer.walletSummary, [key]: value } })} />
+          ))}
+        </div>
+        <div className="mt-5 flex flex-col items-center justify-center gap-5 sm:flex-row">
+          <div className="flex h-56 w-56 items-center justify-center rounded-full border-[28px] border-violet-400/90">
+            <div className="text-center">
+              <p className="text-xs text-slate-400">Total Belanja</p>
+              <p className="text-lg font-bold text-white">{customer.walletSummary.walletNonTelkom}</p>
+            </div>
+          </div>
+          <p className="text-xs text-slate-300"><span className="mr-2 inline-block h-3 w-3 rounded-full bg-violet-400" />{customer.name}</p>
+        </div>
+        <EditableCard className="mt-4" title="Kinerja Finansial" value={customer.financialPerformance} onSave={(financialPerformance) => onUpdate({ financialPerformance })} />
+      </section>
+    </div>
+  )
+}
+
+function normalizeAgencyName(value: string) {
+  return value.trim().toLocaleLowerCase('id-ID').replace(/\s+/g, ' ')
+    .replace(/^pemkot\b/, 'pemerintah kota')
+    .replace(/^kota\b/, 'pemerintah kota')
+    .replace(/^pemkab\b/, 'pemerintah kabupaten')
+    .replace(/^kabupaten\b/, 'pemerintah kabupaten')
+    .replace(/^pemprov\b/, 'pemerintah provinsi')
+    .replace(/^provinsi\b/, 'pemerintah provinsi')
+}
+
+function BusinessProspect({ customer }: { customer: CustomerProfile }) {
+  const [projects, setProjects] = useState<ProjectEntry[]>([])
+  const [loadError, setLoadError] = useState('')
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    let active = true
+    ProjectsDB.getAll()
+      .then((items) => {
+        if (active) setProjects(items)
+      })
+      .catch((error: unknown) => {
+        if (active) setLoadError(error instanceof Error ? error.message : 'Gagal memuat data Sales Funnel.')
+      })
+      .finally(() => {
+        if (active) setLoading(false)
+      })
+    return () => { active = false }
+  }, [])
+
+  const opportunities = projects.filter((project) =>
+    [project.pemdaName, project.agency, project.customerName]
+      .filter((name): name is string => Boolean(name))
+      .some((name) => normalizeAgencyName(name) === normalizeAgencyName(customer.name)),
+  )
+
+  return (
+    <div>
+      <PanelTitle title="Business Prospect" subtitle="Daftar business opportunity di pipeline proyek." />
+      <section className="overflow-hidden rounded-xl border border-slate-700/60">
+        <div className="border-b border-slate-700/60 px-4 py-3">
+          <h4 className="text-sm font-semibold text-slate-200">Daftar Business Opportunity</h4>
+        </div>
+        {loadError && <p role="alert" className="bg-amber-500/5 px-4 py-2 text-xs text-amber-300">{loadError}</p>}
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[760px] text-left">
+            <thead><tr className="border-b border-slate-700/50 bg-slate-950/50">
+              {['Proyek / LOP ID', 'Nama Proyek', 'Kategori Proyek', 'Tahap', 'Nilai Penawaran', 'Kategori Solusi'].map((heading) => <th key={heading} className="px-3 py-3 text-[10px] font-bold text-slate-400">{heading}</th>)}
+            </tr></thead>
+            <tbody className="divide-y divide-slate-800/80">
+              {opportunities.map((project) => (
+                <tr key={project.id} className="hover:bg-slate-800/30">
+                  <td className="px-3 py-3 font-mono text-xs text-cyan-300">{project.idLOP}</td>
+                  <td className="px-3 py-3 text-xs text-slate-200">{project.projectName}</td>
+                  <td className="px-3 py-3 text-xs text-slate-300">{project.category}</td>
+                  <td className="px-3 py-3 text-xs text-slate-300">{project.stage}</td>
+                  <td className="px-3 py-3 text-xs font-semibold text-slate-200">{formatRupiah(project.budget)}</td>
+                  <td className="px-3 py-3 text-xs text-slate-300">{project.serviceType}</td>
+                </tr>
+              ))}
+              {!loading && opportunities.length === 0 && <tr><td colSpan={6} className="px-4 py-8 text-center text-xs text-slate-500">Belum ada business opportunity untuk instansi ini di Sales Funnel.</td></tr>}
+              {loading && <tr><td colSpan={6} className="px-4 py-8 text-center text-xs text-slate-500">Memuat data Sales Funnel...</td></tr>}
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+  )
+}
+
+function ComplaintSolution({ customer, onUpdate }: { customer: CustomerProfile; onUpdate: (updates: Partial<CustomerProfile>) => boolean }) {
+  return (
+    <div>
+      <PanelTitle title="Complaint and Solution" />
+      <EditableTable
+        title="Daftar Keluhan"
+        columns={[
+          { key: 'date', label: 'Tgl. Keluhan', type: 'date' },
+          { key: 'issue', label: 'Keluhan' },
+          { key: 'channel', label: 'Channel' },
+          { key: 'status', label: 'Status' },
+          { key: 'resolvedDate', label: 'Tgl. Disolusikan', type: 'date' },
+          { key: 'solution', label: 'Solusi' },
+        ]}
+        rows={customer.complaints.map((item) => ({ date: item.date, issue: item.issue, channel: item.channel, status: item.status, resolvedDate: item.resolvedDate, solution: item.solution }))}
+        addLabel="+ Tambah Keluhan"
+        onChange={(rows) => onUpdate({ complaints: rows.map((row) => ({ date: row.date ?? '', issue: row.issue ?? '', channel: row.channel ?? '', status: row.status ?? '', resolvedDate: row.resolvedDate ?? '', solution: row.solution ?? '' })) })}
+      />
+    </div>
+  )
+}
+
+function CourtesyVisit({ customer, onUpdate }: { customer: CustomerProfile; onUpdate: (updates: Partial<CustomerProfile>) => boolean }) {
+  return (
+    <div>
+      <PanelTitle title="Courtesy Visit" />
+      <EditableTable
+        title="Daftar Visit"
+        columns={[{ key: 'date', label: 'Tanggal', type: 'date' }, { key: 'objective', label: 'Main Objective' }, { key: 'notes', label: 'Catatan' }]}
+        rows={customer.visits.map((item) => ({ ...item }))}
+        addLabel="+ Tambah Courtesy Visit"
+        onChange={(rows) => onUpdate({ visits: rows.map((row) => ({ date: row.date ?? '', objective: row.objective ?? '', notes: row.notes ?? '' })) })}
+      />
+    </div>
+  )
+}
+
+export function CustomerProfileMaps({
+  customer,
+  onUpdate,
+  saveError,
+}: {
+  customer: CustomerProfile
+  onUpdate: (updates: Partial<CustomerProfile>) => boolean
+  saveError: string
+}) {
   const [activeSection, setActiveSection] = useState<MapsSection>('Customer Profile')
-  let content: ReactNode
-  switch (activeSection) {
-    case 'Customer Profile': content = <CustomerOverview customer={customer} />; break
-    case 'Strategic Highlight': content = <StrategicHighlight customer={customer} />; break
-    case 'Management Profile': content = <ManagementProfile customer={customer} />; break
-    case 'Institution Profile': content = <InstitutionProfile customer={customer} />; break
-    case 'Benchmark Best Practices': content = <Benchmark customer={customer} />; break
-    case 'Customer Value Innovation': content = <CustomerInnovations customer={customer} />; break
-    case 'Revenue and Wallet Shared': content = <RevenueWallet customer={customer} />; break
-    case 'Business Prospect': content = <BusinessProspect customer={customer} />; break
-    case 'Complaint and Solution': content = <ComplaintSolution customer={customer} />; break
+  const sectionContent: Record<MapsSection, ReactNode> = {
+    'Customer Profile': <CustomerOverview customer={customer} onUpdate={onUpdate} />,
+    'Strategic Highlight': <StrategicHighlight customer={customer} onUpdate={onUpdate} />,
+    'Management Profile': <ManagementProfile customer={customer} onUpdate={onUpdate} />,
+    'Institution Profile': <InstitutionProfile customer={customer} onUpdate={onUpdate} />,
+    'Benchmark Best Practices and TOWS Analysis': <Benchmark customer={customer} onUpdate={onUpdate} />,
+    'Customer Value Innovation': <CustomerInnovations customer={customer} onUpdate={onUpdate} />,
+    'Revenue and Wallet Shared': <RevenueWallet customer={customer} onUpdate={onUpdate} />,
+    'Business Prospect': <BusinessProspect customer={customer} />,
+    'Complaint and Solution': <ComplaintSolution customer={customer} onUpdate={onUpdate} />,
+    'Courtesy Visit': <CourtesyVisit customer={customer} onUpdate={onUpdate} />,
   }
 
   return (
-    <div className="grid items-start gap-4 lg:grid-cols-[250px_minmax(0,1fr)]">
+    <div className="grid items-start gap-4 lg:grid-cols-[270px_minmax(0,1fr)]">
       <MapsSidebar active={activeSection} onChange={setActiveSection} />
       <section className="min-h-[440px] rounded-2xl border border-slate-700/70 bg-slate-900/70 p-4 sm:p-6">
-        {content}
+        {saveError && <p role="alert" className="mb-4 rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-xs text-amber-300">{saveError}</p>}
+        {sectionContent[activeSection]}
       </section>
     </div>
   )

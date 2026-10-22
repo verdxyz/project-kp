@@ -68,7 +68,7 @@ export const ServicePoints = {
     idLOP: string,
     file: File,
     serviceGroup?: 'POTS' | 'Non-POTS'
-  ): Promise<{ imported: number; skipped: number }> {
+  ): Promise<{ imported: number; replaced: number; skipped: number; duplicateRows?: number }> {
     const formData = new FormData()
     formData.set('file', file)
     if (serviceGroup) formData.set('serviceGroup', serviceGroup)
@@ -77,7 +77,7 @@ export const ServicePoints = {
       credentials: 'same-origin',
       body: formData,
     })
-    return readJson(response) as Promise<{ imported: number; skipped: number }>
+    return readJson(response) as Promise<{ imported: number; replaced: number; skipped: number; duplicateRows?: number }>
   },
 
   async getPivot(): Promise<AgencyPivotRow[]> {

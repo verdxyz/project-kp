@@ -421,12 +421,22 @@ export function ServicesCatalog({ initialCategory = "Semua" }: ServicesCatalogPr
     setPointsError("")
 
     try {
-      if (serviceRows.some((row) => !Number.isFinite(row.servicePrice) || row.servicePrice <= 0)) {
+      const rowsToSave = serviceRows.filter((row) => (
+        row.sid.trim()
+        || row.orderNo.trim()
+        || row.location.trim()
+        || row.quote.trim()
+        || row.servicePrice > 0
+        || row.serviceGroup === 'POTS'
+        || row.bandwidth !== '100 Mbps'
+        || row.productType !== 'HSI'
+      ))
+      if (rowsToSave.some((row) => !Number.isFinite(row.servicePrice) || row.servicePrice <= 0)) {
         setPointsError("Harga layanan wajib diisi dan harus lebih dari nol untuk setiap titik.")
         setSavingPoints(false)
         return
       }
-      const payload: ProjectServicePoint[] = serviceRows.map((r) => ({
+      const payload: ProjectServicePoint[] = rowsToSave.map((r) => ({
         id: r.id,
         idLOP: selectedIdLOP,
         serviceGroup: r.serviceGroup,

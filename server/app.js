@@ -131,7 +131,9 @@ app.use((error, _req, res, _next) => {
   if (res.headersSent) return
   const status = Number.isInteger(error.status) ? error.status : 500
   res.status(status).json({
-    message: status < 500 ? error.message : 'Terjadi kesalahan pada server.',
+    message: status < 500 || process.env.NODE_ENV !== 'production'
+      ? error.message
+      : 'Terjadi kesalahan pada server.',
   })
 })
 
