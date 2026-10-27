@@ -8,8 +8,10 @@ import {
   X,
   TrendingUp,
   Database,
+  LogOut,
 } from 'lucide-react'
 import { cn } from '../lib/utils'
+import type { AuthUser } from '../lib/auth'
 
 interface NavItem {
   id: string
@@ -184,14 +186,26 @@ export function Sidebar({ activeNav, onNavChange }: SidebarProps) {
 interface TopbarProps {
   title: string
   subtitle?: string
+  user: AuthUser
+  onLogout: () => void
 }
 
-export function Topbar({ title, subtitle }: TopbarProps) {
+export function Topbar({ title, subtitle, user, onLogout }: TopbarProps) {
   return (
     <div className="flex items-center justify-between px-6 py-4 border-b border-slate-700/50 bg-slate-900/50 backdrop-blur-sm sticky top-0 z-30">
       <div>
         <h1 className="text-lg font-bold text-white">{title}</h1>
         {subtitle && <p className="text-xs text-slate-400 mt-0.5">{subtitle}</p>}
+      </div>
+      <div className="flex items-center gap-3">
+        <div className="hidden sm:block text-right">
+          <p className="text-xs font-medium text-slate-200">{user.nama}</p>
+          <p className="text-[11px] text-slate-500">{user.email}</p>
+        </div>
+        <button onClick={onLogout} className="inline-flex items-center gap-2 rounded-lg border border-slate-700 px-3 py-2 text-xs font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition-colors" aria-label="Keluar">
+          <LogOut size={14} />
+          <span className="hidden sm:inline">Keluar</span>
+        </button>
       </div>
     </div>
   )

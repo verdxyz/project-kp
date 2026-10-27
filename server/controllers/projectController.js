@@ -1,7 +1,6 @@
 import { randomUUID } from 'node:crypto'
-import { unlink } from 'node:fs/promises'
-import path from 'node:path'
 import { pool } from '../db.js'
+import { deleteObject } from '../storage.js'
 
 const PROJECT_SELECT = `
   SELECT p.id, p.id_lop AS "idLOP", p.project_name AS "projectName",
@@ -189,8 +188,8 @@ export async function deleteProject(req, res, next) {
     const result = await client.query('DELETE FROM projects WHERE id_lop = $1', [req.params.idLOP])
     await client.query('COMMIT')
     if (!result.rowCount) return res.status(404).json({ message: 'Proyek tidak ditemukan.' })
-    await Promise.all(docs.rows.map((doc) => unlink(doc.storage_path).catch((error) => {
-      if (error.code !== 'ENOENT') throw error
+    await Promise.all(docs.rows.map((doc) => deleteObject(doc.storage_path).catch((error) => {
+      console.error('Failed to remove project document from Cloudflare R2:', error)
     })))
     res.status(204).end()
   } catch (error) {

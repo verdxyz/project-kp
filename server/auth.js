@@ -13,15 +13,20 @@ export async function seedGlobalAdmin() {
   }
 
   const passwordHash = await bcrypt.hash(password, 12)
-  await pool.query(
-    `INSERT INTO global_admin (singleton, email, display_name, password_hash)
-     VALUES (TRUE, $1, $2, $3)
-     ON CONFLICT (singleton) DO UPDATE SET
-       email = EXCLUDED.email,
-       display_name = EXCLUDED.display_name,
-       updated_at = now()`,
-    [email, displayName, passwordHash],
+  const values = [email, displayName, passwordHash]
+  const existing = await pool.query(
+    `UPDATE global_admin
+     SET email = $1, display_name = $2, password_hash = $3, updated_at = now()
+     WHERE singleton IS TRUE`,
+    values,
   )
+  if (existing.rowCount === 0) {
+    await pool.query(
+      `INSERT INTO global_admin (singleton, email, display_name, password_hash)
+       VALUES (TRUE, $1, $2, $3)`,
+      values,
+    )
+  }
 }
 
 export function requireAdmin(req, res, next) {

@@ -1,8 +1,11 @@
-import { readJsonResponse } from './apiResponse'
+import { apiRequest } from './api'
 
 /**
- * db.ts — localStorage-based database for B2G Dashboard
- * Provides typed CRUD helpers for Services, Customers, and Projects.
+ * db.ts — Database helpers untuk B2G Dashboard
+ *
+ * ProjectsDB uses the backend API and PostgreSQL.
+ * ServicesDB and CustomersDB use localStorage.
+
  */
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -80,14 +83,41 @@ export interface ProjectEntry {
   updatedAt: string
 }
 
-// ─── Keys ─────────────────────────────────────────────────────────────────────
+// ─── Project data API response ─────────────────────────────────────────
+
+export const ProjectsDB = {
+  async getAll(): Promise<ProjectEntry[]> {
+    const result = await apiRequest<{ projects: ProjectEntry[] }>('/api/projects')
+    return result.projects
+  },
+  async getById(idLOP: string): Promise<ProjectEntry | undefined> {
+    try {
+      const result = await apiRequest<{ project: ProjectEntry }>('/api/projects/' + encodeURIComponent(idLOP))
+      return result.project
+    } catch (error) {
+      if (error instanceof Error && error.message === 'Proyek tidak ditemukan.') return undefined
+      throw error
+    }
+  },
+  async create(data: Omit<ProjectEntry, 'id' | 'createdAt' | 'updatedAt'>): Promise<ProjectEntry> {
+    const result = await apiRequest<{ project: ProjectEntry }>('/api/projects', { method: 'POST', body: JSON.stringify(data) })
+    return result.project
+  },
+  async update(id: string, data: Omit<ProjectEntry, 'id' | 'createdAt' | 'updatedAt'>): Promise<ProjectEntry> {
+    const result = await apiRequest<{ project: ProjectEntry }>('/api/projects/' + encodeURIComponent(id), { method: 'PUT', body: JSON.stringify(data) })
+    return result.project
+  },
+  async delete(idLOP: string): Promise<void> {
+    await apiRequest<void>('/api/projects/' + encodeURIComponent(idLOP), { method: 'DELETE' })
+  },
+}
 
 const KEYS = {
   services: 'b2g_services',
   customers: 'b2g_customers',
 } as const
 
-// ─── Generic Helpers ─────────────────────────────────────────────────────────
+// ─── Generic localStorage Helpers ─────────────────────────────────────────────
 
 function loadAll<T>(key: string): T[] {
   try {
@@ -110,7 +140,7 @@ function now(): string {
   return new Date().toISOString()
 }
 
-// ─── Services CRUD ────────────────────────────────────────────────────────────
+// ─── Services CRUD (localStorage) ────────────────────────────────────────────
 
 export const ServicesDB = {
   getAll(): ServiceItem[] {
@@ -157,7 +187,7 @@ export const ServicesDB = {
   },
 }
 
-// ─── Customers CRUD ───────────────────────────────────────────────────────────
+// ─── Customers CRUD (localStorage) ────────────────────────────────────────────
 
 export const CustomersDB = {
   getAll(): Customer[] {
@@ -207,60 +237,6 @@ export const CustomersDB = {
       if (existingNames.has(name)) continue
       this.create(item)
       existingNames.add(name)
-    }
-  },
-}
-
-// ─── Projects CRUD ────────────────────────────────────────────────────────────
-
-export const ProjectsDB = {
-  async getAll(): Promise<ProjectEntry[]> {
-    const response = await fetch('/api/projects', { credentials: 'same-origin' })
-    const body = await readJsonResponse(response)
-    if (!response.ok) throw new Error(body.message || 'Gagal memuat data proyek.')
-    return body.projects as ProjectEntry[]
-  },
-
-  async getById(idLOP: string): Promise<ProjectEntry | undefined> {
-    const response = await fetch(`/api/projects/${encodeURIComponent(idLOP)}`, { credentials: 'same-origin' })
-    if (response.status === 404) return undefined
-    const body = await readJsonResponse(response)
-    if (!response.ok) throw new Error(body.message || 'Gagal memuat proyek.')
-    return body.project as ProjectEntry
-  },
-
-  async create(data: Omit<ProjectEntry, 'id' | 'createdAt' | 'updatedAt'>): Promise<ProjectEntry> {
-    const response = await fetch('/api/projects', {
-      method: 'POST',
-      credentials: 'same-origin',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data),
-    })
-    const body = await readJsonResponse(response)
-    if (!response.ok) throw new Error(body.message || 'Gagal menyimpan proyek.')
-    return body.project as ProjectEntry
-  },
-
-  async update(id: string, data: Omit<ProjectEntry, 'id' | 'createdAt' | 'updatedAt'>): Promise<ProjectEntry> {
-    const response = await fetch(`/api/projects/${encodeURIComponent(id)}`, {
-      method: 'PUT',
-      credentials: 'same-origin',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data),
-    })
-    const body = await readJsonResponse(response)
-    if (!response.ok) throw new Error(body.message || 'Gagal memperbarui proyek.')
-    return body.project as ProjectEntry
-  },
-
-  async delete(idLOP: string): Promise<void> {
-    const response = await fetch(`/api/projects/${encodeURIComponent(idLOP)}`, {
-      method: 'DELETE',
-      credentials: 'same-origin',
-    })
-    if (!response.ok) {
-      const body = await readJsonResponse(response).catch(() => ({}))
-      throw new Error(body.message || 'Gagal menghapus proyek.')
     }
   },
 }

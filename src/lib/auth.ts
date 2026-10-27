@@ -1,59 +1,45 @@
-import { readJsonResponse } from './apiResponse'
-
 export interface AuthUser {
   id: string
   nama: string
   email: string
 }
 
-interface AuthResponse {
-  user?: AuthUser
-  message?: string
-}
-
-let currentUser: AuthUser | null = null
-
-async function readResponse(response: Response): Promise<AuthResponse> {
-  const body = await readJsonResponse<AuthResponse>(response)
-  if (!response.ok) {
-    throw new Error(body.message || 'Permintaan autentikasi gagal.')
-  }
-  return body
-}
-
 export const AuthService = {
   getCurrentUser(): AuthUser | null {
-    return currentUser
+    const raw = localStorage.getItem('b2g_current_user')
+    if (!raw) return null
+    try { return JSON.parse(raw) as AuthUser } catch { return null }
   },
 
   async restoreSession(): Promise<AuthUser | null> {
     try {
-      localStorage.removeItem('b2g_telkom_auth_user')
-      localStorage.removeItem('b2g_telkom_users_list')
-    } catch (error) {
-      console.error('Failed to clear legacy browser-stored credentials:', error)
-    }
-    const response = await fetch('/api/auth/me', { credentials: 'same-origin' })
-    if (response.status === 401) {
-      currentUser = null
+      const response = await fetch('/api/auth/me', { credentials: 'include' })
+      if (!response.ok) {
+        localStorage.removeItem('b2g_current_user')
+        return null
+      }
+      const { user } = await response.json() as { user: AuthUser }
+      localStorage.setItem('b2g_current_user', JSON.stringify(user))
+      return user
+    } catch {
+      localStorage.removeItem('b2g_current_user')
       return null
     }
-    const body = await readResponse(response)
-    currentUser = body.user ?? null
-    return currentUser
   },
 
   async login(email: string, password: string): Promise<{ success: boolean; user?: AuthUser; message?: string }> {
     try {
       const response = await fetch('/api/auth/login', {
         method: 'POST',
-        credentials: 'same-origin',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({ email, password }),
       })
-      const body = await readResponse(response)
-      currentUser = body.user ?? null
-      return { success: Boolean(currentUser), user: currentUser ?? undefined }
+      const result = await response.json() as { user?: AuthUser; message?: string }
+      if (!response.ok || !result.user) return { success: false, message: result.message || 'Login gagal.' }
+      const user = result.user
+      localStorage.setItem('b2g_current_user', JSON.stringify(user))
+      return { success: true, user }
     } catch (error) {
       return {
         success: false,
@@ -63,14 +49,10 @@ export const AuthService = {
   },
 
   async logout(): Promise<void> {
-    const response = await fetch('/api/auth/logout', {
-      method: 'POST',
-      credentials: 'same-origin',
-    })
-    if (!response.ok && response.status !== 401) {
-      const body = await readJsonResponse(response).catch(() => ({})) as AuthResponse
-      throw new Error(body.message || 'Gagal mengakhiri sesi.')
+    try {
+      await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' })
+    } finally {
+      localStorage.removeItem('b2g_current_user')
     }
-    currentUser = null
   },
 }

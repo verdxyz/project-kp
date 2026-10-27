@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "concurrently -k -n api,web \"npm:dev:api\" \"npm:dev:web\"",
-    "dev:api": "node --watch server/index.js",
+    "dev:api": "node --watch-path=server server/index.js",
     "dev:web": "vite",
     "start": "node server/index.js",
     "build": "tsc -b && vite build",
@@ -13,9 +13,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.1157.0",
     "@electric-sql/pglite": "^0.5.9",
     "@electric-sql/pglite-socket": "^0.2.12",
-    "@supabase/supabase-js": "^2.118.0",
     "@tailwindcss/vite": "^4.3.3",
     "bcryptjs": "^3.0.2",
     "class-variance-authority": "^0.7.1",

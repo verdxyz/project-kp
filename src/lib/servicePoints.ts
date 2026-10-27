@@ -1,4 +1,4 @@
-import { readJsonResponse } from './apiResponse'
+import { apiRequest } from './api'
 
 export const SERVICE_PRODUCTS = ['HSI', 'WMS', 'Astinet', 'IP Transit', 'VPN', 'Metro Ethernet', 'POTS'] as const
 
@@ -34,55 +34,39 @@ export interface ServicePivotRow {
   capacityMbps: number
 }
 
-async function readJson(response: Response) {
-  const body = await readJsonResponse(response)
-  if (!response.ok) throw new Error(body.message || 'Operasi titik layanan gagal.')
-  return body
-}
+// ─── Service point API response ─────────────────────────────────────────
 
 export const ServicePoints = {
   async list(idLOP: string): Promise<ProjectServicePoint[]> {
-    const response = await fetch(`/api/projects/${encodeURIComponent(idLOP)}/service-points`, {
-      credentials: 'same-origin',
-    })
-    const body = await readJson(response)
-    return body.servicePoints as ProjectServicePoint[]
+    const result = await apiRequest<{ servicePoints: ProjectServicePoint[] }>('/api/projects/' + encodeURIComponent(idLOP) + '/service-points')
+    return result.servicePoints
   },
 
   async batchUpdate(
     idLOP: string,
     servicePoints: ProjectServicePoint[],
-    ngtmaInfo?: { customerName?: string; dinasName?: string; subsidiaryName?: string }
+    ngtmaInfo?: { customerName?: string; dinasName?: string; subsidiaryName?: string },
   ): Promise<{ message: string; servicePoints: ProjectServicePoint[] }> {
-    const response = await fetch(`/api/projects/${encodeURIComponent(idLOP)}/service-points`, {
-      method: 'PUT',
-      credentials: 'same-origin',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ servicePoints, ngtmaInfo }),
+    return apiRequest<{ message: string; servicePoints: ProjectServicePoint[] }>('/api/projects/' + encodeURIComponent(idLOP) + '/service-points', {
+      method: 'PUT', body: JSON.stringify({ servicePoints, ngtmaInfo }),
     })
-    const body = await readJson(response)
-    return body
   },
 
   async importExcel(
     idLOP: string,
     file: File,
-    serviceGroup?: 'POTS' | 'Non-POTS'
+    serviceGroup?: 'POTS' | 'Non-POTS',
   ): Promise<{ imported: number; replaced: number; skipped: number; duplicateRows?: number }> {
-    const formData = new FormData()
-    formData.set('file', file)
-    if (serviceGroup) formData.set('serviceGroup', serviceGroup)
-    const response = await fetch(`/api/projects/${encodeURIComponent(idLOP)}/service-points/import`, {
-      method: 'POST',
-      credentials: 'same-origin',
-      body: formData,
+    const form = new FormData()
+    form.append('file', file)
+    if (serviceGroup) form.append('serviceGroup', serviceGroup)
+    return apiRequest<{ imported: number; replaced: number; skipped: number; duplicateRows?: number }>('/api/projects/' + encodeURIComponent(idLOP) + '/service-points/import', {
+      method: 'POST', body: form,
     })
-    return readJson(response) as Promise<{ imported: number; replaced: number; skipped: number; duplicateRows?: number }>
   },
 
   async getPivot(): Promise<AgencyPivotRow[]> {
-    const response = await fetch('/api/reports/service-pivot', { credentials: 'same-origin' })
-    const body = await readJson(response)
-    return body.rows as AgencyPivotRow[]
+    const result = await apiRequest<{ rows: AgencyPivotRow[] }>('/api/reports/service-pivot')
+    return result.rows.filter((row) => row.pointCount > 0)
   },
 }

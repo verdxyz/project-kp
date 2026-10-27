@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Sidebar, Topbar } from './components/Layout'
 import { ServicesCatalog } from './components/ServicesCatalog'
 import { CustomerDatabase } from './components/CustomerDatabase'
@@ -6,6 +6,8 @@ import { ProjectDatabase } from './components/ProjectDatabase'
 import { AnalyticsReports } from './components/AnalyticsReports'
 import { CustomerProfilePage } from './components/CustomerProfilePage'
 import type { AnalyticsFocus } from './components/AnalyticsReports'
+import { LoginScreen } from './components/LoginScreen'
+import { AuthService, type AuthUser } from './lib/auth'
 
 // Section Header Component
 function SectionHeader({
@@ -46,9 +48,30 @@ const VIEW_MAP: Record<string, ViewKey> = {
 }
 
 export default function App() {
+  const [user, setUser] = useState<AuthUser | null>(null)
+  const [authLoading, setAuthLoading] = useState(true)
   const [activeMenu, setActiveMenu] = useState('analytics')
   const [selectedCustomerName, setSelectedCustomerName] = useState<string>()
   const [analyticsFocus, setAnalyticsFocus] = useState<AnalyticsFocus>()
+
+  useEffect(() => {
+    let mounted = true
+    AuthService.restoreSession()
+      .then((currentUser) => {
+        if (mounted) setUser(currentUser)
+      })
+      .finally(() => {
+        if (mounted) setAuthLoading(false)
+      })
+    return () => { mounted = false }
+  }, [])
+
+  if (authLoading) return (
+    <div className="min-h-screen bg-[#090D16] flex items-center justify-center">
+      <div className="w-5 h-5 border-2 border-slate-600 border-t-red-500 rounded-full animate-spin" aria-label="Memuat sesi" />
+    </div>
+  )
+  if (!user) return <LoginScreen onLoginSuccess={setUser} />
 
   // Resolve which content view to render
   const activeView: ViewKey = VIEW_MAP[activeMenu] ?? 'analytics'
@@ -67,6 +90,10 @@ export default function App() {
       {/* Main Content */}
       <div className="flex-1 flex flex-col overflow-hidden">
         <Topbar
+          user={user}
+          onLogout={async () => {
+            try { await AuthService.logout() } finally { setUser(null) }
+          }}
           title={
             activeView === 'contracts'
               ? 'Kontrak & Manajemen Dokumen'

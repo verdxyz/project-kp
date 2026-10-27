@@ -1,5 +1,4 @@
 ﻿import { randomUUID } from 'node:crypto'
-import { unlink } from 'node:fs/promises'
 import XLSX from 'xlsx'
 import { pool } from '../db.js'
 
@@ -219,7 +218,7 @@ export async function importServicePoints(req, res, next) {
     if (requestedGroup && !['POTS', 'Non-POTS'].includes(requestedGroup)) {
       return res.status(400).json({ message: 'Jenis file harus POTS atau Non-POTS.' })
     }
-    const workbook = XLSX.readFile(file.path, { cellDates: false })
+    const workbook = XLSX.read(file.buffer, { type: 'buffer', cellDates: false })
     const sheetName = requestedGroup
       ? workbook.SheetNames.find((name) => normalizeHeader(name) === normalizeHeader(requestedGroup)) || workbook.SheetNames[0]
       : workbook.SheetNames[0]
@@ -359,7 +358,6 @@ export async function importServicePoints(req, res, next) {
     next(error)
   } finally {
     client?.release()
-    if (file) await unlink(file.path).catch(() => {})
   }
 }
 

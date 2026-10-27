@@ -1,9 +1,13 @@
-import { mkdir } from 'node:fs/promises'
 import path from 'node:path'
 import { randomUUID } from 'node:crypto'
 import express from 'express'
+import session from 'express-session'
+import connectPgSimple from 'connect-pg-simple'
+import rateLimit from 'express-rate-limit'
 import multer from 'multer'
 import { pool } from './db.js'
+import { requireAdmin } from './auth.js'
+import { login, currentUser, logout } from './controllers/authController.js'
 import {
   listProjects, getProject, saveProject, deleteProject,
 } from './controllers/projectController.js'
@@ -18,28 +22,60 @@ import {
 } from './controllers/servicePointController.js'
 
 const app = express()
-const uploadDir = path.resolve(process.env.STORAGE_DIR || './storage/project-documents')
-await mkdir(uploadDir, { recursive: true })
 
 app.disable('x-powered-by')
 if (process.env.NODE_ENV === 'production') app.set('trust proxy', 1)
 app.use(express.json({ limit: '1mb' }))
 
+if (!process.env.SESSION_SECRET || process.env.SESSION_SECRET.length < 32) {
+  throw new Error('SESSION_SECRET must contain at least 32 characters.')
+}
+const PgSession = connectPgSimple(session)
+app.use(session({
+  store: new PgSession({ pool, tableName: 'user_sessions', createTableIfMissing: true }),
+  name: 'b2g.sid',
+  secret: process.env.SESSION_SECRET,
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    httpOnly: true,
+    sameSite: 'lax',
+    secure: process.env.NODE_ENV === 'production',
+    maxAge: 8 * 60 * 60 * 1000,
+  },
+}))
+
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 10,
+  standardHeaders: 'draft-8',
+  legacyHeaders: false,
+  message: { message: 'Terlalu banyak percobaan login. Coba lagi dalam 15 menit.' },
+})
+const allowedOrigins = new Set(
+  (process.env.ALLOWED_APP_ORIGINS || '')
+    .split(',')
+    .map((origin) => origin.trim().replace(/\/$/, ''))
+    .filter(Boolean),
+)
 app.use('/api', (req, res, next) => {
   if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(req.method)) {
-    const origin = req.get('origin')
-    const forwardedHost = req.get('x-forwarded-host')
+    const origin = req.get('origin')?.replace(/\/$/, '')
+    const forwardedHost = req.get('x-forwarded-host')?.split(',')[0].trim()
     const requestHost = forwardedHost || req.get('host')
     const sameOrigin = origin === `${req.protocol}://${requestHost}`
-    const viteDevelopmentOrigin = process.env.NODE_ENV !== 'production' && (
-      origin === 'http://localhost:5173' || origin === 'http://127.0.0.1:5173'
-    )
-    if (origin && !sameOrigin && !viteDevelopmentOrigin) {
+    const localDevelopmentOrigin = process.env.NODE_ENV !== 'production'
+      && /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin || '')
+    if (origin && !sameOrigin && !allowedOrigins.has(origin) && !localDevelopmentOrigin) {
       return res.status(403).json({ message: 'Permintaan lintas-origin ditolak.' })
     }
   }
   next()
 })
+
+app.post('/api/auth/login', loginLimiter, login)
+app.get('/api/auth/me', requireAdmin, currentUser)
+app.post('/api/auth/logout', logout)
 
 const allowedExtensions = new Set([
   '.pdf', '.doc', '.docx', '.xls', '.xlsx', '.png', '.jpg', '.jpeg',
@@ -62,6 +98,11 @@ app.get('/api/health', async (_req, res, next) => {
   } catch (error) {
     next(error)
   }
+})
+
+app.use('/api', (req, res, next) => {
+  if (req.path.startsWith('/auth/')) return next()
+  return requireAdmin(req, res, next)
 })
 
 app.get('/api/agencies', async (_req, res, next) => {

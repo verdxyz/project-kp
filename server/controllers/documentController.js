@@ -1,7 +1,7 @@
 import { randomUUID } from 'node:crypto'
 import path from 'node:path'
 import { pool } from '../db.js'
-import { supabase, SUPABASE_STORAGE_BUCKET } from '../supabase.js'
+import { deleteObject, getObject, putObject } from '../storage.js'
 
 const DOCUMENT_TYPES = new Set([
   'p0', 'p1', 'ba_split', 'supporting_contract_doc', 'contract', 'bast', 'basto', 'other',
@@ -29,6 +29,7 @@ export async function listDocuments(req, res, next) {
 
 export async function uploadDocument(req, res, next) {
   const file = req.file
+  let uploadedStoragePath
   try {
     const { idLOP, documentType } = req.params
     if (!validDocumentType(documentType)) {
@@ -61,19 +62,8 @@ export async function uploadDocument(req, res, next) {
       // Generate cloud object path: projects/<idLOP>/<uuid>-<originalName>
       const fileExt = path.extname(file.originalname).toLowerCase()
       const storagePath = `projects/${encodeURIComponent(idLOP)}/${randomUUID()}${fileExt}`
-
-      if (supabase) {
-        const { error: uploadError } = await supabase.storage
-          .from(SUPABASE_STORAGE_BUCKET)
-          .upload(storagePath, file.buffer, {
-            contentType: file.mimetype,
-            upsert: true,
-          })
-
-        if (uploadError) {
-          throw new Error(`Gagal mengunggah file ke Supabase Storage: ${uploadError.message}`)
-        }
-      }
+      await putObject(storagePath, file.buffer, file.mimetype)
+      uploadedStoragePath = storagePath
 
       const result = await client.query(
         `INSERT INTO project_documents (
@@ -91,11 +81,11 @@ export async function uploadDocument(req, res, next) {
         [randomUUID(), idLOP, documentType, file.originalname, storagePath, file.mimetype, file.size, 'Admin Support'],
       )
       await client.query('COMMIT')
+      uploadedStoragePath = null
 
-      // Remove old file from Supabase storage if it was replaced
-      if (oldStoragePath && oldStoragePath !== storagePath && supabase) {
-        await supabase.storage.from(SUPABASE_STORAGE_BUCKET).remove([oldStoragePath]).catch((error) => {
-          console.error('Failed to remove replaced document from storage:', error)
+      if (oldStoragePath && oldStoragePath !== storagePath) {
+        await deleteObject(oldStoragePath).catch((error) => {
+          console.error('Failed to remove replaced document from Cloudflare R2:', error)
         })
       }
 
@@ -107,6 +97,11 @@ export async function uploadDocument(req, res, next) {
       client.release()
     }
   } catch (error) {
+    if (uploadedStoragePath) {
+      await deleteObject(uploadedStoragePath).catch((cleanupError) => {
+        console.error('Failed to clean up uploaded Cloudflare R2 object:', cleanupError)
+      })
+    }
     next(error)
   }
 }
@@ -121,24 +116,20 @@ export async function downloadDocument(req, res, next) {
 
     const { original_name: originalName, storage_path: storagePath, mime_type: mimeType } = rows[0]
 
-    if (supabase) {
-      const { data, error } = await supabase.storage
-        .from(SUPABASE_STORAGE_BUCKET)
-        .download(storagePath)
-
-      if (error || !data) {
-        return res.status(404).json({ message: 'File dokumen tidak ditemukan di penyimpanan cloud.' })
+    let object
+    try {
+      object = await getObject(storagePath)
+    } catch (error) {
+      if (error.name === 'NoSuchKey' || error.name === 'NotFound') {
+        return res.status(404).json({ message: 'File dokumen tidak ditemukan di Cloudflare R2.' })
       }
-
-      const buffer = Buffer.from(await data.arrayBuffer())
-      res.setHeader('Content-Type', mimeType || 'application/octet-stream')
-      res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(originalName)}"`)
-      return res.send(buffer)
+      throw error
     }
-
-    res.download(storagePath, originalName, { dotfiles: 'allow' }, (error) => {
-      if (error && !res.headersSent) next(error)
-    })
+    if (!object.Body) return res.status(404).json({ message: 'File dokumen tidak ditemukan di Cloudflare R2.' })
+    res.setHeader('Content-Type', mimeType || object.ContentType || 'application/octet-stream')
+    res.setHeader('Content-Disposition', `attachment; filename*=UTF-8''${encodeURIComponent(originalName)}`)
+    if (object.ContentLength !== undefined) res.setHeader('Content-Length', String(object.ContentLength))
+    object.Body.pipe(res)
   } catch (error) {
     next(error)
   }
@@ -155,9 +146,9 @@ export async function deleteDocument(req, res, next) {
     if (!rows[0]) return res.status(404).json({ message: 'Dokumen tidak ditemukan.' })
 
     const storagePath = rows[0].storage_path
-    if (supabase && storagePath) {
-      await supabase.storage.from(SUPABASE_STORAGE_BUCKET).remove([storagePath]).catch((error) => {
-        console.error('Failed to remove document from storage:', error)
+    if (storagePath) {
+      await deleteObject(storagePath).catch((error) => {
+        console.error('Failed to remove document from Cloudflare R2:', error)
       })
     }
     res.status(204).end()

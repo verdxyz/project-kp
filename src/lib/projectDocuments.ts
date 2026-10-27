@@ -1,4 +1,4 @@
-import { readJsonResponse } from './apiResponse'
+import { apiRequest } from './api'
 
 export type ProjectDocumentType =
   | 'p0'
@@ -75,40 +75,32 @@ export function getProjectDocumentLabel(documentType: ProjectDocumentType, categ
   return documentTypes.find((type) => type.id === documentType || type.aliases?.includes(documentType))?.label ?? documentType
 }
 
-async function responseJson(response: Response) {
-  const body = await readJsonResponse(response)
-  if (!response.ok) throw new Error(body.message || 'Operasi dokumen gagal.')
-  return body
-}
+// ─── Project document API ─────────────────────────────────────────────────────
 
 export const ProjectDocuments = {
   async list(idLOP: string): Promise<ProjectDocument[]> {
-    const response = await fetch(`/api/projects/${encodeURIComponent(idLOP)}/documents`, {
-      credentials: 'same-origin',
-    })
-    const body = await responseJson(response)
-    return body.documents as ProjectDocument[]
+    const result = await apiRequest<{ documents: ProjectDocument[] }>('/api/projects/' + encodeURIComponent(idLOP) + '/documents')
+    return result.documents
   },
 
   async upload(idLOP: string, documentType: ProjectDocumentType, file: File): Promise<ProjectDocument> {
-    const formData = new FormData()
-    formData.set('file', file)
-    const response = await fetch(
-      `/api/projects/${encodeURIComponent(idLOP)}/documents/${documentType}`,
-      { method: 'POST', credentials: 'same-origin', body: formData },
+    const form = new FormData()
+    form.append('file', file)
+    const result = await apiRequest<{ document: ProjectDocument }>(
+      '/api/projects/' + encodeURIComponent(idLOP) + '/documents/' + encodeURIComponent(documentType),
+      { method: 'POST', body: form },
     )
-    const body = await responseJson(response)
-    return body.document as ProjectDocument
+    return result.document
   },
 
   async download(idLOP: string, documentType: ProjectDocumentType, filename: string): Promise<void> {
     const response = await fetch(
-      `/api/projects/${encodeURIComponent(idLOP)}/documents/${documentType}/file`,
-      { credentials: 'same-origin' },
+      '/api/projects/' + encodeURIComponent(idLOP) + '/documents/' + encodeURIComponent(documentType) + '/file',
+      { credentials: 'include' },
     )
     if (!response.ok) {
-      const body = await readJsonResponse(response).catch(() => ({}))
-      throw new Error(body.message || 'Gagal mengunduh dokumen.')
+      const result = await response.json().catch(() => null) as { message?: string } | null
+      throw new Error(result?.message || 'Gagal mengunduh dokumen.')
     }
     const objectUrl = URL.createObjectURL(await response.blob())
     const link = document.createElement('a')
@@ -118,5 +110,12 @@ export const ProjectDocuments = {
     link.click()
     link.remove()
     URL.revokeObjectURL(objectUrl)
+  },
+
+  async delete(idLOP: string, documentType: ProjectDocumentType): Promise<void> {
+    await apiRequest<void>(
+      '/api/projects/' + encodeURIComponent(idLOP) + '/documents/' + encodeURIComponent(documentType),
+      { method: 'DELETE' },
+    )
   },
 }
