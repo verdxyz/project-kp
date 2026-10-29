@@ -116,6 +116,7 @@ const KEYS = {
   services: 'b2g_services',
   customers: 'b2g_customers',
 } as const
+const CUSTOMER_PROFILE_CLEANUP_KEY = 'b2g_customer_profile_cleanup_v1'
 
 // ─── Generic localStorage Helpers ─────────────────────────────────────────────
 
@@ -192,6 +193,21 @@ export const ServicesDB = {
 export const CustomersDB = {
   getAll(): Customer[] {
     return loadAll<Customer>(KEYS.customers)
+  },
+
+  clearInitialProfileData(): void {
+    if (localStorage.getItem(CUSTOMER_PROFILE_CLEANUP_KEY) === 'done') return
+
+    const customers = this.getAll()
+    saveAll(KEYS.customers, customers.map((customer) => ({
+      ...customer,
+      picName: '',
+      picPhone: '',
+      picEmail: '',
+      totalContract: 0,
+      updatedAt: now(),
+    })))
+    localStorage.setItem(CUSTOMER_PROFILE_CLEANUP_KEY, 'done')
   },
 
   getById(id: string): Customer | undefined {

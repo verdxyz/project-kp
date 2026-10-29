@@ -234,29 +234,29 @@ export function FinancialModule() {
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-5">
         
         {/* ─── Card 1: Kalkulator Diskon ─── */}
-        <div className="card xl:col-span-1 bg-slate-900/90 border-slate-800 flex flex-col justify-between">
+        <div className="card xl:col-span-1 bg-[#F9F8F6] border-[#E5E5E5] flex flex-col justify-between">
           <div>
             <div className="flex items-center gap-2.5 mb-4">
-              <div className="p-2 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
+              <div className="p-2 rounded-lg bg-[#F3F3F1] border border-[#E5E5E5] text-[#666666]">
                 <Calculator size={18} />
               </div>
               <div>
-                <h3 className="text-sm font-bold text-white">Kalkulator Diskon Proyek</h3>
-                <p className="text-xs text-slate-400">Batas diskon standar: {MAX_DISCOUNT_PERCENT}%</p>
+                <h3 className="text-sm font-bold text-[#1C1C1E]">Kalkulator Diskon Proyek</h3>
+                <p className="text-xs text-[#666666]">Batas diskon standar: {MAX_DISCOUNT_PERCENT}%</p>
               </div>
             </div>
 
             <form onSubmit={handleSaveDiscount} className="space-y-3.5">
               {/* Project Target */}
               <div>
-                <label className="text-xs font-medium text-slate-300 mb-1.5 block">
+                <label className="text-xs font-medium text-[#666666] mb-1.5 block">
                   Pilih Proyek Pipeline
                 </label>
                 <div className="relative">
                   <select
                     value={selectedProjectId}
                     onChange={(e) => handleProjectSelect(e.target.value)}
-                    className="w-full px-3 py-2 bg-slate-950 border border-slate-700/80 rounded-lg text-xs text-white focus:outline-none focus:border-blue-500 cursor-pointer"
+                    className="w-full px-3 py-2 bg-[#F9F8F6] border border-[#E5E5E5] rounded-lg text-xs text-[#1C1C1E] focus:outline-none focus:border-[#E5E5E5] cursor-pointer"
                   >
                     {PROJECTS.map((p) => (
                       <option key={p.id} value={p.id}>
@@ -269,11 +269,11 @@ export function FinancialModule() {
 
               {/* Original Price */}
               <div>
-                <label className="text-xs font-medium text-slate-300 mb-1.5 block">
+                <label className="text-xs font-medium text-[#666666] mb-1.5 block">
                   Harga Asli / Pagu (IDR)
                 </label>
-                <div className="flex items-center rounded-lg bg-slate-950 border border-slate-700/80 focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-500/20 overflow-hidden transition-all shadow-inner">
-                  <span className="px-3.5 py-2 text-xs font-bold text-slate-400 bg-slate-800/90 border-r border-slate-700 select-none">
+                <div className="flex items-center rounded-lg bg-[#F9F8F6] border border-[#E5E5E5] focus-within:border-[#E5E5E5] focus-within:ring-2 focus-within:ring-[#E5E5E5] overflow-hidden transition-all ">
+                  <span className="px-3.5 py-2 text-xs font-bold text-[#666666] bg-[#FFFFFF] border-r border-[#E5E5E5] select-none">
                     Rp
                   </span>
                   <input
@@ -284,7 +284,7 @@ export function FinancialModule() {
                       setOriginalPrice(raw)
                     }}
                     placeholder="0"
-                    className="w-full bg-transparent px-3 py-2 text-xs font-mono text-white placeholder-slate-500 outline-none"
+                    className="w-full bg-transparent px-3 py-2 text-xs font-mono text-[#1C1C1E] placeholder:text-[#666666] outline-none"
                   />
                 </div>
               </div>
@@ -292,14 +292,14 @@ export function FinancialModule() {
               {/* Discount Percentage */}
               <div>
                 <div className="flex items-center justify-between mb-1.5">
-                  <label className="text-xs font-medium text-slate-300">Persentase Diskon (%)</label>
-                  <span className={cn('text-[11px] font-semibold', isDiscountExceeded ? 'text-red-400' : 'text-emerald-400')}>
+                  <label className="text-xs font-medium text-[#666666]">Persentase Diskon (%)</label>
+                  <span className={cn('text-[11px] font-semibold', isDiscountExceeded ? 'text-[#666666]' : 'text-[#666666]')}>
                     {isDiscountExceeded ? 'Melebihi Batas 30%' : 'Dalam Batas Wajar'}
                   </span>
                 </div>
                 <div className={cn(
-                  'flex items-center rounded-lg bg-slate-950 border border-slate-700/80 focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-500/20 overflow-hidden transition-all shadow-inner',
-                  isDiscountExceeded && 'border-red-500 ring-2 ring-red-500/20'
+                  'flex items-center rounded-lg bg-[#F9F8F6] border border-[#E5E5E5] focus-within:border-[#E5E5E5] focus-within:ring-2 focus-within:ring-[#E5E5E5] overflow-hidden transition-all ',
+                  isDiscountExceeded && 'border-[#E5E5E5] ring-2 ring-[#E5E5E5]'
                 )}>
                   <input
                     type="number"
@@ -308,50 +308,50 @@ export function FinancialModule() {
                     placeholder="0"
                     min="0"
                     max="100"
-                    className="w-full bg-transparent px-3 py-2 text-xs font-mono text-white placeholder-slate-500 outline-none"
+                    className="w-full bg-transparent px-3 py-2 text-xs font-mono text-[#1C1C1E] placeholder:text-[#666666] outline-none"
                   />
-                  <span className="px-3.5 py-2 text-xs font-bold text-slate-400 bg-slate-800/90 border-l border-slate-700 select-none">
+                  <span className="px-3.5 py-2 text-xs font-bold text-[#666666] bg-[#FFFFFF] border-l border-[#E5E5E5] select-none">
                     %
                   </span>
                 </div>
 
                 {isDiscountExceeded && (
-                  <div className="mt-2 p-2 rounded-lg bg-red-500/10 border border-red-500/30 flex items-start gap-2 text-[11px] text-red-300">
-                    <AlertTriangle size={13} className="text-red-400 flex-shrink-0 mt-0.5" />
+                  <div className="mt-2 p-2 rounded-lg bg-[#F3F3F1] border border-[#E5E5E5] flex items-start gap-2 text-[11px] text-[#666666]">
+                    <AlertTriangle size={13} className="text-[#666666] flex-shrink-0 mt-0.5" />
                     <span>Diskon di atas 30% wajib melampirkan lembar persetujuan GM/VP.</span>
                   </div>
                 )}
               </div>
 
               {/* Live Calculated Output Box */}
-              <div className="p-3 rounded-xl bg-slate-950/80 border border-slate-800 space-y-1.5 text-xs">
-                <div className="flex justify-between text-slate-400 text-[11px]">
+              <div className="p-3 rounded-xl bg-[#F9F8F6] border border-[#E5E5E5] space-y-1.5 text-xs">
+                <div className="flex justify-between text-[#666666] text-[11px]">
                   <span>Harga Awal</span>
-                  <span className="font-mono text-slate-300">{formatIDR(priceNum)}</span>
+                  <span className="font-mono text-[#666666]">{formatIDR(priceNum)}</span>
                 </div>
                 <div className="flex justify-between text-[11px]">
-                  <span className="text-slate-400">Potongan Diskon ({discNum}%)</span>
-                  <span className={cn('font-mono font-semibold', isDiscountExceeded ? 'text-red-400' : 'text-amber-400')}>
+                  <span className="text-[#666666]">Potongan Diskon ({discNum}%)</span>
+                  <span className={cn('font-mono font-semibold', isDiscountExceeded ? 'text-[#666666]' : 'text-[#666666]')}>
                     - {formatIDR(discountAmount)}
                   </span>
                 </div>
-                <div className="pt-1.5 border-t border-slate-800 flex justify-between items-center">
-                  <span className="font-bold text-white text-xs">Harga Akhir Telkom</span>
-                  <span className="font-bold font-mono text-emerald-400 text-sm">{formatIDR(finalPrice)}</span>
+                <div className="pt-1.5 border-t border-[#E5E5E5] flex justify-between items-center">
+                  <span className="font-bold text-[#1C1C1E] text-xs">Harga Akhir Telkom</span>
+                  <span className="font-bold font-mono text-[#666666] text-sm">{formatIDR(finalPrice)}</span>
                 </div>
               </div>
 
               {/* Action Button */}
               <button
                 type="submit"
-                className="w-full py-2.5 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs shadow-md shadow-emerald-900/30 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                className="w-full py-2.5 px-3 rounded-xl bg-black hover:bg-[#F3F3F1] text-[#1C1C1E] font-semibold text-xs   transition-all flex items-center justify-center gap-1.5 cursor-pointer"
               >
                 <Plus size={14} />
                 <span>Simpan Hasil Justifikasi Diskon</span>
               </button>
 
               {discountSuccessMessage && (
-                <div className="p-2 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs flex items-center gap-1.5 animate-in fade-in">
+                <div className="p-2 rounded-lg bg-[#F3F3F1] border border-[#E5E5E5] text-[#666666] text-xs flex items-center gap-1.5 animate-in fade-in">
                   <Check size={14} /> Hasil perhitungan berhasil disimpan ke riwayat output di bawah!
                 </div>
               )}
@@ -360,45 +360,45 @@ export function FinancialModule() {
         </div>
 
         {/* ─── Card 2: Evaluasi Kompetitor ─── */}
-        <div className="card xl:col-span-1 bg-slate-900/90 border-slate-800 flex flex-col justify-between">
+        <div className="card xl:col-span-1 bg-[#F9F8F6] border-[#E5E5E5] flex flex-col justify-between">
           <div>
             <div className="flex items-center gap-2.5 mb-4">
-              <div className="p-2 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-400">
+              <div className="p-2 rounded-lg bg-[#F3F3F1] border border-[#E5E5E5] text-[#666666]">
                 <Users size={18} />
               </div>
               <div>
-                <h3 className="text-sm font-bold text-white">Evaluasi & Pembanding Kompetitor</h3>
-                <p className="text-xs text-slate-400">Analisis tender saat kalah harga</p>
+                <h3 className="text-sm font-bold text-[#1C1C1E]">Evaluasi & Pembanding Kompetitor</h3>
+                <p className="text-xs text-[#666666]">Analisis tender saat kalah harga</p>
               </div>
             </div>
 
             <form onSubmit={handleSaveCompetitor} className="space-y-3 text-xs">
               <div>
-                <label className="text-slate-300 font-medium mb-1 block">Proyek Terkait</label>
+                <label className="text-[#666666] font-medium mb-1 block">Proyek Terkait</label>
                 <input
                   type="text"
                   value={compProject}
                   onChange={(e) => setCompProject(e.target.value)}
                   placeholder="Nama pengadaan pemda..."
-                  className="w-full px-3 py-2 bg-slate-950 border border-slate-700/80 rounded-lg text-white focus:outline-none focus:border-amber-500"
+                  className="w-full px-3 py-2 bg-[#F9F8F6] border border-[#E5E5E5] rounded-lg text-[#1C1C1E] focus:outline-none focus:border-[#E5E5E5]"
                 />
               </div>
 
               <div>
-                <label className="text-slate-300 font-medium mb-1 block">Nama Operator Kompetitor</label>
+                <label className="text-[#666666] font-medium mb-1 block">Nama Operator Kompetitor</label>
                 <input
                   type="text"
                   value={competitorName}
                   onChange={(e) => setCompetitorName(e.target.value)}
                   placeholder="Contoh: Indosat Ooredoo, Biznet, Icon+"
-                  className="w-full px-3 py-2 bg-slate-950 border border-slate-700/80 rounded-lg text-white focus:outline-none focus:border-amber-500"
+                  className="w-full px-3 py-2 bg-[#F9F8F6] border border-[#E5E5E5] rounded-lg text-[#1C1C1E] focus:outline-none focus:border-[#E5E5E5]"
                 />
               </div>
 
               <div>
-                <label className="text-slate-300 font-medium mb-1 block">Harga Tawaran Kompetitor (IDR)</label>
-                <div className="flex items-center rounded-lg bg-slate-950 border border-slate-700/80 focus-within:border-amber-500 focus-within:ring-2 focus-within:ring-amber-500/20 overflow-hidden transition-all shadow-inner">
-                  <span className="px-3.5 py-2 text-xs font-bold text-slate-400 bg-slate-800/90 border-r border-slate-700 select-none">
+                <label className="text-[#666666] font-medium mb-1 block">Harga Tawaran Kompetitor (IDR)</label>
+                <div className="flex items-center rounded-lg bg-[#F9F8F6] border border-[#E5E5E5] focus-within:border-[#E5E5E5] focus-within:ring-2 focus-within:ring-[#E5E5E5] overflow-hidden transition-all ">
+                  <span className="px-3.5 py-2 text-xs font-bold text-[#666666] bg-[#FFFFFF] border-r border-[#E5E5E5] select-none">
                     Rp
                   </span>
                   <input
@@ -409,32 +409,32 @@ export function FinancialModule() {
                       setCompetitorPrice(raw)
                     }}
                     placeholder="0"
-                    className="w-full bg-transparent px-3 py-2 text-xs font-mono text-white placeholder-slate-500 outline-none"
+                    className="w-full bg-transparent px-3 py-2 text-xs font-mono text-[#1C1C1E] placeholder:text-[#666666] outline-none"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="text-slate-300 font-medium mb-1 block">Alasan Kekalahan & Analisis Spesifikasi</label>
+                <label className="text-[#666666] font-medium mb-1 block">Alasan Kekalahan & Analisis Spesifikasi</label>
                 <textarea
                   rows={2}
                   value={competitorNotes}
                   onChange={(e) => setCompetitorNotes(e.target.value)}
                   placeholder="Uraikan faktor kekalahan: selisih harga, SLA, perangkat gratis, dll."
-                  className="w-full px-3 py-2 bg-slate-950 border border-slate-700/80 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-amber-500 resize-none"
+                  className="w-full px-3 py-2 bg-[#F9F8F6] border border-[#E5E5E5] rounded-lg text-[#1C1C1E] placeholder:text-[#666666] focus:outline-none focus:border-[#E5E5E5] resize-none"
                 />
               </div>
 
               <button
                 type="submit"
-                className="w-full py-2.5 px-3 rounded-xl bg-amber-600 hover:bg-amber-500 text-white font-semibold text-xs shadow-md shadow-amber-900/30 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                className="w-full py-2.5 px-3 rounded-xl bg-black hover:bg-[#F3F3F1] text-[#1C1C1E] font-semibold text-xs   transition-all flex items-center justify-center gap-1.5 cursor-pointer"
               >
                 <TrendingDown size={14} />
                 <span>Simpan Evaluasi Kompetitor</span>
               </button>
 
               {competitorSuccessMessage && (
-                <div className="p-2 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs flex items-center gap-1.5 animate-in fade-in">
+                <div className="p-2 rounded-lg bg-[#F3F3F1] border border-[#E5E5E5] text-[#666666] text-xs flex items-center gap-1.5 animate-in fade-in">
                   <Check size={14} /> Data kompetitor berhasil dicatat dan muncul di daftar riwayat!
                 </div>
               )}
@@ -443,14 +443,14 @@ export function FinancialModule() {
         </div>
 
         {/* ─── Card 3: Term of Payment (TOP) ─── */}
-        <div className="card xl:col-span-1 bg-slate-900/90 border-slate-800">
+        <div className="card xl:col-span-1 bg-[#F9F8F6] border-[#E5E5E5]">
           <div className="flex items-center gap-2.5 mb-4">
-            <div className="p-2 rounded-lg bg-violet-500/10 border border-violet-500/20 text-violet-400">
+            <div className="p-2 rounded-lg bg-[#F3F3F1] border border-[#E5E5E5] text-[#666666]">
               <CreditCard size={18} />
             </div>
             <div>
-              <h3 className="text-sm font-bold text-white">Skema Pembayaran (ToP)</h3>
-              <p className="text-xs text-slate-400">Pola pencairan kas daerah (DPA Pemda)</p>
+              <h3 className="text-sm font-bold text-[#1C1C1E]">Skema Pembayaran (ToP)</h3>
+              <p className="text-xs text-[#666666]">Pola pencairan kas daerah (DPA Pemda)</p>
             </div>
           </div>
 
@@ -462,7 +462,7 @@ export function FinancialModule() {
                 desc: 'Penagihan rutin setiap bulan setelah layanan aktif. Standar utama untuk Astinet Dedicated & VPN IP.',
                 badge: 'Paling Umum',
                 icon: '📅',
-                color: 'border-blue-500/40 bg-blue-500/5',
+                color: 'border-[#E5E5E5] bg-[#F3F3F1]',
               },
               {
                 value: 'termin',
@@ -470,7 +470,7 @@ export function FinancialModule() {
                 desc: 'Pembayaran dibagi 2x atau 3x sesuai progres fisik berita acara (BAST). Cocok untuk integrasi GTMA + CPE.',
                 badge: 'Multi-Milestone',
                 icon: '🏗️',
-                color: 'border-amber-500/40 bg-amber-500/5',
+                color: 'border-[#E5E5E5] bg-[#F3F3F1]',
               },
               {
                 value: 'otc',
@@ -478,7 +478,7 @@ export function FinancialModule() {
                 desc: 'Dibayarkan 100% lunas saat serah terima perangkat/lisensi (BASTO). Khusus hardware, switch, & lisensi.',
                 badge: 'Pengadaan Hardware',
                 icon: '💳',
-                color: 'border-violet-500/40 bg-violet-500/5',
+                color: 'border-[#E5E5E5] bg-[#F3F3F1]',
               },
             ].map((item) => (
               <div
@@ -488,22 +488,22 @@ export function FinancialModule() {
                   'p-3 rounded-xl border cursor-pointer transition-all duration-200',
                   item.color,
                   topValue === item.value
-                    ? 'ring-2 ring-blue-500/60 border-blue-500 bg-blue-500/10'
-                    : 'hover:border-slate-600'
+                    ? 'ring-2 ring-[#E5E5E5] border-[#E5E5E5] bg-[#F3F3F1]'
+                    : 'hover:border-[#E5E5E5]'
                 )}
               >
                 <div className="flex items-start gap-2.5">
                   <span className="text-base">{item.icon}</span>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between mb-0.5">
-                      <p className="font-bold text-white text-xs">{item.title}</p>
+                      <p className="font-bold text-[#1C1C1E] text-xs">{item.title}</p>
                       {topValue === item.value && (
-                        <span className="text-[10px] font-bold text-blue-400 flex items-center gap-1">
+                        <span className="text-[10px] font-bold text-[#666666] flex items-center gap-1">
                           <CheckCircle2 size={12} /> Terpilih
                         </span>
                       )}
                     </div>
-                    <p className="text-[11px] text-slate-400 leading-relaxed">{item.desc}</p>
+                    <p className="text-[11px] text-[#666666] leading-relaxed">{item.desc}</p>
                   </div>
                 </div>
               </div>
@@ -516,18 +516,18 @@ export function FinancialModule() {
       {/* ═══════════════════════════════════════════════════════════════ */}
       {/* ─── OUTPUT SECTION 1: DAFTAR HASIL JUSTIFIKASI DISKON ─── */}
       {/* ═══════════════════════════════════════════════════════════════ */}
-      <div className="card bg-slate-900/90 border-slate-800 p-0 overflow-hidden">
-        <div className="px-5 py-4 border-b border-slate-800 flex items-center justify-between">
+      <div className="card bg-[#F9F8F6] border-[#E5E5E5] p-0 overflow-hidden">
+        <div className="px-5 py-4 border-b border-[#E5E5E5] flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-400">
+            <div className="p-1.5 rounded-lg bg-[#F3F3F1] text-[#666666]">
               <ShieldCheck size={16} />
             </div>
             <div>
-              <h3 className="text-sm font-bold text-white">Output Riwayat Justifikasi Diskon Proyek</h3>
-              <p className="text-[11px] text-slate-400">Hasil kalkulasi yang telah disimpan dan siap diaudit BPK/SPI</p>
+              <h3 className="text-sm font-bold text-[#1C1C1E]">Output Riwayat Justifikasi Diskon Proyek</h3>
+              <p className="text-[11px] text-[#666666]">Hasil kalkulasi yang telah disimpan dan siap diaudit BPK/SPI</p>
             </div>
           </div>
-          <span className="text-xs px-2.5 py-1 rounded-full bg-slate-800 text-slate-300 font-semibold">
+          <span className="text-xs px-2.5 py-1 rounded-full bg-[#FFFFFF] text-[#666666] font-semibold">
             {discountsList.length} Berkas Tercatat
           </span>
         </div>
@@ -535,7 +535,7 @@ export function FinancialModule() {
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs border-collapse">
             <thead>
-              <tr className="bg-slate-950/80 border-b border-slate-800 text-slate-400 font-semibold uppercase text-[10px]">
+              <tr className="bg-[#F9F8F6] border-b border-[#E5E5E5] text-[#666666] font-semibold uppercase text-[10px]">
                 <th className="px-4 py-3">Nama Proyek & Pemda</th>
                 <th className="px-4 py-3">Harga Asli</th>
                 <th className="px-4 py-3">Diskon</th>
@@ -545,37 +545,37 @@ export function FinancialModule() {
                 <th className="px-4 py-3 text-right">Aksi</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-800/60">
+            <tbody className="divide-y divide-[#E5E5E5]">
               {discountsList.map((d) => (
-                <tr key={d.id} className="hover:bg-slate-800/30 transition-colors">
+                <tr key={d.id} className="hover:bg-[#FFFFFF] transition-colors">
                   <td className="px-4 py-3.5">
-                    <p className="font-semibold text-white">{d.projectName}</p>
-                    <p className="text-[11px] text-slate-400 mt-0.5">{d.agency} • Ref: {d.id}</p>
+                    <p className="font-semibold text-[#1C1C1E]">{d.projectName}</p>
+                    <p className="text-[11px] text-[#666666] mt-0.5">{d.agency} • Ref: {d.id}</p>
                   </td>
-                  <td className="px-4 py-3.5 font-mono text-slate-300 whitespace-nowrap">
+                  <td className="px-4 py-3.5 font-mono text-[#666666] whitespace-nowrap">
                     {formatIDR(d.originalPrice)}
                   </td>
                   <td className="px-4 py-3.5 whitespace-nowrap">
-                    <span className={cn('font-bold', d.discountPercent > 30 ? 'text-red-400' : 'text-amber-400')}>
+                    <span className={cn('font-bold', d.discountPercent > 30 ? 'text-[#666666]' : 'text-[#666666]')}>
                       {d.discountPercent}%
                     </span>
-                    <span className="text-slate-500 text-[10px] block">
+                    <span className="text-[#666666] text-[10px] block">
                       (- {formatIDR(d.discountAmount)})
                     </span>
                   </td>
-                  <td className="px-4 py-3.5 font-mono font-bold text-emerald-400 whitespace-nowrap">
+                  <td className="px-4 py-3.5 font-mono font-bold text-[#666666] whitespace-nowrap">
                     {formatIDR(d.finalPrice)}
                   </td>
-                  <td className="px-4 py-3.5 text-slate-300 whitespace-nowrap">
+                  <td className="px-4 py-3.5 text-[#666666] whitespace-nowrap">
                     {d.topScheme}
                   </td>
                   <td className="px-4 py-3.5 whitespace-nowrap">
                     {d.status === 'approved' ? (
-                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-[#F3F3F1] text-[#666666] border border-[#E5E5E5]">
                         <Check size={11} /> Sesuai SOP (&le; 30%)
                       </span>
                     ) : (
-                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-red-500/10 text-red-400 border border-red-500/20">
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-[#F3F3F1] text-[#666666] border border-[#E5E5E5]">
                         <AlertTriangle size={11} /> Wajib Approval GM
                       </span>
                     )}
@@ -583,7 +583,7 @@ export function FinancialModule() {
                   <td className="px-4 py-3.5 text-right whitespace-nowrap">
                     <button
                       onClick={() => handleDeleteDiscount(d.id)}
-                      className="p-1.5 rounded-lg text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition-colors cursor-pointer"
+                      className="p-1.5 rounded-lg text-[#666666] hover:text-[#666666] hover:bg-[#F3F3F1] transition-colors cursor-pointer"
                       title="Hapus rekaman"
                     >
                       <Trash2 size={13} />
@@ -599,57 +599,57 @@ export function FinancialModule() {
       {/* ═══════════════════════════════════════════════════════════════ */}
       {/* ─── OUTPUT SECTION 2: DAFTAR EVALUASI KOMPETITOR ─── */}
       {/* ═══════════════════════════════════════════════════════════════ */}
-      <div className="card bg-slate-900/90 border-slate-800 p-0 overflow-hidden">
-        <div className="px-5 py-4 border-b border-slate-800 flex items-center justify-between">
+      <div className="card bg-[#F9F8F6] border-[#E5E5E5] p-0 overflow-hidden">
+        <div className="px-5 py-4 border-b border-[#E5E5E5] flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="p-1.5 rounded-lg bg-amber-500/10 text-amber-400">
+            <div className="p-1.5 rounded-lg bg-[#F3F3F1] text-[#666666]">
               <FileWarning size={16} />
             </div>
             <div>
-              <h3 className="text-sm font-bold text-white">Output Riwayat Evaluasi Kompetitor & Kekalahan Tender</h3>
-              <p className="text-[11px] text-slate-400">Bukti justifikasi penyebab kalah tender sebagai bahan pertanggungjawaban audit</p>
+              <h3 className="text-sm font-bold text-[#1C1C1E]">Output Riwayat Evaluasi Kompetitor & Kekalahan Tender</h3>
+              <p className="text-[11px] text-[#666666]">Bukti justifikasi penyebab kalah tender sebagai bahan pertanggungjawaban audit</p>
             </div>
           </div>
-          <span className="text-xs px-2.5 py-1 rounded-full bg-slate-800 text-slate-300 font-semibold">
+          <span className="text-xs px-2.5 py-1 rounded-full bg-[#FFFFFF] text-[#666666] font-semibold">
             {competitorsList.length} Rekaman
           </span>
         </div>
 
-        <div className="divide-y divide-slate-800/60">
+        <div className="divide-y divide-[#E5E5E5]">
           {competitorsList.map((comp) => {
             const selisih = comp.telkomPrice - comp.competitorPrice
             const pctSelisih = comp.telkomPrice > 0 ? Math.round((selisih / comp.telkomPrice) * 100) : 0
 
             return (
-              <div key={comp.id} className="p-4 hover:bg-slate-800/20 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+              <div key={comp.id} className="p-4 hover:bg-[#FFFFFF] transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
                 <div className="space-y-1 flex-1">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className="font-bold text-white text-sm">{comp.competitorName}</span>
-                    <span className="text-[10px] uppercase font-bold px-2 py-0.2 rounded bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                    <span className="font-bold text-[#1C1C1E] text-sm">{comp.competitorName}</span>
+                    <span className="text-[10px] uppercase font-bold px-2 py-0.2 rounded bg-[#F3F3F1] text-[#666666] border border-[#E5E5E5]">
                       Kompetitor
                     </span>
-                    <span className="text-slate-500 text-[11px]">Proyek: {comp.projectName}</span>
+                    <span className="text-[#666666] text-[11px]">Proyek: {comp.projectName}</span>
                   </div>
-                  <p className="text-slate-300 text-[11px] leading-relaxed italic">
+                  <p className="text-[#666666] text-[11px] leading-relaxed italic">
                     "{comp.notes}"
                   </p>
-                  <p className="text-slate-500 text-[10px]">
+                  <p className="text-[#666666] text-[10px]">
                     Dicatat oleh {comp.createdBy} pada {comp.createdAt}
                   </p>
                 </div>
 
                 <div className="flex items-center gap-4 self-end sm:self-center">
                   <div className="text-right">
-                    <p className="text-[10px] text-slate-400">Tawaran Kompetitor</p>
-                    <p className="text-sm font-mono font-bold text-amber-400">{formatIDR(comp.competitorPrice)}</p>
-                    <p className="text-[10px] text-slate-500">
+                    <p className="text-[10px] text-[#666666]">Tawaran Kompetitor</p>
+                    <p className="text-sm font-mono font-bold text-[#666666]">{formatIDR(comp.competitorPrice)}</p>
+                    <p className="text-[10px] text-[#666666]">
                       Telkom: {formatIDR(comp.telkomPrice)} ({pctSelisih > 0 ? `Lebih murah ${pctSelisih}%` : 'Selisih harga'})
                     </p>
                   </div>
 
                   <button
                     onClick={() => handleDeleteCompetitor(comp.id)}
-                    className="p-2 rounded-lg text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition-colors cursor-pointer"
+                    className="p-2 rounded-lg text-[#666666] hover:text-[#666666] hover:bg-[#F3F3F1] transition-colors cursor-pointer"
                     title="Hapus evaluasi"
                   >
                     <Trash2 size={14} />

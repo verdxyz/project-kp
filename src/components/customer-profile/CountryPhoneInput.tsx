@@ -52,7 +52,7 @@ export function CountryPhoneInput({
           save(code, phone.number)
         }}
         title={selectedCountry ? `${selectedCountry.country} ${selectedCountry.code}` : 'Pilih kode negara'}
-        className="w-full min-w-0 rounded-md border border-slate-700 bg-slate-900 px-1.5 py-1 text-[10px] text-slate-300 outline-none focus:border-blue-500"
+        className="w-full min-w-0 rounded-md border border-[#E5E5E5] bg-[#F9F8F6] px-1.5 py-1 text-[10px] text-[#666666] outline-none focus:border-[#E5E5E5]"
       >
         {COUNTRY_CODES.map(({ country, code, shortName }) => <option key={code} value={code}>{shortName} {code} · {country}</option>)}
       </select>
@@ -63,7 +63,7 @@ export function CountryPhoneInput({
         onChange={(event) => setPhone((current) => ({ ...current, number: event.target.value }))}
         onBlur={() => save(phone.code, phone.number)}
         placeholder={`Buat ${label} Disini`}
-        className="w-full min-w-0 rounded-md border border-slate-700 bg-slate-900/60 px-2 py-1 text-xs text-slate-200 outline-none focus:border-blue-500"
+        className="w-full min-w-0 rounded-md border border-[#E5E5E5] bg-[#F9F8F6] px-2 py-1 text-xs text-[#666666] outline-none focus:border-[#E5E5E5]"
       />
     </div>
   )

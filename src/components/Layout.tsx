@@ -6,12 +6,10 @@ import {
   Wifi,
   Menu,
   X,
-  TrendingUp,
   Database,
   LogOut,
 } from 'lucide-react'
 import { cn } from '../lib/utils'
-import type { AuthUser } from '../lib/auth'
 
 interface NavItem {
   id: string
@@ -35,9 +33,10 @@ const NAV_ITEMS: NavItem[] = [
 interface SidebarProps {
   activeNav: string
   onNavChange: (id: string) => void
+  onLogout: () => void | Promise<void>
 }
 
-export function Sidebar({ activeNav, onNavChange }: SidebarProps) {
+export function Sidebar({ activeNav, onNavChange, onLogout }: SidebarProps) {
   const [collapsed, setCollapsed] = useState(false)
   const [expandedItem, setExpandedItem] = useState<string | null>(null)
   const [mobileOpen, setMobileOpen] = useState(false)
@@ -49,19 +48,19 @@ export function Sidebar({ activeNav, onNavChange }: SidebarProps) {
   const SidebarContent = () => (
     <div className="flex flex-col h-full">
       {/* Logo */}
-      <div className="flex items-center gap-3 px-4 py-5 border-b border-slate-700/50">
-        <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center flex-shrink-0 shadow-lg shadow-blue-900/30">
-          <TrendingUp size={18} className="text-white" />
-        </div>
+      <div className="flex items-center gap-3 px-4 py-5 border-b border-[#E5E5E5]">
         {!collapsed && (
           <div className="min-w-0">
-            <p className="text-sm font-bold text-white leading-tight truncate">B2Gov Portal</p>
-            <p className="text-xs text-slate-400 truncate">Telkom Indonesia</p>
+            <p className="text-sm font-bold text-[#1C1C1E] leading-tight truncate">B2Gov Portal</p>
           </div>
         )}
         <button
           onClick={() => setCollapsed(!collapsed)}
-          className="ml-auto text-slate-400 hover:text-white transition-colors p-1 rounded hidden lg:flex"
+          className="ml-auto text-[#666666] hover:text-[#1C1C1E] transition-colors p-1 rounded hidden lg:flex"
+          type="button"
+          aria-label={collapsed ? 'Perluas menu navigasi' : 'Ciutkan menu navigasi'}
+          aria-expanded={!collapsed}
+          title={collapsed ? 'Perluas menu' : 'Ciutkan menu'}
         >
           <Menu size={16} />
         </button>
@@ -94,7 +93,7 @@ export function Sidebar({ activeNav, onNavChange }: SidebarProps) {
                 <>
                   <span className="flex-1 text-left">{item.label}</span>
                   {item.badge !== undefined && (
-                    <span className="bg-blue-600/20 text-blue-400 text-xs px-1.5 py-0.5 rounded-full font-semibold">
+                    <span className="bg-[#F3F3F1] text-[#666666] text-xs px-1.5 py-0.5 rounded-full font-semibold">
                       {item.badge}
                     </span>
                   )}
@@ -113,7 +112,7 @@ export function Sidebar({ activeNav, onNavChange }: SidebarProps) {
 
             {/* Submenu */}
             {item.children && expandedItem === item.id && !collapsed && (
-              <div className="ml-8 mt-1 space-y-0.5 border-l border-slate-700/50 pl-3">
+              <div className="ml-8 mt-1 space-y-0.5 border-l border-[#E5E5E5] pl-3">
                 {item.children.map((child) => (
                   <button
                     key={child.id}
@@ -124,8 +123,8 @@ export function Sidebar({ activeNav, onNavChange }: SidebarProps) {
                     className={cn(
                       'w-full text-left px-3 py-1.5 rounded-md text-xs font-medium transition-all',
                       activeNav === child.id
-                        ? 'text-blue-400 bg-blue-500/10'
-                        : 'text-slate-400 hover:text-slate-200 hover:bg-slate-700/30'
+                        ? 'text-[#666666] bg-[#F3F3F1]'
+                        : 'text-[#666666] hover:text-[#666666] hover:bg-[#F3F3F1]'
                     )}
                   >
                     {child.label}
@@ -137,6 +136,25 @@ export function Sidebar({ activeNav, onNavChange }: SidebarProps) {
         ))}
       </nav>
 
+      <div className="border-t border-[#E5E5E5] p-3">
+        <button
+          onClick={() => {
+            setMobileOpen(false)
+            onLogout()
+          }}
+          className={cn(
+            'flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm text-[#666666] transition-colors hover:bg-[#F3F3F1] hover:text-[#1C1C1E]',
+            collapsed && 'justify-center px-2'
+          )}
+          type="button"
+          aria-label="Keluar"
+          title="Keluar"
+        >
+          <LogOut size={18} className="flex-shrink-0" />
+          {!collapsed && <span>Keluar</span>}
+        </button>
+      </div>
+
     </div>
   )
 
@@ -145,7 +163,11 @@ export function Sidebar({ activeNav, onNavChange }: SidebarProps) {
       {/* Mobile Toggle Button */}
       <button
         onClick={() => setMobileOpen(!mobileOpen)}
-        className="lg:hidden fixed top-4 left-4 z-50 p-2 rounded-lg bg-slate-800 border border-slate-700 text-slate-300"
+        className="lg:hidden fixed top-4 left-4 z-50 p-2 rounded-lg bg-[#FFFFFF] border border-[#E5E5E5] text-[#666666]"
+        type="button"
+        aria-label={mobileOpen ? 'Tutup menu navigasi' : 'Buka menu navigasi'}
+        aria-expanded={mobileOpen}
+        aria-controls="mobile-navigation"
       >
         {mobileOpen ? <X size={20} /> : <Menu size={20} />}
       </button>
@@ -153,7 +175,7 @@ export function Sidebar({ activeNav, onNavChange }: SidebarProps) {
       {/* Mobile Overlay */}
       {mobileOpen && (
         <div
-          className="lg:hidden fixed inset-0 bg-black/60 z-40 backdrop-blur-sm"
+          className="lg:hidden fixed inset-0 bg-black/60 z-40 "
           onClick={() => setMobileOpen(false)}
         />
       )}
@@ -162,7 +184,7 @@ export function Sidebar({ activeNav, onNavChange }: SidebarProps) {
       <aside
         className={cn(
           'hidden lg:flex flex-col h-screen sticky top-0 flex-shrink-0 transition-all duration-300',
-          'bg-slate-900 border-r border-slate-700/50',
+          'bg-[#F9F8F6] border-r border-[#E5E5E5]',
           collapsed ? 'w-16' : 'w-60'
         )}
       >
@@ -171,9 +193,10 @@ export function Sidebar({ activeNav, onNavChange }: SidebarProps) {
 
       {/* Mobile Sidebar */}
       <aside
+        id="mobile-navigation"
         className={cn(
           'lg:hidden fixed top-0 left-0 z-50 h-screen w-64 flex flex-col transition-transform duration-300',
-          'bg-slate-900 border-r border-slate-700/50',
+          'bg-[#F9F8F6] border-r border-[#E5E5E5]',
           mobileOpen ? 'translate-x-0' : '-translate-x-full'
         )}
       >
@@ -186,26 +209,14 @@ export function Sidebar({ activeNav, onNavChange }: SidebarProps) {
 interface TopbarProps {
   title: string
   subtitle?: string
-  user: AuthUser
-  onLogout: () => void
 }
 
-export function Topbar({ title, subtitle, user, onLogout }: TopbarProps) {
+export function Topbar({ title, subtitle }: TopbarProps) {
   return (
-    <div className="flex items-center justify-between px-6 py-4 border-b border-slate-700/50 bg-slate-900/50 backdrop-blur-sm sticky top-0 z-30">
+    <div className="flex items-center justify-between px-6 py-4 border-b border-[#E5E5E5] bg-[#F9F8F6]  sticky top-0 z-30">
       <div>
-        <h1 className="text-lg font-bold text-white">{title}</h1>
-        {subtitle && <p className="text-xs text-slate-400 mt-0.5">{subtitle}</p>}
-      </div>
-      <div className="flex items-center gap-3">
-        <div className="hidden sm:block text-right">
-          <p className="text-xs font-medium text-slate-200">{user.nama}</p>
-          <p className="text-[11px] text-slate-500">{user.email}</p>
-        </div>
-        <button onClick={onLogout} className="inline-flex items-center gap-2 rounded-lg border border-slate-700 px-3 py-2 text-xs font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition-colors" aria-label="Keluar">
-          <LogOut size={14} />
-          <span className="hidden sm:inline">Keluar</span>
-        </button>
+        <h1 className="text-lg font-bold text-[#1C1C1E]">{title}</h1>
+        {subtitle && <p className="text-xs text-[#666666] mt-0.5">{subtitle}</p>}
       </div>
     </div>
   )

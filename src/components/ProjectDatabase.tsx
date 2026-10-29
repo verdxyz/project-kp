@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react'
+﻿import React, { useCallback, useEffect, useState } from 'react'
 import {
   AlertCircle,
   Building2,
@@ -33,22 +33,22 @@ const STAGE_PROGRESS: Record<ProjectStage, number> = {
   F0: 0, F1: 20, F2: 40, F3: 60, F4: 80, F5: 100, Loss: 0, Cancel: 0,
 }
 const STAGE_COLORS: Record<ProjectStage, string> = {
-  F0: 'bg-indigo-500/20 text-indigo-400 border-indigo-500/30',
-  F1: 'bg-amber-500/20 text-amber-400 border-amber-500/30',
-  F2: 'bg-blue-500/20 text-blue-400 border-blue-500/30',
-  F3: 'bg-violet-500/20 text-violet-400 border-violet-500/30',
-  F4: 'bg-cyan-500/20 text-cyan-400 border-cyan-500/30',
-  F5: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30',
-  Loss: 'bg-red-500/20 text-red-400 border-red-500/30',
-  Cancel: 'bg-slate-700 text-slate-300 border-slate-600',
+  F0: 'bg-[#F3F3F1] text-[#666666] border-[#E5E5E5]',
+  F1: 'bg-[#F3F3F1] text-[#666666] border-[#E5E5E5]',
+  F2: 'bg-[#F3F3F1] text-[#666666] border-[#E5E5E5]',
+  F3: 'bg-[#F3F3F1] text-[#666666] border-[#E5E5E5]',
+  F4: 'bg-[#F3F3F1] text-[#666666] border-[#E5E5E5]',
+  F5: 'bg-[#F3F3F1] text-[#666666] border-[#E5E5E5]',
+  Loss: 'bg-[#F3F3F1] text-[#666666] border-[#E5E5E5]',
+  Cancel: 'bg-[#F3F3F1] text-[#666666] border-[#E5E5E5]',
 }
 const STATUSES: ProjectEntry['status'][] = ['Active', 'At Risk', 'Completed', 'Lost', 'Cancelled']
 const STATUS_COLORS: Record<ProjectEntry['status'], string> = {
-  Active: 'bg-blue-500/20 text-blue-400 border-blue-500/30',
-  'At Risk': 'bg-red-500/20 text-red-400 border-red-500/30',
-  Completed: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30',
-  Lost: 'bg-slate-700 text-slate-300 border-slate-600',
-  Cancelled: 'bg-slate-700 text-slate-300 border-slate-600',
+  Active: 'bg-[#F3F3F1] text-[#666666] border-[#E5E5E5]',
+  'At Risk': 'bg-[#F3F3F1] text-[#666666] border-[#E5E5E5]',
+  Completed: 'bg-[#F3F3F1] text-[#666666] border-[#E5E5E5]',
+  Lost: 'bg-[#F3F3F1] text-[#666666] border-[#E5E5E5]',
+  Cancelled: 'bg-[#F3F3F1] text-[#666666] border-[#E5E5E5]',
 }
 const CATEGORIES: ProjectEntry['category'][] = ['On Channel', 'GTMA', 'NGTMA']
 const AGENCY_BY_NAME = new Map<string, (typeof MASTER_INSTANSI)[number]>(
@@ -125,7 +125,11 @@ function blankForm(category: ProjectEntry['category'] = 'On Channel'): ProjectFo
 
 function agencyFields(name: string) {
   const agency = AGENCY_BY_NAME.get(name)
-  return { agencyType: agency?.tipe ?? 'Lainnya', region: agency?.wilayah ?? '' }
+  return {
+    pemdaName: name,
+    agencyType: agency?.tipe ?? 'Lainnya',
+    region: agency?.wilayah ?? '',
+  }
 }
 
 interface ProjectModalProps {
@@ -187,7 +191,6 @@ function ProjectModal({ mode, initial, fixedCategory, onSave, onClose, saving, s
     if (mode === 'edit' && (!form.servicePrice || form.servicePrice < 0)) {
       nextErrors.servicePrice = 'Harga layanan tidak boleh negatif'
     }
-    if (!form.pic.trim()) nextErrors.pic = 'PIC wajib diisi'
     setErrors(nextErrors)
     return Object.keys(nextErrors).length === 0
   }
@@ -198,7 +201,11 @@ function ProjectModal({ mode, initial, fixedCategory, onSave, onClose, saving, s
   }
 
   const matchingServices = services.filter((service) => service.category === (fixedCategory ?? form.category))
-  const availablePICs = customers.filter((customer) => customer.picName.trim())
+  const availablePICs = customers.filter((customer) => (
+    customer.name.trim().toLocaleLowerCase() === form.agency.trim().toLocaleLowerCase()
+    && customer.picName.trim()
+  ))
+  const showPICDropdown = availablePICs.length > 0
   const documentTypes = getProjectDocumentTypes(form.category)
 
   const selectFile = (documentType: ProjectDocumentType, file?: File) => {
@@ -214,24 +221,23 @@ function ProjectModal({ mode, initial, fixedCategory, onSave, onClose, saving, s
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative w-full max-w-3xl max-h-[92vh] overflow-y-auto bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl">
-        <div className="sticky top-0 flex items-center justify-between px-6 py-4 border-b border-slate-700/50 bg-slate-900/95 z-10">
+      <div className="absolute inset-0 bg-black/70 " onClick={onClose} />
+      <div className="relative w-full max-w-3xl max-h-[92vh] flex flex-col bg-[#F9F8F6] border border-[#E5E5E5] rounded-2xl overflow-hidden shadow-2xl">
+        <div className="sticky top-0 flex items-center justify-between px-6 py-4 border-b border-[#E5E5E5] bg-[#F9F8F6] z-10">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-violet-500/20 border border-violet-500/30 flex items-center justify-center">
-              <FolderPlus size={16} className="text-violet-400" />
+            <div className="w-8 h-8 rounded-lg bg-[#F3F3F1] border border-[#E5E5E5] flex items-center justify-center">
+              <FolderPlus size={16} className="text-[#666666]" />
             </div>
-            <h3 className="text-base font-bold text-white">{mode === 'add' ? 'Input Proyek Baru' : 'Edit Proyek'}</h3>
+            <h3 className="text-base font-bold text-[#1C1C1E]">{mode === 'add' ? 'Input Proyek Baru' : 'Edit Proyek'}</h3>
           </div>
-          <button type="button" onClick={onClose} className="p-1.5 rounded-lg hover:bg-slate-800 text-slate-400">
+          <button type="button" onClick={onClose} className="p-1.5 rounded-lg hover:bg-[#FFFFFF] text-[#666666]">
             <X size={18} />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-5">
-          {saveError && <div role="alert" className="rounded-xl border border-red-500/30 bg-red-500/10 p-3 text-xs text-red-300">{saveError}</div>}
+        <form onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0"><div className="flex-1 overflow-y-auto p-6 space-y-5">{saveError && <div role="alert" className="rounded-xl border border-[#E5E5E5] bg-[#F3F3F1] p-3 text-xs text-[#666666]">{saveError}</div>}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Field label="ID LOP *" error={errors.idLOP}>
+            <Field label="ID LOP" error={errors.idLOP}>
               <input value={form.idLOP} onChange={(event) => set('idLOP', event.target.value)} placeholder="LOP-2026-SMG-001" className="form-input" />
             </Field>
             {!fixedCategory && (
@@ -248,18 +254,19 @@ function ProjectModal({ mode, initial, fixedCategory, onSave, onClose, saving, s
               </Field>
             )}
           </div>
-          <Field label="Nama Proyek *" error={errors.projectName}>
+          <Field label="Nama Proyek" error={errors.projectName}>
             <input value={form.projectName} onChange={(event) => set('projectName', event.target.value)} className="form-input" />
           </Field>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Field label="Nama Pemda *" error={errors.pemdaName}>
-              <input
-                value={form.pemdaName}
-                onChange={(event) => set('pemdaName', event.target.value)}
-                placeholder="Contoh: Pemkot Pekalongan"
-                className="form-input"
-              />
-            </Field>
+          {mode === 'edit' && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Field label="Nama Pemda" error={errors.pemdaName}>
+                <input
+                  value={form.pemdaName}
+                  onChange={(event) => set('pemdaName', event.target.value)}
+                  placeholder="Contoh: Pemkot Pekalongan"
+                  className="form-input"
+                />
+              </Field>
             <Field label="Nama Dinas">
               <input
                 value={form.dinasName ?? ''}
@@ -268,11 +275,22 @@ function ProjectModal({ mode, initial, fixedCategory, onSave, onClose, saving, s
                 className="form-input"
               />
             </Field>
-          </div>
+            </div>
+          )}
+          {mode === 'add' && (
+            <Field label="Nama Dinas">
+              <input
+                value={form.dinasName ?? ''}
+                onChange={(event) => set('dinasName', event.target.value)}
+                placeholder="Contoh: Kominfo atau Dukcapil"
+                className="form-input"
+              />
+            </Field>
+          )}
           {mode === 'edit' && (
-            <Field label="Harga Layanan / Nilai Kontrak" error={errors.servicePrice}>
+            <Field label="Harga Layanan" error={errors.servicePrice}>
               <div className="flex items-center gap-2">
-                <span className="flex h-[38px] items-center rounded-lg border border-slate-700 bg-slate-800/80 px-3 text-xs font-semibold text-slate-300 select-none">
+                <span className="flex h-[38px] items-center rounded-lg border border-[#E5E5E5] bg-[#FFFFFF] px-3 text-xs font-semibold text-[#666666] select-none">
                   Rp
                 </span>
                 <input
@@ -290,31 +308,13 @@ function ProjectModal({ mode, initial, fixedCategory, onSave, onClose, saving, s
             </Field>
           )}
           {form.category === 'NGTMA' && (
-            <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/30 space-y-4">
+            <div className="p-4 rounded-xl bg-[#F3F3F1] border border-[#E5E5E5] space-y-4">
               <div className="flex items-center gap-2">
-                <span className="text-xs font-bold text-amber-300 uppercase tracking-wider">
-                  Field Khusus Kategori NGTMA (Revisi 1)
+                <span className="text-xs font-bold text-[#666666] uppercase tracking-wider">
+                  Field Khusus Kategori NGTMA
                 </span>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <Field label="Nama Pelanggan (Government Customer) *">
-                  <Select
-                    value={form.customerName || form.agency || ''}
-                    onChange={(val) => {
-                      set('customerName', val)
-                      if (!form.agency) {
-                        setForm((curr) => ({ ...curr, agency: val, ...agencyFields(val) }))
-                      }
-                    }}
-                  >
-                    <option value="">Pilih Instansi Pemerintah</option>
-                    {MASTER_INSTANSI.map((inst) => (
-                      <option key={inst.nama} value={inst.nama}>{inst.nama}</option>
-                    ))}
-                  </Select>
-                </Field>
-              </div>
-              <Field label="Nama Anak Perusahaan Telkom *" error={errors.subsidiaryName}>
+              <Field label="Nama Anak Perusahaan Telkom" error={errors.subsidiaryName}>
                 <input
                   value={form.subsidiaryName ?? ''}
                   onChange={(event) => set('subsidiaryName', event.target.value)}
@@ -325,10 +325,16 @@ function ProjectModal({ mode, initial, fixedCategory, onSave, onClose, saving, s
             </div>
           )}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Field label="Instansi Referensi *" error={errors.agency}>
+            <Field label="Instansi" error={errors.agency}>
               <Select
                 value={form.agency}
-                onChange={(agency) => setForm((current) => ({ ...current, agency, ...agencyFields(agency) }))}
+                onChange={(agency) => setForm((current) => ({
+                  ...current,
+                  agency,
+                  ...agencyFields(agency),
+                  ...(mode === 'add' ? { customerName: agency } : {}),
+                  ...(current.agency !== agency ? { pic: '' } : {}),
+                }))}
               >
                 <option value="">Pilih instansi pelanggan</option>
                 {MASTER_INSTANSI.map((agency) => <option key={agency.nama}>{agency.nama}</option>)}
@@ -358,7 +364,7 @@ function ProjectModal({ mode, initial, fixedCategory, onSave, onClose, saving, s
                       onClick={() => handleStageChange(stage)}
                       className={cn(
                         'px-3 py-1.5 rounded-lg text-xs font-bold border',
-                        form.stage === stage ? STAGE_COLORS[stage] : 'bg-slate-800 border-slate-700 text-slate-500',
+                        form.stage === stage ? STAGE_COLORS[stage] : 'bg-[#FFFFFF] border-[#E5E5E5] text-[#666666]',
                       )}
                     >
                       {stage}
@@ -367,23 +373,32 @@ function ProjectModal({ mode, initial, fixedCategory, onSave, onClose, saving, s
                 </div>
               </Field>
               <Field label={`Progress (${form.progress}%)`}>
-                <input type="range" min={0} max={100} value={form.progress} onChange={(event) => set('progress', Number(event.target.value))} className="w-full accent-blue-500" />
+                <input type="range" min={0} max={100} value={form.progress} onChange={(event) => set('progress', Number(event.target.value))} className="w-full accent-[#111111]" />
               </Field>
             </>
           )}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Field label="PIC *" error={errors.pic}>
-              <Select value={form.pic} onChange={(value) => set('pic', value)}>
-                <option value="">Pilih PIC dari Database Instansi</option>
-                {form.pic && !availablePICs.some((customer) => customer.picName === form.pic) && (
-                  <option value={form.pic}>{form.pic} (data proyek sebelumnya)</option>
-                )}
-                {availablePICs.map((customer) => (
-                  <option key={customer.id} value={customer.picName}>{customer.picName} ({customer.name})</option>
-                ))}
-              </Select>
+            <Field label="PIC" error={errors.pic}>
+              {showPICDropdown ? (
+                <Select value={form.pic} onChange={(value) => set('pic', value)}>
+                  <option value="">Pilih PIC dari Database Instansi</option>
+                  {form.pic && !availablePICs.some((customer) => customer.picName === form.pic) && (
+                    <option value={form.pic}>{form.pic} (data proyek sebelumnya)</option>
+                  )}
+                  {availablePICs.map((customer) => (
+                    <option key={customer.id} value={customer.picName}>{customer.picName} ({customer.name})</option>
+                  ))}
+                </Select>
+              ) : (
+                <input
+                  value={form.pic}
+                  onChange={(event) => set('pic', event.target.value)}
+                  placeholder="Nama PIC / penanggung jawab"
+                  className="form-input"
+                />
+              )}
             </Field>
-            {mode === 'add' ? (
+            {mode === 'add' && (
               <Field label="Nama Pelanggan">
                 <input
                   value={form.customerName ?? ''}
@@ -392,7 +407,8 @@ function ProjectModal({ mode, initial, fixedCategory, onSave, onClose, saving, s
                   className="form-input"
                 />
               </Field>
-            ) : (
+            )}
+            {mode === 'edit' && (
               <Field label="Status">
                 <Select value={form.status} onChange={(value) => set('status', value as ProjectEntry['status'])}>
                   {STATUSES.map((status) => <option key={status}>{status}</option>)}
@@ -415,28 +431,28 @@ function ProjectModal({ mode, initial, fixedCategory, onSave, onClose, saving, s
           </Field>
 
           {mode === 'edit' && (
-            <section className="space-y-3 border-t border-slate-800 pt-4">
+            <section className="space-y-3 border-t border-[#E5E5E5] pt-4">
               <div>
-                <h4 className="text-sm font-semibold text-white">Dokumen berdasarkan ID LOP</h4>
-                <p className="text-xs text-slate-500 mt-1">File PDF, Office, atau gambar; maksimal 10 MB per dokumen.</p>
+                <h4 className="text-sm font-semibold text-[#1C1C1E]">Dokumen berdasarkan ID LOP</h4>
+                <p className="text-xs text-[#666666] mt-1">File PDF, Office, atau gambar; maksimal 10 MB per dokumen.</p>
                 {form.category === 'NGTMA' && (
-                  <p className="mt-2 text-[11px] leading-relaxed text-slate-400">
+                  <p className="mt-2 text-[11px] leading-relaxed text-[#666666]">
                     Dokumen ini wajib sebagai evidence Kontrak Management dan dapat dilengkapi bertahap saat edit. Kirim melalui NDE ke Segmen dengan tembusan GPO untuk pencatatan performa dan input pada aplikasi Web NGTMA.
                   </p>
                 )}
               </div>
-              {documentError && <p role="alert" className="text-xs text-red-400">{documentError}</p>}
+              {documentError && <p role="alert" className="text-xs text-[#666666]">{documentError}</p>}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {documentTypes.map((documentType) => {
                   const existing = documents.find((document) => (
                     document.documentType === documentType.id || documentType.aliases?.includes(document.documentType)
                   ))
                   return (
-                    <label key={documentType.id} className="block p-3 rounded-xl border border-slate-700/70 bg-slate-950/40">
-                      <span className="block text-xs font-semibold text-slate-300 mb-2">{documentType.label}</span>
-                      {documentType.helperText && <span className="mb-2 block text-[11px] text-amber-300">{documentType.helperText}</span>}
+                    <label key={documentType.id} className="block p-3 rounded-xl border border-[#E5E5E5] bg-[#F9F8F6]">
+                      <span className="block text-xs font-semibold text-[#666666] mb-2">{documentType.label}</span>
+                      {documentType.helperText && <span className="mb-2 block text-[11px] text-[#666666]">{documentType.helperText}</span>}
                       {documentType.templateUrl && (
-                        <a href={documentType.templateUrl} target="_blank" rel="noreferrer" className="mb-2 inline-block text-[11px] text-blue-400 hover:text-blue-300">
+                        <a href={documentType.templateUrl} target="_blank" rel="noreferrer" className="mb-2 inline-block text-[11px] text-[#666666] hover:text-[#666666]">
                           Unduh template
                         </a>
                       )}
@@ -444,9 +460,9 @@ function ProjectModal({ mode, initial, fixedCategory, onSave, onClose, saving, s
                         type="file"
                         accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg"
                         onChange={(event) => selectFile(documentType.id, event.target.files?.[0])}
-                        className="block w-full text-xs text-slate-400 file:mr-2 file:rounded-lg file:border-0 file:bg-slate-700 file:px-2 file:py-1 file:text-xs file:text-slate-200"
+                        className="block w-full text-xs text-[#666666] file:mr-2 file:rounded-lg file:border-0 file:bg-[#F3F3F1] file:px-2 file:py-1 file:text-xs file:text-[#666666]"
                       />
-                      <span className="block text-[11px] text-slate-500 mt-1 truncate">
+                      <span className="block text-[11px] text-[#666666] mt-1 truncate">
                         {files[documentType.id]?.name ?? (existing ? `Tersimpan: ${existing.originalName}` : 'Belum diunggah')}
                       </span>
                     </label>
@@ -456,13 +472,7 @@ function ProjectModal({ mode, initial, fixedCategory, onSave, onClose, saving, s
             </section>
           )}
 
-          <div className="flex gap-3 pt-2">
-            <button type="button" onClick={onClose} className="btn-secondary flex-1" disabled={saving}>Batal</button>
-            <button type="submit" className="btn-primary flex-1 flex items-center justify-center gap-2" disabled={saving}>
-              <Check size={15} />{saving ? 'Menyimpan...' : mode === 'add' ? 'Simpan Proyek' : 'Update Proyek'}
-            </button>
-          </div>
-        </form>
+          </div><div className="sticky bottom-0 flex gap-3 px-6 py-4 border-t border-[#E5E5E5] bg-[#F9F8F6] z-10"><button type="button" onClick={onClose} className="btn-secondary flex-1" disabled={saving}>Batal</button><button type="submit" className="btn-primary flex-1 flex items-center justify-center gap-2" disabled={saving}><Check size={15} />{saving ? "Menyimpan..." : mode === "add" ? "Simpan Proyek" : "Update Proyek"}</button></div></form>
       </div>
     </div>
   )
@@ -471,9 +481,9 @@ function ProjectModal({ mode, initial, fixedCategory, onSave, onClose, saving, s
 function Field({ label, error, children }: { label: string; error?: string; children: React.ReactNode }) {
   return (
     <div>
-      <label className="block text-xs font-semibold text-slate-400 mb-1.5">{label}</label>
+      <label className="block text-xs font-semibold text-[#666666] mb-1.5">{label}</label>
       {children}
-      {error && <p className="mt-1 flex items-center gap-1 text-xs text-red-400"><AlertCircle size={11} />{error}</p>}
+      {error && <p className="mt-1 flex items-center gap-1 text-xs text-[#666666]"><AlertCircle size={11} />{error}</p>}
     </div>
   )
 }
@@ -484,7 +494,7 @@ function Select({ value, onChange, children }: { value: string; onChange: (value
       <select value={value} onChange={(event) => onChange(event.target.value)} className="form-input appearance-none pr-8">
         {children}
       </select>
-      <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+      <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#666666] pointer-events-none" />
     </div>
   )
 }
@@ -521,17 +531,17 @@ export function ProjectDocumentsModal({ idLOP, category, onClose }: {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/70" onClick={onClose} />
-      <section className="relative max-h-[92vh] w-full max-w-xl overflow-y-auto rounded-2xl border border-slate-700 bg-slate-900 p-5 shadow-2xl">
-        <header className="flex items-start justify-between border-b border-slate-800 pb-4">
+      <section className="relative max-h-[92vh] w-full max-w-xl overflow-y-auto rounded-2xl border border-[#E5E5E5] bg-[#F9F8F6] p-5 ">
+        <header className="flex items-start justify-between border-b border-[#E5E5E5] pb-4">
           <div>
-            <h3 className="font-bold text-white">Dokumen Proyek</h3>
-            <p className="mt-1 font-mono text-xs text-blue-400">{idLOP}</p>
+            <h3 className="font-bold text-[#1C1C1E]">Dokumen Proyek</h3>
+            <p className="mt-1 font-mono text-xs text-[#666666]">{idLOP}</p>
           </div>
-          <button type="button" onClick={onClose} className="text-slate-400 hover:text-white"><X size={18} /></button>
+          <button type="button" onClick={onClose} className="text-[#666666] hover:text-[#1C1C1E]"><X size={18} /></button>
         </header>
-        {error && <p className="mt-3 text-xs text-red-400">{error}</p>}
-        {loading ? <p className="py-6 text-sm text-slate-400">Memuat dokumen...</p> : (
-          <ul className="mt-3 divide-y divide-slate-800">
+        {error && <p className="mt-3 text-xs text-[#666666]">{error}</p>}
+        {loading ? <p className="py-6 text-sm text-[#666666]">Memuat dokumen...</p> : (
+          <ul className="mt-3 divide-y divide-[#E5E5E5]">
             {getProjectDocumentTypes(category).map((type) => {
               const document = documents.find((item) => item.documentType === type.id)
                 ?? documents.find((item) => type.aliases?.includes(item.documentType))
@@ -539,8 +549,8 @@ export function ProjectDocumentsModal({ idLOP, category, onClose }: {
                 <li key={type.id} className="space-y-2 py-3">
                   <div className="flex items-center justify-between gap-3">
                     <div className="min-w-0">
-                      <p className="text-sm font-medium text-slate-200">{type.label}</p>
-                      <p className="truncate text-xs text-slate-500">
+                      <p className="text-sm font-medium text-[#666666]">{type.label}</p>
+                      <p className="truncate text-xs text-[#666666]">
                         {document ? `${document.originalName} · ${formatBytes(document.sizeBytes)}` : 'Belum diunggah'}
                       </p>
                     </div>
@@ -551,7 +561,7 @@ export function ProjectDocumentsModal({ idLOP, category, onClose }: {
                         disabled={downloading === type.id}
                         title={`Unduh ${document.originalName}`}
                         aria-label={`Unduh ${document.originalName}`}
-                        className="rounded-lg p-2 text-blue-400 hover:bg-blue-500/10 disabled:opacity-50"
+                        className="rounded-lg p-2 text-[#666666] hover:bg-[#F3F3F1] disabled:opacity-50"
                       >
                         <Download size={16} />
                       </button>
@@ -637,9 +647,9 @@ export function ProjectDatabase({
         const file = files[documentType.id]
         if (file) await ProjectDocuments.upload(saved.idLOP, documentType.id, file)
       }
-      if (mode === 'add') setModal({ mode: 'edit', editId: saved.id })
       setModal(null)
       await load()
+      if (mode === 'add') setServicePointsFor(saved.idLOP)
     } catch (error) {
       setPageError(error instanceof Error ? error.message : 'Gagal menyimpan proyek atau dokumen.')
     } finally {
@@ -693,20 +703,20 @@ export function ProjectDatabase({
       {showStats && (
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           {[
-            { label: 'Total Proyek', value: filtered.length, color: 'text-blue-400' },
-            { label: 'Total Harga Layanan', value: formatIDR(totalServicePrice), color: 'text-emerald-400' },
-            { label: 'Tahap F5', value: wins, color: 'text-violet-400' },
-            { label: 'At Risk', value: atRisk, color: 'text-red-400' },
+            { label: 'Total Proyek', value: filtered.length, color: 'text-[#666666]' },
+            { label: 'Total Harga Layanan', value: formatIDR(totalServicePrice), color: 'text-[#666666]' },
+            { label: 'Tahap F5', value: wins, color: 'text-[#666666]' },
+            { label: 'At Risk', value: atRisk, color: 'text-[#666666]' },
           ].map((stat) => (
-            <div key={stat.label} className="card-glass rounded-xl px-5 py-4">
-              <p className="text-xs text-slate-500">{stat.label}</p>
+            <div key={stat.label} className="bg-white border border-[#E5E5E5] rounded-xl px-5 py-4">
+              <p className="text-xs text-[#666666]">{stat.label}</p>
               <p className={cn('mt-0.5 text-xl font-bold', stat.color)}>{stat.value}</p>
             </div>
           ))}
         </div>
       )}
 
-      {pageError && <div role="alert" className="rounded-xl border border-red-500/30 bg-red-500/10 p-3 text-sm text-red-300">{pageError}</div>}
+      {pageError && <div role="alert" className="rounded-xl border border-[#E5E5E5] bg-[#F3F3F1] p-3 text-sm text-[#666666]">{pageError}</div>}
       <div className="flex flex-wrap items-center gap-3">
         <div className="min-w-48 flex-1">
           <input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Cari ID LOP, proyek, instansi..." className="form-input" />
@@ -716,12 +726,12 @@ export function ProjectDatabase({
           {MASTER_INSTANSI.map((agency) => <option key={agency.nama}>{agency.nama}</option>)}
         </select>
         <select value={filterStage} onChange={(event) => setFilterStage(event.target.value)} className="form-input w-auto">
-          <option>Semua</option>
+          <option value="Semua">Semua Tahap</option>
           {STAGES.map((stage) => <option key={stage}>{stage}</option>)}
         </select>
         {!initialCategory && (
           <select value={filterCategory} onChange={(event) => setFilterCategory(event.target.value)} className="form-input w-auto">
-            <option>Semua</option>
+            <option value="Semua">Semua Kategori</option>
             {CATEGORIES.map((category) => (
               <option key={category} value={category}>
                 {category === 'On Channel' ? 'Own Channel' : category}
@@ -734,46 +744,45 @@ export function ProjectDatabase({
         </button>
       </div>
 
-      <div className="card-glass overflow-x-auto rounded-2xl">
+      <div className="bg-white border border-[#E5E5E5] overflow-x-auto rounded-2xl">
         <table className="w-full">
           <thead>
-            <tr className="border-b border-slate-700/50">
-              {['Proyek / ID LOP', 'Nama Pemda / Dinas', 'Kategori / SID', 'Harga Layanan', 'Tahap', 'Kapasitas', 'Status', 'Aksi'].map((heading) => (
-                <th key={heading} className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-slate-500">{heading}</th>
+            <tr className="border-b border-[#E5E5E5]">
+              {['Proyek', 'Nama Pemda', 'Kategori', 'Harga Layanan', 'Tahap', 'Kapasitas', 'Aksi'].map((heading) => (
+                <th key={heading} className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-[#666666]">{heading}</th>
               ))}
             </tr>
           </thead>
           <tbody>
             {loading ? (
-              <tr><td colSpan={8} className="py-12 text-center text-sm text-slate-400">Memuat proyek...</td></tr>
+              <tr><td colSpan={7} className="py-12 text-center text-sm text-[#666666]">Memuat proyek...</td></tr>
             ) : filtered.length === 0 ? (
-              <tr><td colSpan={8} className="py-12 text-center text-sm text-slate-500">Belum ada proyek untuk filter ini</td></tr>
+              <tr><td colSpan={7} className="py-12 text-center text-sm text-[#666666]">Belum ada proyek untuk filter ini</td></tr>
             ) : filtered.map((project) => (
-              <tr key={project.id} className="group border-b border-slate-700/30 hover:bg-slate-800/30">
+              <tr key={project.id} className="group border-b border-[#E5E5E5] hover:bg-[#FFFFFF]">
                 <td className="px-4 py-3">
-                  <button type="button" onClick={() => setDocumentsFor({ idLOP: project.idLOP, category: project.category })} className="flex items-center gap-1 font-mono text-xs text-blue-400 hover:text-blue-300">
+                  <button type="button" onClick={() => setDocumentsFor({ idLOP: project.idLOP, category: project.category })} className="flex items-center gap-1 font-mono text-xs text-[#666666] hover:text-[#666666]">
                     <FileText size={12} />{project.idLOP}
                   </button>
-                  <p className="mt-1 max-w-xs truncate text-sm font-semibold text-white">{project.projectName}</p>
+                  <p className="mt-1 max-w-xs truncate text-sm font-semibold text-[#1C1C1E]">{project.projectName}</p>
                 </td>
                 <td className="px-4 py-3">
-                  <span className="flex items-center gap-1.5 text-xs text-slate-300"><Building2 size={11} />{project.pemdaName || project.agency}</span>
-                  {project.dinasName && <span className="mt-1 block text-[11px] text-slate-500">{project.dinasName}</span>}
+                  <span className="flex items-center gap-1.5 text-xs text-[#666666]"><Building2 size={11} />{project.pemdaName || project.agency}</span>
+                  {project.dinasName && <span className="mt-1 block text-[11px] text-[#666666]">{project.dinasName}</span>}
                 </td>
-                <td className="px-4 py-3 text-xs text-slate-300">
+                <td className="px-4 py-3 text-xs text-[#666666]">
                   <div>{project.category === 'On Channel' ? 'Own Channel' : project.category}</div>
-                  {project.subsidiaryName && <div className="mt-1 text-slate-400">{project.subsidiaryName}</div>}
-                  <div className="mt-1 text-slate-500">{project.sid || 'SID belum diisi'}</div>
+                  {project.subsidiaryName && <div className="mt-1 text-[#666666]">{project.subsidiaryName}</div>}
+                  {project.sid && <div className="mt-1 text-[#666666]">{project.sid}</div>}
                 </td>
-                <td className="px-4 py-3 text-sm font-semibold text-emerald-400">{formatIDR(project.servicePrice)}</td>
+                <td className="px-4 py-3 text-sm font-semibold text-[#666666]">{formatIDR(project.servicePrice)}</td>
                 <td className="px-4 py-3"><span className={cn('rounded-full border px-2.5 py-1 text-[10px] font-bold', STAGE_COLORS[project.stage])}>{project.stage}</span></td>
-                <td className="px-4 py-3 text-xs text-slate-300">{project.totalCapacityMbps === null ? '—' : `${project.totalCapacityMbps} Mbps`}</td>
-                <td className="px-4 py-3"><span className={cn('rounded-full border px-2.5 py-1 text-[10px] font-bold', STATUS_COLORS[project.status])}>{project.status}</span></td>
+                <td className="px-4 py-3 text-xs text-[#666666]">{project.totalCapacityMbps === null ? '—' : `${project.totalCapacityMbps} Mbps`}</td>
                 <td className="px-4 py-3">
                   <div className="flex items-center gap-1.5">
-                    <button type="button" aria-label={`Import SID ${project.idLOP}`} title="Import SID" onClick={() => setServicePointsFor(project.idLOP)} className="rounded-lg p-1.5 text-slate-400 hover:bg-emerald-500/20 hover:text-emerald-400"><FileSpreadsheet size={13} /></button>
-                    <button type="button" aria-label={`Edit ${project.idLOP}`} onClick={() => { setPageError(''); setModal({ mode: 'edit', editId: project.id }) }} className="rounded-lg p-1.5 text-slate-400 hover:bg-blue-500/20 hover:text-blue-400"><Edit3 size={13} /></button>
-                    <button type="button" aria-label={`Hapus ${project.idLOP}`} onClick={() => setDeleteConfirm(project.idLOP)} className="rounded-lg p-1.5 text-slate-400 hover:bg-red-500/20 hover:text-red-400"><Trash2 size={13} /></button>
+                    <button type="button" aria-label={`Import SID ${project.idLOP}`} title="Import SID" onClick={() => setServicePointsFor(project.idLOP)} className="rounded-lg p-1.5 text-[#666666] hover:bg-[#F3F3F1] hover:text-[#666666]"><FileSpreadsheet size={13} /></button>
+                    <button type="button" aria-label={`Edit ${project.idLOP}`} onClick={() => { setPageError(''); setModal({ mode: 'edit', editId: project.id }) }} className="rounded-lg p-1.5 text-[#666666] hover:bg-[#F3F3F1] hover:text-[#666666]"><Edit3 size={13} /></button>
+                    <button type="button" aria-label={`Hapus ${project.idLOP}`} onClick={() => setDeleteConfirm(project.idLOP)} className="rounded-lg p-1.5 text-[#666666] hover:bg-[#F3F3F1] hover:text-[#666666]"><Trash2 size={13} /></button>
                   </div>
                 </td>
               </tr>
@@ -804,12 +813,12 @@ export function ProjectDatabase({
       {deleteConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/70" onClick={() => setDeleteConfirm(null)} />
-          <div className="relative w-full max-w-sm rounded-2xl border border-slate-700 bg-slate-900 p-6">
-            <h4 className="text-sm font-bold text-white">Hapus Proyek</h4>
-            <p className="my-4 text-sm text-slate-300">Hapus proyek {deleteConfirm} beserta dokumennya?</p>
+          <div className="relative w-full max-w-sm rounded-2xl border border-[#E5E5E5] bg-[#F9F8F6] p-6">
+            <h4 className="text-sm font-bold text-[#1C1C1E]">Hapus Proyek</h4>
+            <p className="my-4 text-sm text-[#666666]">Hapus proyek {deleteConfirm} beserta dokumennya?</p>
             <div className="flex gap-3">
               <button type="button" onClick={() => setDeleteConfirm(null)} className="btn-secondary flex-1">Batal</button>
-              <button type="button" onClick={() => void handleDelete(deleteConfirm)} className="flex-1 rounded-xl bg-red-600 px-4 py-2 text-sm font-semibold text-white">Hapus</button>
+              <button type="button" onClick={() => void handleDelete(deleteConfirm)} className="flex-1 rounded-xl bg-black px-4 py-2 text-sm font-semibold text-[#1C1C1E]">Hapus</button>
             </div>
           </div>
         </div>

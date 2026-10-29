@@ -26,12 +26,12 @@ type ProjectSummaryItem = Pick<
 
 // Urutan tahapan Sales Funnel Telkom B2G
 const PIPELINE_STAGES = [
-  { id: 'F0', label: 'F0', color: '#1e3a8a', textColor: '#ffffff', desc: 'Lead / Inisiasi' },
-  { id: 'F1', label: 'F1', color: '#1d4ed8', textColor: '#ffffff', desc: 'Penawaran' },
-  { id: 'F2', label: 'F2', color: '#2563eb', textColor: '#ffffff', desc: 'Tender / Katalog' },
-  { id: 'F3', label: 'F3', color: '#38bdf8', textColor: '#0f172a', desc: 'Kontrak' },
-  { id: 'F4', label: 'F4', color: '#bae6fd', textColor: '#0f172a', desc: 'Delivery' },
-  { id: 'F5', label: 'F5', color: '#e2e8f0', textColor: '#0f172a', desc: 'Won (BAST)' },
+  { id: 'F0', label: 'F0', color: '#1e3a8a', textColor: '#ffffff' },
+  { id: 'F1', label: 'F1', color: '#1d4ed8', textColor: '#ffffff' },
+  { id: 'F2', label: 'F2', color: '#2563eb', textColor: '#ffffff' },
+  { id: 'F3', label: 'F3', color: '#38bdf8', textColor: '#0f172a' },
+  { id: 'F4', label: 'F4', color: '#bae6fd', textColor: '#0f172a' },
+  { id: 'F5', label: 'F5', color: '#e2e8f0', textColor: '#0f172a' },
 ] as const
 
 type StageKey = (typeof PIPELINE_STAGES)[number]['id']
@@ -119,50 +119,47 @@ export function ProjectSummaryTable({
   }, [summaries, search])
 
   return (
-    <section className="card-glass overflow-hidden rounded-2xl border border-slate-700/60 bg-slate-900/80 shadow-2xl">
+    <section className="bg-white border border-[#E5E5E5] overflow-hidden rounded-2xl border border-[#E5E5E5] bg-[#F9F8F6] ">
       {/* ─── Header Section ─── */}
-      <div className="border-b border-slate-700/60 p-5 bg-gradient-to-r from-slate-900 via-slate-850 to-slate-900">
+      <div className="border-b border-[#E5E5E5] bg-[#F3F3F1] p-5">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-2">
-              <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-500/20 text-blue-400 border border-blue-500/30">
+              <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#F3F3F1] text-[#666666] border border-[#E5E5E5]">
                 <BarChart3 size={15} />
               </span>
-              <h3 className="text-base font-bold text-white tracking-wide">
+              <h3 className="text-base font-bold text-[#1C1C1E] tracking-wide">
                 Sales Funnel Progress Pemda
               </h3>
             </div>
-            <p className="mt-1 text-xs text-slate-400">
-              Visualisasi progres tahapan pengadaan (F0–F5) segmen B2G per entitas Pemerintah Daerah dalam format stacked progress bar.
-            </p>
           </div>
 
           {/* Search Pemda */}
           <div className="relative w-full md:w-64">
-            <Search size={14} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+            <Search size={14} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[#666666]" />
             <input
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Cari Pemda..."
-              className="w-full rounded-xl border border-slate-700 bg-slate-950/70 py-1.5 pl-9 pr-3 text-xs text-slate-200 placeholder-slate-500 focus:border-blue-500 focus:outline-none"
+              className="w-full rounded-xl border border-[#E5E5E5] bg-[#F9F8F6] py-1.5 pl-9 pr-3 text-xs text-[#666666] placeholder:text-[#666666] focus:border-[#E5E5E5] focus:outline-none"
             />
           </div>
         </div>
 
         {/* ─── Top Regional Summary Card (Persis seperti panel atas pada gambar referensi) ─── */}
-        <div className="mt-4 rounded-xl border border-slate-700/70 bg-slate-950/60 p-4 shadow-inner">
+        <div className="mt-4 rounded-xl border border-[#E5E5E5] bg-[#F9F8F6] p-4 ">
           <div className="mb-2 flex items-center justify-between">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-300">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-[#666666]">
               Akumulasi Seluruh Wilayah Jateng Utara (Total: {totalAllProjects} Proyek)
             </span>
-            <span className="text-xs font-semibold text-emerald-400">
+            <span className="text-xs font-semibold text-[#666666]">
               Total: {formatIDR(summaries.reduce((sum, s) => sum + s.value, 0))}
             </span>
           </div>
 
           {/* Overall 100% Stacked Bar */}
-          <div className="flex h-8 w-full overflow-hidden rounded-lg bg-slate-800 shadow-inner">
+          <div className="flex h-8 w-full overflow-hidden rounded-lg bg-[#FFFFFF] ">
             {totalAllProjects > 0 ? (
               PIPELINE_STAGES.map((stg) => {
                 const count = overallStages[stg.id]
@@ -173,26 +170,25 @@ export function ProjectSummaryTable({
                     key={stg.id}
                     style={{ width: `${pct}%`, backgroundColor: stg.color, color: stg.textColor }}
                     className="flex items-center justify-center text-[11px] font-bold transition-all hover:brightness-110 relative group"
-                    title={`${stg.id} (${stg.desc}): ${count} proyek (${pct.toFixed(2)}%)`}
+                    title={`${stg.id}: ${count} proyek (${pct.toFixed(2)}%)`}
                   >
                     {pct >= 5 && <span>{pct.toFixed(2)}%</span>}
                   </div>
                 )
               })
             ) : (
-              <div className="flex h-full w-full items-center justify-center text-xs text-slate-500">
+              <div className="flex h-full w-full items-center justify-center text-xs text-[#666666]">
                 Belum ada data proyek
               </div>
             )}
           </div>
 
           {/* Legend F0 - F5 */}
-          <div className="mt-3 flex flex-wrap items-center justify-center gap-4 text-[11px] text-slate-300">
+          <div className="mt-3 flex flex-wrap items-center justify-center gap-4 text-[11px] text-[#666666]">
             {PIPELINE_STAGES.map((stg) => (
               <div key={stg.id} className="flex items-center gap-1.5">
-                <span className="h-3 w-3 rounded-sm border border-black/20" style={{ backgroundColor: stg.color }} />
+                <span className="h-3 w-3 rounded-sm border border-[#E5E5E5]/20" style={{ backgroundColor: stg.color }} />
                 <span className="font-semibold">{stg.id}</span>
-                <span className="text-[10px] text-slate-500 hidden sm:inline">({stg.desc})</span>
               </div>
             ))}
           </div>
@@ -202,7 +198,7 @@ export function ProjectSummaryTable({
       {/* ─── Stacked Horizontal Funnel List Per Pemda ─── */}
       <div className="p-5 space-y-4">
         {filteredSummaries.length === 0 ? (
-          <div className="py-12 text-center text-xs text-slate-500">
+          <div className="py-12 text-center text-xs text-[#666666]">
             Belum ada proyek atau Pemda yang sesuai dengan filter pencarian.
           </div>
         ) : (
@@ -213,31 +209,31 @@ export function ProjectSummaryTable({
             return (
               <div
                 key={summary.pemda}
-                className="rounded-xl border border-slate-700/60 bg-slate-950/40 p-4 transition-all hover:border-slate-600 hover:bg-slate-900/60 shadow-sm"
+                className="rounded-xl border border-[#E5E5E5] bg-[#F9F8F6] p-4 transition-all hover:border-[#E5E5E5] hover:bg-[#F9F8F6] "
               >
                 {/* Header Row per Pemda: Nama Pemda, Nilai Kontrak, Total SID & Proyek */}
                 <div className="mb-2.5 flex flex-wrap items-center justify-between gap-2">
                   <div className="flex items-center gap-2">
-                    <span className="flex h-6 w-6 items-center justify-center rounded-md bg-blue-500/10 text-blue-400">
+                    <span className="flex h-6 w-6 items-center justify-center rounded-md bg-[#F3F3F1] text-[#666666]">
                       <Building2 size={13} />
                     </span>
-                    <h4 className="text-sm font-bold text-white tracking-tight">{summary.pemda}</h4>
-                    <span className="rounded-full bg-slate-800 border border-slate-700 px-2 py-0.5 text-[10px] font-medium text-slate-300">
+                    <h4 className="text-sm font-bold text-[#1C1C1E] tracking-tight">{summary.pemda}</h4>
+                    <span className="rounded-full bg-[#FFFFFF] border border-[#E5E5E5] px-2 py-0.5 text-[10px] font-medium text-[#666666]">
                       {totalProj} Proyek
                     </span>
-                    <span className="rounded-full bg-violet-500/10 border border-violet-500/30 px-2 py-0.5 text-[10px] font-medium text-violet-300">
+                    <span className="rounded-full bg-[#F3F3F1] border border-[#E5E5E5] px-2 py-0.5 text-[10px] font-medium text-[#666666]">
                       {summary.points} Titik SID
                     </span>
                   </div>
 
                   <div className="flex items-center gap-3">
-                    <span className="text-xs font-semibold tabular-nums text-emerald-400">
+                    <span className="text-xs font-semibold tabular-nums text-[#666666]">
                       {formatIDR(summary.value)}
                     </span>
                     <button
                       type="button"
                       onClick={() => setExpandedPemda(isExpanded ? null : summary.pemda)}
-                      className="inline-flex items-center gap-1 rounded-lg border border-slate-700 bg-slate-800/80 px-2 py-1 text-[11px] font-medium text-slate-300 hover:bg-slate-700 hover:text-white transition"
+                      className="inline-flex items-center gap-1 rounded-lg border border-[#E5E5E5] bg-[#FFFFFF] px-2 py-1 text-[11px] font-medium text-[#666666] hover:bg-[#F3F3F1] hover:text-[#1C1C1E] transition"
                     >
                       <span>Proyek</span>
                       {isExpanded ? <ChevronDown size={12} /> : <ChevronRight size={12} />}
@@ -246,7 +242,7 @@ export function ProjectSummaryTable({
                 </div>
 
                 {/* Progress Bar Funnel Progres (Persis seperti baris Witel di referensi gambar) */}
-                <div className="flex h-8 w-full overflow-hidden rounded-md bg-slate-800 shadow-inner">
+                <div className="flex h-8 w-full overflow-hidden rounded-md bg-[#FFFFFF] ">
                   {totalProj > 0 ? (
                     PIPELINE_STAGES.map((stg) => {
                       const count = summary.stages[stg.id]
@@ -261,7 +257,7 @@ export function ProjectSummaryTable({
                             backgroundColor: stg.color,
                             color: stg.textColor,
                           }}
-                          className="flex items-center justify-center text-[10px] sm:text-xs font-bold transition-all hover:brightness-110 relative group border-r border-black/10 last:border-0"
+                          className="flex items-center justify-center text-[10px] sm:text-xs font-bold transition-all hover:brightness-110 relative group border-r border-[#E5E5E5]/10 last:border-0"
                           title={`${summary.pemda} - ${stg.id}: ${count} paket (${pct.toFixed(2)}%)`}
                         >
                           {pct >= 6 && <span>{pct.toFixed(2)}%</span>}
@@ -269,21 +265,21 @@ export function ProjectSummaryTable({
                       )
                     })
                   ) : (
-                    <div className="flex h-full w-full items-center justify-center text-[10px] text-slate-500">
+                    <div className="flex h-full w-full items-center justify-center text-[10px] text-[#666666]">
                       0%
                     </div>
                   )}
                 </div>
 
                 {/* Legend Mini Per Pemda (Jumlah paket per tahapan) */}
-                <div className="mt-2.5 flex flex-wrap items-center gap-3 text-[11px] text-slate-400">
+                <div className="mt-2.5 flex flex-wrap items-center gap-3 text-[11px] text-[#666666]">
                   {PIPELINE_STAGES.map((stg) => {
                     const count = summary.stages[stg.id]
                     return (
                       <span key={stg.id} className="flex items-center gap-1">
                         <span className="h-2 w-2 rounded-full" style={{ backgroundColor: stg.color }} />
-                        <span className="font-semibold text-slate-300">{stg.id}:</span>
-                        <span className={count > 0 ? 'text-white font-bold' : 'text-slate-600'}>
+                        <span className="font-semibold text-[#666666]">{stg.id}:</span>
+                        <span className={count > 0 ? 'text-[#1C1C1E] font-bold' : 'text-[#666666]'}>
                           {count}
                         </span>
                       </span>
@@ -293,8 +289,8 @@ export function ProjectSummaryTable({
 
                 {/* Detail Proyek Dropdown saat diklik */}
                 {isExpanded && (
-                  <div className="mt-3 rounded-lg border border-slate-800 bg-slate-900/90 p-3">
-                    <p className="text-[11px] font-semibold text-slate-300 mb-2">
+                  <div className="mt-3 rounded-lg border border-[#E5E5E5] bg-[#F9F8F6] p-3">
+                    <p className="text-[11px] font-semibold text-[#666666] mb-2">
                       Daftar Paket Proyek {summary.pemda}:
                     </p>
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
@@ -303,15 +299,15 @@ export function ProjectSummaryTable({
                           key={proj.idLOP}
                           type="button"
                           onClick={() => onOpenProject(proj.idLOP)}
-                          className="flex items-start justify-between gap-2 rounded-lg border border-slate-700/60 bg-slate-950/60 p-2 text-left transition hover:border-blue-500/50 hover:bg-slate-800/60"
+                          className="flex items-start justify-between gap-2 rounded-lg border border-[#E5E5E5] bg-[#F9F8F6] p-2 text-left transition hover:border-[#E5E5E5] hover:bg-[#FFFFFF]"
                         >
                           <div className="min-w-0 flex-1">
-                            <span className="font-mono text-[10px] text-blue-400 block">{proj.idLOP}</span>
-                            <span className="text-xs font-semibold text-white truncate block">
+                            <span className="font-mono text-[10px] text-[#666666] block">{proj.idLOP}</span>
+                            <span className="text-xs font-semibold text-[#1C1C1E] truncate block">
                               {proj.projectName}
                             </span>
                           </div>
-                          <span className="rounded bg-blue-500/20 px-1.5 py-0.5 text-[10px] font-bold text-blue-300 shrink-0">
+                          <span className="rounded bg-[#F3F3F1] px-1.5 py-0.5 text-[10px] font-bold text-[#666666] shrink-0">
                             {proj.stage}
                           </span>
                         </button>

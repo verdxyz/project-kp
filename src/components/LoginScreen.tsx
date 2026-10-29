@@ -1,15 +1,10 @@
 import React, { useState } from 'react'
 import {
-  Building2,
   Lock,
   Mail,
-  ArrowRight,
   Eye,
   EyeOff,
-  ShieldCheck,
-  Sparkles,
   AlertCircle,
-  Activity,
 } from 'lucide-react'
 import { AuthService, type AuthUser } from '../lib/auth'
 
@@ -47,102 +42,44 @@ export function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
   }
 
   return (
-    <div className="min-h-screen bg-[#090D16] text-slate-100 flex flex-col justify-between relative overflow-hidden select-none">
-      {/* Background Ambient Glows */}
-      <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-red-600/15 rounded-full blur-[120px] pointer-events-none" />
-      <div className="absolute bottom-[-10%] right-[-10%] w-[600px] h-[600px] bg-blue-600/15 rounded-full blur-[140px] pointer-events-none" />
-      <div className="absolute top-[40%] right-[30%] w-[350px] h-[350px] bg-red-500/10 rounded-full blur-[100px] pointer-events-none" />
+    <div className="min-h-screen bg-[#F9F8F6] text-[#666666] flex flex-col justify-between relative overflow-hidden select-none">
+      {/* Background accents */}
+      <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] rounded-full pointer-events-none" />
+      <div className="absolute bottom-[-10%] right-[-10%] w-[600px] h-[600px] rounded-full pointer-events-none" />
+      <div className="absolute top-[40%] right-[30%] w-[350px] h-[350px] rounded-full pointer-events-none" />
 
       {/* Decorative Grid Lines */}
       <div
         className="absolute inset-0 opacity-[0.03] pointer-events-none"
-        style={{
-          backgroundImage: `linear-gradient(to right, #ffffff 1px, transparent 1px), linear-gradient(to bottom, #ffffff 1px, transparent 1px)`,
-          backgroundSize: '40px 40px',
-        }}
       />
-
-      {/* Header Bar */}
-      <header className="relative z-10 px-6 py-4 flex items-center justify-between border-b border-slate-800/60 backdrop-blur-md bg-slate-900/30">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-red-600 to-red-800 flex items-center justify-center shadow-lg shadow-red-900/30 border border-red-500/30">
-            <span className="font-extrabold text-white text-base tracking-wider">T</span>
-          </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="font-bold text-white text-sm tracking-wide">B2Gov Portal</span>
-              <span className="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-red-500/20 text-red-400 border border-red-500/30">
-                Telkom Enterprise
-              </span>
-            </div>
-            <p className="text-[11px] text-slate-400">Manajemen Pengadaan Pemerintah (Jawa Tengah)</p>
-          </div>
-        </div>
-
-        <div className="hidden sm:flex items-center gap-2 text-xs text-slate-400 bg-slate-800/50 px-3 py-1.5 rounded-lg border border-slate-700/50">
-          <Building2 size={13} className="text-red-400" />
-          <span>Witel Jateng Utara</span>
-        </div>
-      </header>
 
       {/* Center Content */}
       <main className="relative z-10 flex-1 flex items-center justify-center px-4 py-8">
-        <div className="w-full max-w-4xl grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-          
-          {/* Left Column: Context & Overview */}
-          <div className="lg:col-span-6 space-y-6">
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-medium">
-              <Sparkles size={13} className="text-red-400 animate-pulse" />
-              <span>Sistem Monitoring Proyek Magang B2G</span>
-            </div>
-
-            <div>
-              <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight leading-tight">
-              Kelola Proyek <br />
-                <span className="bg-gradient-to-r from-red-400 via-rose-300 to-blue-400 bg-clip-text text-transparent">
-                  Pengadaan Pemerintah
-                </span>
-              </h1>
-              <p className="text-slate-400 text-sm mt-3 leading-relaxed">
-                Kelola data proyek pengadaan, tahapan F0 sampai F5, dokumen kontrak, dan layanan instansi secara terpusat.
-              </p>
-            </div>
-
-            {/* Coverage Badges */}
-            <div className="p-4 rounded-xl bg-slate-900/60 border border-slate-800 backdrop-blur-sm space-y-2.5">
-              <div className="flex items-center justify-between text-xs text-slate-300 font-medium">
-                <span className="flex items-center gap-1.5">
-                  <Activity size={13} className="text-emerald-400" />
-                  Cakupan 13 Instansi Target
-                </span>
-                <span className="text-[11px] text-slate-500">Witel Jateng Utara</span>
-              </div>
-              <p className="text-[11px] text-slate-400 leading-relaxed">
-                Kota Salatiga • Kab. Semarang • Kota Semarang • Kab. Kendal • Kab. Batang • Kab. & Kota Pekalongan • Kab. Pemalang • Kab. & Kota Tegal • Kab. Brebes • Pemprov Jateng • Polda Jateng.
-              </p>
-            </div>
-
+        <div className="grid w-full max-w-5xl grid-cols-1 items-center gap-10 lg:grid-cols-2">
+          <div className="flex flex-col justify-center text-center lg:text-left">
+            <h1 className="text-6xl font-extrabold leading-tight tracking-tight text-[#111111] sm:text-7xl">
+              <span className="block">SIMPUL</span>
+              <span className="text-[#111111]">Jateng</span>
+            </h1>
+            <p className="mt-6 text-3xl font-semibold leading-tight text-[#444444] md:text-4xl">
+              Sistem Informasi Manajemen Proyek dan Layanan
+            </p>
           </div>
 
-          {/* Right Column: Form Card */}
-          <div className="lg:col-span-6">
-            <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 sm:p-8 backdrop-blur-xl shadow-2xl shadow-black/60 relative">
+          <div className="w-full max-w-md justify-self-center lg:justify-self-end">
+            <div className="bg-white border border-[#E5E5E5] rounded-2xl p-6 sm:p-8 relative">
               
               {/* Card Header */}
               <div className="mb-6">
-                <h2 className="text-xl font-bold text-white flex items-center gap-2">
-                  <span>Masuk ke Portal</span>
-                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                <h2 className="text-center text-xl font-bold text-[#1C1C1E]">
+                  Masuk ke Portal
                 </h2>
-                <p className="text-xs text-slate-400 mt-1">
-                  Masuk menggunakan akun admin support yang dikelola secara terpusat.
-                </p>
               </div>
 
               {/* Error Alert */}
               {error && (
-                <div className="mb-5 p-3 rounded-xl bg-red-500/10 border border-red-500/30 flex items-start gap-2.5 text-xs text-red-300">
-                  <AlertCircle size={15} className="text-red-400 flex-shrink-0 mt-0.5" />
+                <div className="mb-5 p-3 rounded-xl bg-[#F3F3F1] border border-[#E5E5E5] flex items-start gap-2.5 text-xs text-[#666666]">
+                  <AlertCircle size={15} className="text-[#666666] flex-shrink-0 mt-0.5" />
                   <span>{error}</span>
                 </div>
               )}
@@ -150,36 +87,34 @@ export function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
               {/* Form */}
               <form onSubmit={handleLogin} className="space-y-4">
                 <div>
-                  <label className="block text-xs font-medium text-slate-300 mb-1.5">Email Akun Telkom</label>
+                    <label className="block text-xs font-medium text-[#666666] mb-1.5">Email</label>
                   <div className="relative">
-                    <Mail size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500" />
+                    <Mail size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#666666]" />
                     <input
                       type="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      placeholder="Email admin support"
-                      className="w-full pl-10 pr-4 py-2.5 bg-slate-950/70 border border-slate-800 rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 transition-all"
+                      className="w-full pl-10 pr-4 py-2.5 bg-white border border-[#E5E5E5] rounded-xl text-sm text-[#1C1C1E] placeholder:text-[#666666] focus:outline-none focus:border-[#E5E5E5] focus:ring-1 focus:ring-[#E5E5E5] transition-all"
                     />
                   </div>
                 </div>
 
                 <div>
                   <div className="flex items-center justify-between mb-1.5">
-                    <label className="text-xs font-medium text-slate-300">Kata Sandi</label>
+                    <label className="text-xs font-medium text-[#666666]">Kata Sandi</label>
                   </div>
                   <div className="relative">
-                    <Lock size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500" />
+                    <Lock size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#666666]" />
                     <input
                       type={showPassword ? 'text' : 'password'}
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      placeholder="Masukkan kata sandi..."
-                      className="w-full pl-10 pr-10 py-2.5 bg-slate-950/70 border border-slate-800 rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 transition-all"
+                      className="w-full pl-10 pr-10 py-2.5 bg-white border border-[#E5E5E5] rounded-xl text-sm text-[#1C1C1E] placeholder:text-[#666666] focus:outline-none focus:border-[#E5E5E5] focus:ring-1 focus:ring-[#E5E5E5] transition-all"
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300"
+                      className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[#666666] hover:text-[#666666]"
                     >
                       {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
                     </button>
@@ -190,41 +125,27 @@ export function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
                   <button
                     type="submit"
                     disabled={loading}
-                    className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-red-600 hover:from-red-500 to-rose-600 hover:to-rose-500 text-white font-semibold text-sm shadow-lg shadow-red-900/40 hover:shadow-red-800/60 active:scale-[0.99] transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                    className="w-full py-3 px-4 rounded-xl bg-black hover:bg-black text-[#1C1C1E] font-semibold text-sm active:scale-[0.99] transition-all flex items-center justify-center gap-2 disabled:opacity-50"
                   >
                     {loading ? (
                       <>
-                        <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                        <div className="w-4 h-4 border-2 border-[#E5E5E5]/30 border-t-white rounded-full animate-spin" />
                         <span>Memverifikasi Akun...</span>
                       </>
                     ) : (
                       <>
-                        <span>Masuk ke Dashboard</span>
-                        <ArrowRight size={15} />
+                        <span>Masuk</span>
                       </>
                     )}
                   </button>
                 </div>
               </form>
-
-              {/* Security Footnote */}
-              <div className="mt-5 pt-4 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-slate-500">
-                <span className="flex items-center gap-1.5">
-                  <ShieldCheck size={13} className="text-emerald-400" />
-                  Sesi admin aman (cookie HTTP-only)
-                </span>
-                <span>v1.2.0 • Build Magang</span>
-              </div>
             </div>
           </div>
-
         </div>
       </main>
 
-      {/* Footer */}
-      <footer className="relative z-10 px-6 py-3 border-t border-slate-800/60 text-center text-xs text-slate-500 backdrop-blur-md bg-slate-900/30">
-        © 2026 PT Telkom Indonesia (Persero) Tbk — Divisi Government Enterprise Witel Jateng Utara
-      </footer>
+
     </div>
   )
 }

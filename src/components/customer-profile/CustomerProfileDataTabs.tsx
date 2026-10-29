@@ -9,9 +9,9 @@ const serviceFilters = ['Semua', 'Aktif', 'Suspend', 'Non Aktif'] as const
 type ServiceFilter = (typeof serviceFilters)[number]
 
 const serviceStatusStyles: Record<CustomerProfileService['status'], string> = {
-  Aktif: 'border-emerald-500/20 bg-emerald-500/10 text-emerald-300',
-  Suspend: 'border-amber-500/20 bg-amber-500/10 text-amber-300',
-  'Non Aktif': 'border-red-500/20 bg-red-500/10 text-red-300',
+  Aktif: 'border-[#E5E5E5] bg-[#F3F3F1] text-[#666666]',
+  Suspend: 'border-[#E5E5E5] bg-[#F3F3F1] text-[#666666]',
+  'Non Aktif': 'border-[#E5E5E5] bg-[#F3F3F1] text-[#666666]',
 }
 
 const contractFilters = [
@@ -25,19 +25,19 @@ const contractFilters = [
 type ContractFilter = (typeof contractFilters)[number]
 
 const serviceFilterStyles: Record<ServiceFilter, { selected: string; hover: string }> = {
-  Semua: { selected: 'border-blue-500/40 bg-blue-500/15 text-blue-200', hover: 'hover:border-blue-500/40 hover:bg-blue-500/10 hover:text-blue-200' },
-  Aktif: { selected: 'border-emerald-500/40 bg-emerald-500/15 text-emerald-200', hover: 'hover:border-emerald-500/40 hover:bg-emerald-500/10 hover:text-emerald-200' },
-  Suspend: { selected: 'border-amber-500/40 bg-amber-500/15 text-amber-200', hover: 'hover:border-amber-500/40 hover:bg-amber-500/10 hover:text-amber-200' },
-  'Non Aktif': { selected: 'border-red-500/40 bg-red-500/15 text-red-200', hover: 'hover:border-red-500/40 hover:bg-red-500/10 hover:text-red-200' },
+  Semua: { selected: 'border-[#E5E5E5] bg-[#F3F3F1] text-[#666666]', hover: 'hover:border-[#E5E5E5] hover:bg-[#F3F3F1] hover:text-[#666666]' },
+  Aktif: { selected: 'border-[#E5E5E5] bg-[#F3F3F1] text-[#666666]', hover: 'hover:border-[#E5E5E5] hover:bg-[#F3F3F1] hover:text-[#666666]' },
+  Suspend: { selected: 'border-[#E5E5E5] bg-[#F3F3F1] text-[#666666]', hover: 'hover:border-[#E5E5E5] hover:bg-[#F3F3F1] hover:text-[#666666]' },
+  'Non Aktif': { selected: 'border-[#E5E5E5] bg-[#F3F3F1] text-[#666666]', hover: 'hover:border-[#E5E5E5] hover:bg-[#F3F3F1] hover:text-[#666666]' },
 }
 
 const contractFilterStyles: Record<ContractFilter, { selected: string; hover: string }> = {
-  'Semua Kontrak': { selected: 'border-blue-500/40 bg-blue-500/15 text-blue-200', hover: 'hover:border-blue-500/40 hover:bg-blue-500/10 hover:text-blue-200' },
-  'Modify & Renewal Agreement': { selected: 'border-emerald-500/40 bg-emerald-500/15 text-emerald-200', hover: 'hover:border-emerald-500/40 hover:bg-emerald-500/10 hover:text-emerald-200' },
-  'New Install': { selected: 'border-emerald-500/40 bg-emerald-500/15 text-emerald-200', hover: 'hover:border-emerald-500/40 hover:bg-emerald-500/10 hover:text-emerald-200' },
-  Disconnect: { selected: 'border-red-500/40 bg-red-500/15 text-red-200', hover: 'hover:border-red-500/40 hover:bg-red-500/10 hover:text-red-200' },
-  Resume: { selected: 'border-blue-500/40 bg-blue-500/15 text-blue-200', hover: 'hover:border-blue-500/40 hover:bg-blue-500/10 hover:text-blue-200' },
-  Suspend: { selected: 'border-amber-500/40 bg-amber-500/15 text-amber-200', hover: 'hover:border-amber-500/40 hover:bg-amber-500/10 hover:text-amber-200' },
+  'Semua Kontrak': { selected: 'border-[#E5E5E5] bg-[#F3F3F1] text-[#666666]', hover: 'hover:border-[#E5E5E5] hover:bg-[#F3F3F1] hover:text-[#666666]' },
+  'Modify & Renewal Agreement': { selected: 'border-[#E5E5E5] bg-[#F3F3F1] text-[#666666]', hover: 'hover:border-[#E5E5E5] hover:bg-[#F3F3F1] hover:text-[#666666]' },
+  'New Install': { selected: 'border-[#E5E5E5] bg-[#F3F3F1] text-[#666666]', hover: 'hover:border-[#E5E5E5] hover:bg-[#F3F3F1] hover:text-[#666666]' },
+  Disconnect: { selected: 'border-[#E5E5E5] bg-[#F3F3F1] text-[#666666]', hover: 'hover:border-[#E5E5E5] hover:bg-[#F3F3F1] hover:text-[#666666]' },
+  Resume: { selected: 'border-[#E5E5E5] bg-[#F3F3F1] text-[#666666]', hover: 'hover:border-[#E5E5E5] hover:bg-[#F3F3F1] hover:text-[#666666]' },
+  Suspend: { selected: 'border-[#E5E5E5] bg-[#F3F3F1] text-[#666666]', hover: 'hover:border-[#E5E5E5] hover:bg-[#F3F3F1] hover:text-[#666666]' },
 }
 
 function normalizePemdaName(value: string) {
@@ -109,32 +109,32 @@ function ServiceList({
   }), [customer.services])
 
   return (
-    <section className="overflow-hidden rounded-xl border border-slate-700/60">
-      <div className="flex flex-col gap-3 border-b border-slate-700/60 p-4 xl:flex-row xl:items-center xl:justify-between">
+    <section className="overflow-hidden rounded-xl border border-[#E5E5E5]">
+      <div className="flex flex-col gap-3 border-b border-[#E5E5E5] p-4 xl:flex-row xl:items-center xl:justify-between">
         <div>
-          <h3 className="text-sm font-semibold text-slate-100">Daftar Layanan</h3>
-          <p className="mt-1 text-xs text-slate-400">Periode data tertampil: 01 Januari 2023 - {displayDate}</p>
+          <h3 className="text-sm font-semibold text-[#666666]">Daftar Layanan</h3>
+          <p className="mt-1 text-xs text-[#666666]">Periode data tertampil: 01 Januari 2023 - {displayDate}</p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <label className="relative block xl:w-72">
-            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
+            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#666666]" />
             <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Cari Nama Layanan/Service ID" className="form-input py-2 pl-9 text-xs" />
           </label>
           <button type="button" onClick={() => setEditingService({ row: {} })} className="btn-primary flex items-center gap-1.5 px-3 py-2 text-[10px]"><Plus size={13} />Tambah Layanan Baru</button>
         </div>
       </div>
-      <div className="flex flex-wrap gap-2 border-b border-slate-700/60 px-4 py-3">
+      <div className="flex flex-wrap gap-2 border-b border-[#E5E5E5] px-4 py-3">
         {serviceFilters.map((item) => (
-          <button key={item} type="button" onClick={() => setFilter(item)} className={`rounded-full border px-3 py-1.5 text-[10px] font-semibold transition-colors ${filter === item ? serviceFilterStyles[item].selected : `border-slate-700 text-slate-400 ${serviceFilterStyles[item].hover}`}`}>
-            {item === 'Semua' ? 'Semua Kontrak' : item}<span className="ml-1.5 rounded-full bg-slate-700 px-1.5">{counts[item]}</span>
+          <button key={item} type="button" onClick={() => setFilter(item)} className={`rounded-full border px-3 py-1.5 text-[10px] font-semibold transition-colors ${filter === item ? serviceFilterStyles[item].selected : `border-[#E5E5E5] text-[#666666] ${serviceFilterStyles[item].hover}`}`}>
+            {item === 'Semua' ? 'Semua Kontrak' : item}<span className="ml-1.5 rounded-full bg-[#F3F3F1] px-1.5">{counts[item]}</span>
           </button>
         ))}
       </div>
-      {projectLoadError && <p role="alert" className="border-b border-amber-500/20 bg-amber-500/5 px-4 py-2 text-xs text-amber-300">{projectLoadError}</p>}
+      {projectLoadError && <p role="alert" className="border-b border-[#E5E5E5] bg-[#F3F3F1] px-4 py-2 text-xs text-[#666666]">{projectLoadError}</p>}
       <div className="overflow-x-auto">
         <table className="w-full min-w-[960px] text-left">
-          <thead><tr className="border-b border-slate-700/50 bg-slate-950/40">{['Nama Layanan', 'Status Layanan', 'No. Layanan', 'ID LOP', 'Alamat Pemasangan', 'Aksi'].map((heading) => <th key={heading} className="px-4 py-3 text-[10px] font-semibold text-slate-400">{heading}</th>)}</tr></thead>
-          <tbody className="divide-y divide-slate-800/80">
+          <thead><tr className="border-b border-[#E5E5E5] bg-[#F9F8F6]">{['Nama Layanan', 'Status Layanan', 'No. Layanan', 'ID LOP', 'Alamat Pemasangan', 'Aksi'].map((heading) => <th key={heading} className="px-4 py-3 text-[10px] font-semibold text-[#666666]">{heading}</th>)}</tr></thead>
+          <tbody className="divide-y divide-[#E5E5E5]">
             {services.map((service) => {
               const pemda = normalizePemdaName(customer.name)
               const linkedProjects = projects.filter((project) => {
@@ -143,23 +143,23 @@ function ServiceList({
                   && serviceKey(project.serviceType).includes(serviceKey(service.name))
               })
               return (
-                <tr key={service.serviceNumber} className="hover:bg-slate-800/30">
-                  <td className="px-4 py-3 text-xs font-semibold text-slate-200">
-                    <button type="button" disabled={!linkedProjects.length || projectsLoading} onClick={() => onOpenAnalytics(customer.name, service.name)} className="text-left enabled:hover:text-cyan-200 enabled:hover:underline">{service.name}</button>
+                <tr key={service.serviceNumber} className="hover:bg-[#FFFFFF]">
+                  <td className="px-4 py-3 text-xs font-semibold text-[#666666]">
+                    <button type="button" disabled={!linkedProjects.length || projectsLoading} onClick={() => onOpenAnalytics(customer.name, service.name)} className="text-left enabled:hover:text-[#666666] enabled:hover:underline">{service.name}</button>
                   </td>
                   <td className="px-4 py-3"><span className={`rounded-full border px-2.5 py-1 text-[10px] font-bold ${serviceStatusStyles[service.status]}`}>{service.status}</span></td>
-                  <td className="px-4 py-3 font-mono text-xs text-cyan-300">{service.serviceNumber}</td>
+                  <td className="px-4 py-3 font-mono text-xs text-[#666666]">{service.serviceNumber}</td>
                   <td className="px-4 py-3">
-                    {projectsLoading ? <span className="text-xs text-slate-500">Memuat...</span> : linkedProjects.length ? linkedProjects.map((project) => (
-                      <button key={project.idLOP} type="button" onClick={() => onOpenAnalytics(customer.name, service.name)} className="mr-2 font-mono text-xs text-blue-300 hover:underline">{project.idLOP}</button>
-                    )) : <span className="text-xs text-slate-500">-</span>}
+                    {projectsLoading ? <span className="text-xs text-[#666666]">Memuat...</span> : linkedProjects.length ? linkedProjects.map((project) => (
+                      <button key={project.idLOP} type="button" onClick={() => onOpenAnalytics(customer.name, service.name)} className="mr-2 font-mono text-xs text-[#666666] hover:underline">{project.idLOP}</button>
+                    )) : <span className="text-xs text-[#666666]">-</span>}
                   </td>
-                  <td className="px-4 py-3 text-xs text-slate-400">{service.address}</td>
-                  <td className="px-4 py-3"><button type="button" aria-label={`Edit ${service.name}`} className="text-slate-400 hover:text-blue-300" onClick={() => setEditingService({ originalNumber: service.serviceNumber, row: { name: service.name, status: service.status, serviceNumber: service.serviceNumber, address: service.address } })}><Pencil size={14} /></button><button type="button" aria-label={`Hapus ${service.name}`} className="ml-2 text-slate-400 hover:text-blue-300" onClick={() => onUpdate({ services: customer.services.filter((item) => item.serviceNumber !== service.serviceNumber) })}><Trash2 size={14} /></button></td>
+                  <td className="px-4 py-3 text-xs text-[#666666]">{service.address}</td>
+                  <td className="px-4 py-3"><button type="button" aria-label={`Edit ${service.name}`} className="text-[#666666] hover:text-[#666666]" onClick={() => setEditingService({ originalNumber: service.serviceNumber, row: { name: service.name, status: service.status, serviceNumber: service.serviceNumber, address: service.address } })}><Pencil size={14} /></button><button type="button" aria-label={`Hapus ${service.name}`} className="ml-2 text-[#666666] hover:text-[#666666]" onClick={() => onUpdate({ services: customer.services.filter((item) => item.serviceNumber !== service.serviceNumber) })}><Trash2 size={14} /></button></td>
                 </tr>
               )
             })}
-            {!services.length && <tr><td colSpan={6} className="px-4 py-10 text-center text-xs text-slate-500">Tidak ada layanan yang cocok dengan filter.</td></tr>}
+            {!services.length && <tr><td colSpan={6} className="px-4 py-10 text-center text-xs text-[#666666]">Tidak ada layanan yang cocok dengan filter.</td></tr>}
           </tbody>
         </table>
       </div>
@@ -206,10 +206,10 @@ function ContractList({ customer, onUpdate }: { customer: CustomerProfile; onUpd
   }
   return (
     <div className="space-y-3">
-      <div className="flex flex-wrap gap-2 border-b border-slate-700/60 px-1 py-2">
+      <div className="flex flex-wrap gap-2 border-b border-[#E5E5E5] px-1 py-2">
         {contractFilters.map((item) => (
-          <button key={item} type="button" onClick={() => setFilter(item)} className={`rounded-full border px-3 py-1.5 text-[10px] font-semibold transition-colors ${filter === item ? contractFilterStyles[item].selected : `border-slate-700 text-slate-400 ${contractFilterStyles[item].hover}`}`}>
-            {item}<span className="ml-1.5 rounded-full bg-slate-700 px-1.5">{counts[item]}</span>
+          <button key={item} type="button" onClick={() => setFilter(item)} className={`rounded-full border px-3 py-1.5 text-[10px] font-semibold transition-colors ${filter === item ? contractFilterStyles[item].selected : `border-[#E5E5E5] text-[#666666] ${contractFilterStyles[item].hover}`}`}>
+            {item}<span className="ml-1.5 rounded-full bg-[#F3F3F1] px-1.5">{counts[item]}</span>
           </button>
         ))}
       </div>
@@ -261,16 +261,16 @@ function DocumentCards({ customer, onUpdate }: { customer: CustomerProfile; onUp
   return (
     <section>
       <div className="mb-4 flex items-center justify-between">
-        <h3 className="text-sm font-semibold text-slate-100">Daftar Dokumen Pelanggan</h3>
+        <h3 className="text-sm font-semibold text-[#666666]">Daftar Dokumen Pelanggan</h3>
       </div>
       <div className="grid gap-4 lg:grid-cols-2">
         {customer.documents.map((documentItem, index) => (
           <article key={`${documentItem.type}-${index}`} className="space-y-2">
             <div className="flex items-center justify-between gap-2">
-              <input defaultValue={documentItem.type || documentTypes[index] || 'Dokumen'} onBlur={(event) => updateDocument(index, { type: event.target.value })} placeholder={`Buat ${documentTypes[index] ?? 'Judul dokumen'} Disini`} className="min-w-0 flex-1 bg-transparent text-sm text-slate-200 outline-none" />
+              <input defaultValue={documentItem.type || documentTypes[index] || 'Dokumen'} onBlur={(event) => updateDocument(index, { type: event.target.value })} placeholder={`Buat ${documentTypes[index] ?? 'Judul dokumen'} Disini`} className="min-w-0 flex-1 bg-transparent text-sm text-[#666666] outline-none" />
               <div className="flex gap-2">
-                <button type="button" aria-label="Edit dokumen" onClick={() => setEditingIndex(index)} className="text-slate-400 hover:text-blue-300"><Pencil size={14} /></button>
-                <button type="button" aria-label="Hapus dokumen" onClick={() => onUpdate({ documents: customer.documents.filter((_, rowIndex) => rowIndex !== index) })} className="text-slate-400 hover:text-blue-300"><Trash2 size={14} /></button>
+                <button type="button" aria-label="Edit dokumen" onClick={() => setEditingIndex(index)} className="text-[#666666] hover:text-[#666666]"><Pencil size={14} /></button>
+                <button type="button" aria-label="Hapus dokumen" onClick={() => onUpdate({ documents: customer.documents.filter((_, rowIndex) => rowIndex !== index) })} className="text-[#666666] hover:text-[#666666]"><Trash2 size={14} /></button>
               </div>
             </div>
             <DocumentUploadCard
@@ -278,7 +278,7 @@ function DocumentCards({ customer, onUpdate }: { customer: CustomerProfile; onUp
               name={documentItem.name}
               onSelect={(name) => updateDocument(index, { name, updatedAt: new Date().toLocaleDateString('id-ID') })}
             />
-            <p className="text-[10px] italic text-slate-500">Format PDF, ukuran maks. 25 MB, jumlah maks. 1.</p>
+            <p className="text-[10px] italic text-[#666666]">Format PDF, ukuran maks. 25 MB, jumlah maks. 1.</p>
             {documentItem.name && <button type="button" onClick={() => {
               const contents = `${documentItem.type}\n${customer.name}\nDokumen contoh untuk tampilan dashboard.`
               const url = URL.createObjectURL(new Blob([contents], { type: 'text/plain;charset=utf-8' }))
@@ -287,16 +287,16 @@ function DocumentCards({ customer, onUpdate }: { customer: CustomerProfile; onUp
               link.download = documentItem.name.replace(/\.pdf$/i, '.txt')
               link.click()
               URL.revokeObjectURL(url)
-            }} className="inline-flex items-center gap-1 text-[10px] font-semibold text-cyan-300"><Download size={12} />Unduh</button>}
+            }} className="inline-flex items-center gap-1 text-[10px] font-semibold text-[#666666]"><Download size={12} />Unduh</button>}
           </article>
         ))}
       </div>
       {editingIndex !== null && (
         <div className="fixed inset-0 z-[80] flex items-center justify-center bg-black/70 p-4" onMouseDown={(event) => { if (event.target === event.currentTarget) setEditingIndex(null) }}>
-          <div className="w-full max-w-md space-y-4 rounded-2xl border border-slate-700 bg-slate-900 p-5">
-            <h4 className="text-sm font-bold text-white">Edit Dokumen</h4>
-            <label className="block text-xs text-slate-300">Nama Dokumen<input defaultValue={customer.documents[editingIndex].name} onBlur={(event) => updateDocument(editingIndex, { name: event.target.value })} placeholder="Buat Nama Dokumen Disini" className="form-input mt-1.5" /></label>
-            <label className="block text-xs text-slate-300">Jenis Dokumen<input defaultValue={customer.documents[editingIndex].type} onBlur={(event) => updateDocument(editingIndex, { type: event.target.value })} placeholder="Buat Jenis Dokumen Disini" className="form-input mt-1.5" /></label>
+          <div className="w-full max-w-md space-y-4 rounded-2xl border border-[#E5E5E5] bg-[#F9F8F6] p-5">
+            <h4 className="text-sm font-bold text-[#1C1C1E]">Edit Dokumen</h4>
+            <label className="block text-xs text-[#666666]">Nama Dokumen<input defaultValue={customer.documents[editingIndex].name} onBlur={(event) => updateDocument(editingIndex, { name: event.target.value })} placeholder="Buat Nama Dokumen Disini" className="form-input mt-1.5" /></label>
+            <label className="block text-xs text-[#666666]">Jenis Dokumen<input defaultValue={customer.documents[editingIndex].type} onBlur={(event) => updateDocument(editingIndex, { type: event.target.value })} placeholder="Buat Jenis Dokumen Disini" className="form-input mt-1.5" /></label>
             <button type="button" onClick={() => setEditingIndex(null)} className="btn-primary float-right">Selesai</button>
           </div>
         </div>
@@ -321,9 +321,9 @@ function DocumentUploadCard({
         const file = event.target.files?.[0]
         if (file) onSelect(file.name)
       }} />
-      <button type="button" onClick={() => inputRef.current?.click()} className="flex min-h-14 w-full items-center justify-between gap-3 rounded-lg border border-dashed border-slate-600 px-4 py-3 text-left text-xs text-slate-400 hover:border-cyan-500/50">
-        <span className="flex items-center gap-3"><FileText size={18} className="text-cyan-400" />{name || `Letakkan dokumen ${category} di sini atau klik tombol unggah`}</span>
-        <span className="rounded-full border border-slate-600 px-4 py-2 font-semibold text-slate-200"><Upload size={13} className="inline" /> Unggah Dokumen</span>
+      <button type="button" onClick={() => inputRef.current?.click()} className="flex min-h-14 w-full items-center justify-between gap-3 rounded-lg border border-dashed border-[#E5E5E5] px-4 py-3 text-left text-xs text-[#666666] hover:border-[#E5E5E5]">
+        <span className="flex items-center gap-3"><FileText size={18} className="text-[#666666]" />{name || `Letakkan dokumen ${category} di sini atau klik tombol unggah`}</span>
+        <span className="rounded-full border border-[#E5E5E5] px-4 py-2 font-semibold text-[#666666]"><Upload size={13} className="inline" /> Unggah Dokumen</span>
       </button>
     </>
   )

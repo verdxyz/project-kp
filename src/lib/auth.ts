@@ -1,3 +1,6 @@
+import { readJsonResponse } from './apiResponse'
+import { csrfHeaders } from './csrf'
+
 export interface AuthUser {
   id: string
   nama: string
@@ -13,7 +16,10 @@ export const AuthService = {
 
   async restoreSession(): Promise<AuthUser | null> {
     try {
-      const response = await fetch('/api/auth/me', { credentials: 'include' })
+      const response = await fetch('/api/auth/me', {
+        headers: { Accept: 'application/json' },
+        credentials: 'include',
+      })
       if (!response.ok) {
         localStorage.removeItem('b2g_current_user')
         return null
@@ -31,11 +37,11 @@ export const AuthService = {
     try {
       const response = await fetch('/api/auth/login', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { ...csrfHeaders(), Accept: 'application/json', 'Content-Type': 'application/json' },
         credentials: 'include',
         body: JSON.stringify({ email, password }),
       })
-      const result = await response.json() as { user?: AuthUser; message?: string }
+      const result = await readJsonResponse<{ user?: AuthUser; message?: string }>(response)
       if (!response.ok || !result.user) return { success: false, message: result.message || 'Login gagal.' }
       const user = result.user
       localStorage.setItem('b2g_current_user', JSON.stringify(user))
@@ -50,7 +56,11 @@ export const AuthService = {
 
   async logout(): Promise<void> {
     try {
-      await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' })
+      await fetch('/api/auth/logout', {
+        method: 'POST',
+        headers: { ...csrfHeaders(), Accept: 'application/json' },
+        credentials: 'include',
+      })
     } finally {
       localStorage.removeItem('b2g_current_user')
     }

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react"
+﻿import React, { useState, useEffect, useCallback } from "react"
 import {
   Wifi,
   Plus,
@@ -36,11 +36,11 @@ const SEED_SERVICES = [
 
 const SERVICE_ICONS: Record<string, React.ElementType> = { "Astinet": Globe, "VPN IP": Shield, "Metro Ethernet": Network, "SD-WAN": Zap, "Lainnya": Wifi }
 const SERVICE_COLORS: Record<string, string> = {
-  "Astinet": "from-blue-500/20 to-blue-600/10 border-blue-500/30 text-blue-400",
-  "VPN IP": "from-violet-500/20 to-violet-600/10 border-violet-500/30 text-violet-400",
-  "Metro Ethernet": "from-emerald-500/20 to-emerald-600/10 border-emerald-500/30 text-emerald-400",
-  "SD-WAN": "from-amber-500/20 to-amber-600/10 border-amber-500/30 text-amber-400",
-  "Lainnya": "from-slate-500/20 to-slate-600/10 border-slate-500/30 text-slate-400",
+  "Astinet": "bg-white border-[#E5E5E5] text-[#1C1C1E]",
+  "VPN IP": "bg-white border-[#E5E5E5] text-[#1C1C1E]",
+  "Metro Ethernet": "bg-white border-[#E5E5E5] text-[#1C1C1E]",
+  "SD-WAN": "bg-white border-[#E5E5E5] text-[#1C1C1E]",
+  "Lainnya": "bg-white border-[#E5E5E5] text-[#1C1C1E]",
 }
 
 function formatIDR(n: number) {
@@ -80,92 +80,92 @@ function ServiceModal({ mode, initial, onSave, onClose }: ModalProps) {
   const handleSubmit = (e: React.FormEvent) => { e.preventDefault(); if (!validate()) return; onSave({ ...form, features: form.features.filter(f => f.trim()) }) }
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl shadow-black/50">
-        <div className="sticky top-0 flex items-center justify-between px-6 py-4 border-b border-slate-700/50 bg-slate-900/90 backdrop-blur-sm z-10">
+      <div className="absolute inset-0 bg-black/70 " onClick={onClose} />
+      <div className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-[#F9F8F6] border border-[#E5E5E5] rounded-2xl  ">
+        <div className="sticky top-0 flex items-center justify-between px-6 py-4 border-b border-[#E5E5E5] bg-[#F9F8F6]  z-10">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-blue-500/20 border border-blue-500/30 flex items-center justify-center"><Wifi size={16} className="text-blue-400" /></div>
-            <h3 className="text-base font-bold text-white">{mode === "add" ? "Tambah Layanan Baru" : "Edit Layanan"}</h3>
+            <div className="w-8 h-8 rounded-lg bg-[#F3F3F1] border border-[#E5E5E5] flex items-center justify-center"><Wifi size={16} className="text-[#666666]" /></div>
+            <h3 className="text-base font-bold text-[#1C1C1E]">{mode === "add" ? "Tambah Layanan Baru" : "Edit Layanan"}</h3>
           </div>
-          <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white transition-colors"><X size={18} /></button>
+          <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-[#FFFFFF] text-[#666666] hover:text-[#1C1C1E] transition-colors"><X size={18} /></button>
         </div>
         <form onSubmit={handleSubmit} className="p-6 space-y-5">
           <div>
-            <label className="block text-xs font-semibold text-slate-400 mb-1.5">Nama Layanan *</label>
-            <input value={form.name} onChange={e => set("name", e.target.value)} placeholder="Contoh: Astinet Dedicated 100 Mbps" className={cn("form-input", errors.name && "border-red-500/60")} />
-            {errors.name && <p className="text-xs text-red-400 mt-1 flex items-center gap-1"><AlertCircle size={11} />{errors.name}</p>}
+            <label className="block text-xs font-semibold text-[#666666] mb-1.5">Nama Layanan *</label>
+            <input value={form.name} onChange={e => set("name", e.target.value)} placeholder="Contoh: Astinet Dedicated 100 Mbps" className={cn("form-input", errors.name && "border-[#E5E5E5]")} />
+            {errors.name && <p className="text-xs text-[#666666] mt-1 flex items-center gap-1"><AlertCircle size={11} />{errors.name}</p>}
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-semibold text-slate-400 mb-1.5">Kategori</label>
+              <label className="block text-xs font-semibold text-[#666666] mb-1.5">Kategori</label>
               <div className="relative">
                 <select value={form.category} onChange={e => set("category", e.target.value)} className="form-input appearance-none pr-8">
                   <option value="On Channel">Own Channel</option>
                   <option value="GTMA">GTMA</option>
                   <option value="NGTMA">NGTMA</option>
                 </select>
-                <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+                <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#666666] pointer-events-none" />
               </div>
             </div>
             <div>
-              <label className="block text-xs font-semibold text-slate-400 mb-1.5">Tipe Layanan</label>
+              <label className="block text-xs font-semibold text-[#666666] mb-1.5">Tipe Layanan</label>
               <div className="relative">
                 <select value={form.serviceType} onChange={e => set("serviceType", e.target.value)} className="form-input appearance-none pr-8">
                   {SERVICE_TYPES.map(t => <option key={t}>{t}</option>)}
                 </select>
-                <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+                <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#666666] pointer-events-none" />
               </div>
             </div>
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-semibold text-slate-400 mb-1.5">Bandwidth</label>
+              <label className="block text-xs font-semibold text-[#666666] mb-1.5">Bandwidth</label>
               <input value={form.bandwidth ?? ""} onChange={e => set("bandwidth", e.target.value)} placeholder="Contoh: 100 Mbps" className="form-input" />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-slate-400 mb-1.5">SLA</label>
+              <label className="block text-xs font-semibold text-[#666666] mb-1.5">SLA</label>
               <input value={form.sla} onChange={e => set("sla", e.target.value)} placeholder="Contoh: 99.5%" className="form-input" />
             </div>
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-semibold text-slate-400 mb-1.5">Harga Monthly (Rp) *</label>
-              <input type="number" value={form.priceMonthly || ""} onChange={e => set("priceMonthly", Number(e.target.value))} placeholder="0" className={cn("form-input", errors.priceMonthly && "border-red-500/60")} />
-              {errors.priceMonthly && <p className="text-xs text-red-400 mt-1 flex items-center gap-1"><AlertCircle size={11} />{errors.priceMonthly}</p>}
+              <label className="block text-xs font-semibold text-[#666666] mb-1.5">Harga Monthly (Rp) *</label>
+              <input type="number" value={form.priceMonthly || ""} onChange={e => set("priceMonthly", Number(e.target.value))} placeholder="0" className={cn("form-input", errors.priceMonthly && "border-[#E5E5E5]")} />
+              {errors.priceMonthly && <p className="text-xs text-[#666666] mt-1 flex items-center gap-1"><AlertCircle size={11} />{errors.priceMonthly}</p>}
             </div>
             <div>
-              <label className="block text-xs font-semibold text-slate-400 mb-1.5">Harga OTC (Rp)</label>
+              <label className="block text-xs font-semibold text-[#666666] mb-1.5">Harga OTC (Rp)</label>
               <input type="number" step="0.01" value={form.priceOTC ?? ""} onChange={e => set("priceOTC", e.target.value ? Number(e.target.value) : undefined)} placeholder="Opsional" className="form-input" />
             </div>
           </div>
           <div>
-            <label className="block text-xs font-semibold text-slate-400 mb-1.5">Deskripsi *</label>
-            <textarea value={form.description} onChange={e => set("description", e.target.value)} rows={3} placeholder="Jelaskan layanan ini secara singkat..." className={cn("form-input resize-none", errors.description && "border-red-500/60")} />
-            {errors.description && <p className="text-xs text-red-400 mt-1 flex items-center gap-1"><AlertCircle size={11} />{errors.description}</p>}
+            <label className="block text-xs font-semibold text-[#666666] mb-1.5">Deskripsi *</label>
+            <textarea value={form.description} onChange={e => set("description", e.target.value)} rows={3} placeholder="Jelaskan layanan ini secara singkat..." className={cn("form-input resize-none", errors.description && "border-[#E5E5E5]")} />
+            {errors.description && <p className="text-xs text-[#666666] mt-1 flex items-center gap-1"><AlertCircle size={11} />{errors.description}</p>}
           </div>
           <div>
             <div className="flex items-center justify-between mb-1.5">
-              <label className="text-xs font-semibold text-slate-400">Fitur / Keunggulan</label>
-              <button type="button" onClick={addFeature} className="text-xs text-blue-400 hover:text-blue-300 flex items-center gap-1 transition-colors"><Plus size={12} /> Tambah</button>
+              <label className="text-xs font-semibold text-[#666666]">Fitur / Keunggulan</label>
+              <button type="button" onClick={addFeature} className="text-xs text-[#666666] hover:text-[#666666] flex items-center gap-1 transition-colors"><Plus size={12} /> Tambah</button>
             </div>
             <div className="space-y-2">
               {form.features.map((f, i) => (
                 <div key={i} className="flex items-center gap-2">
                   <input value={f} onChange={e => setFeature(i, e.target.value)} placeholder={`Fitur ${i + 1}`} className="form-input flex-1" />
-                  {form.features.length > 1 && <button type="button" onClick={() => removeFeature(i)} className="p-1.5 rounded-lg text-slate-500 hover:text-red-400 hover:bg-red-500/10 transition-colors"><X size={14} /></button>}
+                  {form.features.length > 1 && <button type="button" onClick={() => removeFeature(i)} className="p-1.5 rounded-lg text-[#666666] hover:text-[#666666] hover:bg-[#F3F3F1] transition-colors"><X size={14} /></button>}
                 </div>
               ))}
             </div>
           </div>
           <div>
-            <label className="block text-xs font-semibold text-slate-400 mb-1.5">Status</label>
+            <label className="block text-xs font-semibold text-[#666666] mb-1.5">Status</label>
             <div className="flex gap-3">
               {["Aktif", "Tidak Aktif"].map(s => (
                 <label key={s} className="flex items-center gap-2 cursor-pointer">
-                  <div onClick={() => set("status", s)} className={cn("w-4 h-4 rounded-full border-2 flex items-center justify-center transition-all cursor-pointer", form.status === s ? "border-blue-500 bg-blue-500" : "border-slate-600")}>
+                  <div onClick={() => set("status", s)} className={cn("w-4 h-4 rounded-full border-2 flex items-center justify-center transition-all cursor-pointer", form.status === s ? "border-[#E5E5E5] bg-[#F3F3F1]" : "border-[#E5E5E5]")}>
                     {form.status === s && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
                   </div>
-                  <span className="text-sm text-slate-300">{s}</span>
+                  <span className="text-sm text-[#666666]">{s}</span>
                 </label>
               ))}
             </div>
@@ -184,34 +184,34 @@ function ServiceCard({ item, onEdit, onDelete }: { item: ServiceItem; onEdit: ()
   const Icon = SERVICE_ICONS[item.serviceType] ?? Wifi
   const colorClass = SERVICE_COLORS[item.serviceType] ?? SERVICE_COLORS["Lainnya"]
   return (
-    <div className={cn("group relative rounded-2xl border bg-gradient-to-br p-5 transition-all duration-300 hover:shadow-lg hover:shadow-black/20 hover:-translate-y-0.5", colorClass)}>
+    <div className={cn("group relative rounded-2xl border p-5 transition-all duration-300 hover:-translate-y-0.5", colorClass)}>
       <div className="absolute top-4 right-4">
-        <span className={cn("text-[10px] font-bold px-2 py-0.5 rounded-full", item.status === "Aktif" ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30" : "bg-slate-700 text-slate-500 border border-slate-600")}>{item.status}</span>
+        <span className={cn("text-[10px] font-bold px-2 py-0.5 rounded-full", item.status === "Aktif" ? "bg-[#F3F3F1] text-[#666666] border border-[#E5E5E5]" : "bg-[#F3F3F1] text-[#666666] border border-[#E5E5E5]")}>{item.status}</span>
       </div>
       <div className="flex items-start gap-3 mb-4">
-        <div className={cn("w-10 h-10 rounded-xl border bg-gradient-to-br flex items-center justify-center flex-shrink-0", colorClass)}><Icon size={20} /></div>
+        <div className={cn("w-10 h-10 rounded-xl border  flex items-center justify-center flex-shrink-0", colorClass)}><Icon size={20} /></div>
         <div className="min-w-0 pr-16">
-          <h3 className="text-sm font-bold text-white leading-tight truncate">{item.name}</h3>
+          <h3 className="text-sm font-bold text-[#1C1C1E] leading-tight truncate">{item.name}</h3>
           <div className="flex items-center gap-2 mt-1">
-            <span className="text-xs text-slate-400">{item.serviceType}</span>
-            {item.bandwidth && <><span className="text-slate-600">·</span><span className="text-xs text-slate-400">{item.bandwidth}</span></>}
+            <span className="text-xs text-[#666666]">{item.serviceType}</span>
+            {item.bandwidth && <><span className="text-[#666666]">·</span><span className="text-xs text-[#666666]">{item.bandwidth}</span></>}
           </div>
         </div>
       </div>
-      <p className="text-xs text-slate-400 mb-4 line-clamp-2 leading-relaxed">{item.description}</p>
+      <p className="text-xs text-[#666666] mb-4 line-clamp-2 leading-relaxed">{item.description}</p>
       {item.features.length > 0 && (
         <div className="flex flex-wrap gap-1.5 mb-4">
-          {item.features.slice(0, 3).map(f => <span key={f} className="text-[10px] px-2 py-0.5 rounded-full bg-slate-800/60 border border-slate-700 text-slate-400">{f}</span>)}
-          {item.features.length > 3 && <span className="text-[10px] px-2 py-0.5 rounded-full bg-slate-800/60 border border-slate-700 text-slate-500">+{item.features.length - 3}</span>}
+          {item.features.slice(0, 3).map(f => <span key={f} className="text-[10px] px-2 py-0.5 rounded-full bg-[#FFFFFF] border border-[#E5E5E5] text-[#666666]">{f}</span>)}
+          {item.features.length > 3 && <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#FFFFFF] border border-[#E5E5E5] text-[#666666]">+{item.features.length - 3}</span>}
         </div>
       )}
-      <div className="flex items-center justify-between pt-3 border-t border-slate-700/40">
-        <div><p className="text-xs text-slate-500">Monthly</p><p className="text-sm font-bold text-white">{formatIDR(item.priceMonthly)}</p></div>
-        <div className="text-right"><p className="text-xs text-slate-500">SLA</p><p className="text-sm font-semibold text-emerald-400">{item.sla}</p></div>
+      <div className="flex items-center justify-between pt-3 border-t border-[#E5E5E5]">
+        <div><p className="text-xs text-[#666666]">Monthly</p><p className="text-sm font-bold text-[#1C1C1E]">{formatIDR(item.priceMonthly)}</p></div>
+        <div className="text-right"><p className="text-xs text-[#666666]">SLA</p><p className="text-sm font-semibold text-[#666666]">{item.sla}</p></div>
       </div>
       <div className="absolute bottom-4 right-4 flex gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-        <button onClick={onEdit} className="p-1.5 rounded-lg bg-slate-800/90 border border-slate-700 text-slate-400 hover:text-blue-400 hover:border-blue-500/40 transition-colors" title="Edit"><Edit3 size={13} /></button>
-        <button onClick={onDelete} className="p-1.5 rounded-lg bg-slate-800/90 border border-slate-700 text-slate-400 hover:text-red-400 hover:border-red-500/40 transition-colors" title="Hapus"><Trash2 size={13} /></button>
+        <button onClick={onEdit} className="p-1.5 rounded-lg bg-[#FFFFFF] border border-[#E5E5E5] text-[#666666] hover:text-[#666666] hover:border-[#E5E5E5] transition-colors" title="Edit"><Edit3 size={13} /></button>
+        <button onClick={onDelete} className="p-1.5 rounded-lg bg-[#FFFFFF] border border-[#E5E5E5] text-[#666666] hover:text-[#666666] hover:border-[#E5E5E5] transition-colors" title="Hapus"><Trash2 size={13} /></button>
       </div>
     </div>
   )
@@ -308,16 +308,24 @@ export function ServicesCatalog({ initialCategory = "Semua" }: ServicesCatalogPr
   useEffect(() => {
     if (!selectedIdLOP) {
       setSelectedProject(null)
+      setLoadingPoints(false)
       return
     }
 
-    const proj = projectsList.find((p) => p.idLOP === selectedIdLOP)
-    if (proj) {
-      setSelectedProject(proj)
-      setNgtmaCustomer(proj.customerName || proj.agency || "")
-      setNgtmaDinas(proj.dinasName || "")
-      setNgtmaSubsidiary(proj.subsidiaryName || "")
+    const proj = projectsList.find((p) => p.idLOP === selectedIdLOP.trim())
+    if (!proj) {
+      setSelectedProject(null)
+      setLoadingPoints(false)
+      setSaveSuccessMessage("")
+      setPointsError("")
+      setServiceRows([emptyServicePointRow()])
+      return
     }
+
+    setSelectedProject(proj)
+    setNgtmaCustomer(proj.customerName || proj.agency || "")
+    setNgtmaDinas(proj.dinasName || "")
+    setNgtmaSubsidiary(proj.subsidiaryName || "")
 
     let active = true
     setLoadingPoints(true)
@@ -371,7 +379,7 @@ export function ServicesCatalog({ initialCategory = "Semua" }: ServicesCatalogPr
     return () => { active = false }
   }, [selectedIdLOP, projectsList])
 
-  // Service Row Actions (Revisi 2: Multiple Input)
+  // Service Row Actions (Multiple Input)
   const handleAddRow = () => {
     setServiceRows((prev) => [...prev, emptyServicePointRow(selectedProject?.serviceType || 'HSI')])
   }
@@ -412,7 +420,11 @@ export function ServicesCatalog({ initialCategory = "Semua" }: ServicesCatalogPr
   // Save Service Points (Revisi 4: Update Data Layanan)
   const handleSaveServicePoints = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!selectedIdLOP) return
+    if (!selectedProject || selectedProject.idLOP !== selectedIdLOP.trim()) {
+      setPointsError("ID LOP harus cocok dengan proyek yang sudah terdaftar.")
+      return
+    }
+    const idLOP = selectedProject.idLOP
     setSavingPoints(true)
     setSaveSuccessMessage("")
     setPointsError("")
@@ -435,7 +447,7 @@ export function ServicesCatalog({ initialCategory = "Semua" }: ServicesCatalogPr
       }
       const payload: ProjectServicePoint[] = rowsToSave.map((r) => ({
         id: r.id,
-        idLOP: selectedIdLOP,
+        idLOP,
         serviceGroup: r.serviceGroup,
         productType: r.serviceGroup === 'POTS' ? 'HSI' : r.productType,
         capacityMbps: r.serviceGroup === 'POTS' ? 0 : r.capacityMbps,
@@ -454,8 +466,8 @@ export function ServicesCatalog({ initialCategory = "Semua" }: ServicesCatalogPr
         subsidiaryName: ngtmaSubsidiary,
       } : undefined
 
-      const result = await ServicePoints.batchUpdate(selectedIdLOP, payload, ngtmaInfo)
-      setSaveSuccessMessage(`${result.servicePoints.length} titik layanan berhasil disimpan dan diperbarui untuk ID LOP: ${selectedIdLOP}.`)
+      const result = await ServicePoints.batchUpdate(idLOP, payload, ngtmaInfo)
+      setSaveSuccessMessage(`${result.servicePoints.length} titik layanan berhasil disimpan dan diperbarui untuk ID LOP: ${idLOP}.`)
       
       // Refresh project list to reflect any customer/dinas updates
       void loadProjects()
@@ -498,22 +510,20 @@ export function ServicesCatalog({ initialCategory = "Semua" }: ServicesCatalogPr
   return (
     <div className="space-y-6">
       {/* ─── TAB NAVIGATION HEADER ─── */}
-      <div className="flex border-b border-slate-700/60 pb-3 gap-3">
+      <div className="flex border-b border-[#E5E5E5] pb-3 gap-3">
         <button
           type="button"
           onClick={() => setActiveTab('service-points')}
           className={cn(
             "flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition-all cursor-pointer",
             activeTab === 'service-points'
-              ? "bg-blue-600 text-white shadow-lg shadow-blue-600/30 ring-2 ring-blue-500/20"
-              : "bg-slate-800/80 text-slate-400 hover:text-white hover:bg-slate-800"
+              ? "bg-black text-[#1C1C1E]   ring-2 ring-[#E5E5E5]"
+              : "bg-[#FFFFFF] text-[#666666] hover:text-[#1C1C1E] hover:bg-[#FFFFFF]"
           )}
         >
           <Layers size={16} />
           Pembaruan & Input Titik Layanan (per ID LOP)
-          <span className="text-[10px] uppercase font-mono px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-200 border border-blue-400/30">
-            Revisi AM
-          </span>
+
         </button>
 
         <button
@@ -522,8 +532,8 @@ export function ServicesCatalog({ initialCategory = "Semua" }: ServicesCatalogPr
           className={cn(
             "flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition-all cursor-pointer",
             activeTab === 'catalog'
-              ? "bg-blue-600 text-white shadow-lg shadow-blue-600/30 ring-2 ring-blue-500/20"
-              : "bg-slate-800/80 text-slate-400 hover:text-white hover:bg-slate-800"
+              ? "bg-black text-[#1C1C1E]   ring-2 ring-[#E5E5E5]"
+              : "bg-[#FFFFFF] text-[#666666] hover:text-[#1C1C1E] hover:bg-[#FFFFFF]"
           )}
         >
           <Wifi size={16} />
@@ -536,100 +546,49 @@ export function ServicesCatalog({ initialCategory = "Semua" }: ServicesCatalogPr
       {/* ═══════════════════════════════════════════════════════════════════ */}
       {activeTab === 'service-points' && (
         <div className="space-y-6">
-          {/* Top Info Banner */}
-          <div className="p-4 rounded-2xl bg-gradient-to-r from-blue-900/40 via-indigo-900/20 to-slate-900 border border-blue-500/30 flex items-start justify-between gap-4">
-            <div className="flex items-start gap-3">
-              <div className="w-10 h-10 rounded-xl bg-blue-500/20 border border-blue-500/40 flex items-center justify-center flex-shrink-0 text-blue-400">
-                <Network size={20} />
-              </div>
-              <div>
-                <h3 className="text-sm font-bold text-white">Input & Pembaruan Layanan per ID LOP (Account Manager)</h3>
-                <p className="text-xs text-slate-400 mt-1 max-w-2xl leading-relaxed">
-                  Pilih ID LOP untuk memuat data layanan tersimpan. AM dapat memperbarui instansi dinas, menambahkan banyak titik layanan (multiple input), serta menentukan klasifikasi <strong>POTS</strong> vs <strong>Non-POTS</strong>.
-                </p>
-              </div>
-            </div>
-            <div className="hidden sm:block text-right">
-              <span className="text-xs font-mono text-emerald-400 font-bold block">{projectsList.length} Proyek Terdaftar</span>
-              <span className="text-[11px] text-slate-500">Database Witel Jateng Utara</span>
-            </div>
-          </div>
-
           <form onSubmit={handleSaveServicePoints} className="space-y-6">
-            {/* 1. SELEKSI ID LOP & DETAIL PROYEK (REVISI 4) */}
-            <div className="card-glass p-5 rounded-2xl space-y-4">
-              <div className="flex items-center justify-between border-b border-slate-700/50 pb-3">
+            {/* 1. SELEKSI ID LOP & DETAIL PROYEK */}
+            <div className="bg-white border border-[#E5E5E5] p-5 rounded-2xl space-y-4">
+              <div className="flex items-center justify-between border-b border-[#E5E5E5] pb-3">
                 <div className="flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-blue-500"></span>
-                  <h4 className="text-sm font-bold text-white uppercase tracking-wider text-[11px]">
-                    1. Pilih ID LOP & Informasi Proyek (Revisi 4)
+                  <span className="w-2 h-2 rounded-full bg-[#F3F3F1]"></span>
+                  <h4 className="text-sm font-bold text-[#1C1C1E] uppercase tracking-wider text-[11px]">
+                    1. Pilih ID LOP & Informasi Proyek{selectedProject ? ` (${selectedProject.stage})` : ''}
                   </h4>
                 </div>
-                <span className="text-xs text-slate-400">Hubungkan data layanan dengan ID LOP</span>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-                    Pilih ID LOP Proyek *
-                  </label>
-                  <div className="relative">
-                    <select
-                      value={selectedIdLOP}
-                      onChange={(e) => setSelectedIdLOP(e.target.value)}
-                      className="form-input appearance-none pr-8 font-mono text-sm font-semibold text-blue-300"
-                      disabled={loadingProjects}
-                    >
-                      {projectsList.length === 0 ? (
-                        <option value="">Tidak ada proyek ditemukan</option>
-                      ) : (
-                        projectsList.map((p) => (
-                          <option key={p.idLOP} value={p.idLOP}>
-                            [{p.idLOP}] {p.agency} — {p.projectName}
-                          </option>
-                        ))
-                      )}
-                    </select>
-                    <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
-                  </div>
-                  <p className="text-[11px] text-slate-500 mt-1">Data layanan akan terhubung langsung ke proyek ini.</p>
-                </div>
-
-                {selectedProject && (
-                  <div className="p-3.5 rounded-xl bg-slate-950/60 border border-slate-800 grid grid-cols-2 gap-3 text-xs">
-                    <div>
-                      <span className="text-[10px] text-slate-500 block">Kategori Kontrak</span>
-                      <span className={cn(
-                        "font-bold px-2 py-0.5 rounded text-[10px] inline-block mt-0.5 border",
-                        selectedProject.category === 'NGTMA'
-                          ? "bg-amber-500/20 text-amber-300 border-amber-500/30"
-                          : selectedProject.category === 'GTMA'
-                          ? "bg-violet-500/20 text-violet-300 border-violet-500/30"
-                          : "bg-blue-500/20 text-blue-300 border-blue-500/30"
-                      )}>
-                        {selectedProject.category}
-                      </span>
-                    </div>
-                    <div>
-                      <span className="text-[10px] text-slate-500 block">Status & Tahap</span>
-                      <span className="font-semibold text-slate-200 mt-0.5 block">{selectedProject.stage} ({selectedProject.status})</span>
-                    </div>
-                    <div className="col-span-2">
-                      <span className="text-[10px] text-slate-500 block">Nama Proyek</span>
-                      <span className="font-semibold text-white truncate block">{selectedProject.projectName}</span>
-                    </div>
-                  </div>
-                )}
+              <div>
+                <select
+                  value={selectedIdLOP}
+                  onChange={(e) => setSelectedIdLOP(e.target.value)}
+                  className="form-input font-mono text-sm font-semibold text-[#666666]"
+                  disabled={loadingProjects}
+                >
+                  <option value="">
+                    {loadingProjects ? "Memuat daftar ID LOP..." : "Pilih ID LOP"}
+                  </option>
+                  {projectsList.map((project) => (
+                    <option key={project.idLOP} value={project.idLOP}>
+                      {project.idLOP} — {project.agency} — {project.projectName}
+                    </option>
+                  ))}
+                </select>
+                  {selectedIdLOP.trim() && !selectedProject && !loadingProjects && (
+                    <p role="alert" className="mt-1 text-[11px] text-[#666666]">
+                      ID LOP tidak ditemukan. Pilih proyek yang sudah terdaftar.
+                    </p>
+                  )}
               </div>
 
               {/* 2. PENYESUAIAN FORM KATEGORI NGTMA (REVISI 1) */}
               {selectedProject?.category === 'NGTMA' && (
-                <div className="mt-4 p-4 rounded-xl bg-amber-500/10 border border-amber-500/30 space-y-3">
+                <div className="mt-4 p-4 rounded-xl bg-[#F3F3F1] border border-[#E5E5E5] space-y-3">
                   <div className="flex items-center gap-2">
-                    <span className="px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[10px] font-bold">
+                    <span className="px-2 py-0.5 rounded bg-[#F3F3F1] text-[#666666] border border-[#E5E5E5] text-[10px] font-bold">
                       Kategori NGTMA Aktif
                     </span>
-                    <span className="text-xs font-semibold text-white">
+                    <span className="text-xs font-semibold text-[#1C1C1E]">
                       Field Khusus Layanan NGTMA (Revisi 1)
                     </span>
                   </div>
@@ -637,14 +596,14 @@ export function ServicesCatalog({ initialCategory = "Semua" }: ServicesCatalogPr
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     {/* Field 1: Nama Pelanggan (Government Customer) */}
                     <div>
-                      <label className="block text-xs font-semibold text-amber-200 mb-1.5">
+                      <label className="block text-xs font-semibold text-[#666666] mb-1.5">
                         Nama Pelanggan (Instansi Pemda) *
                       </label>
                       <div className="relative">
                         <select
                           value={ngtmaCustomer}
                           onChange={(e) => setNgtmaCustomer(e.target.value)}
-                          className="form-input appearance-none pr-8 bg-slate-900 border-amber-500/40 text-white"
+                          className="form-input appearance-none pr-8 bg-[#F9F8F6] border-[#E5E5E5] text-[#1C1C1E]"
                         >
                           <option value="">Pilih Instansi Pemerintah...</option>
                           {MASTER_INSTANSI.map((inst) => (
@@ -653,14 +612,14 @@ export function ServicesCatalog({ initialCategory = "Semua" }: ServicesCatalogPr
                             </option>
                           ))}
                         </select>
-                        <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+                        <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#666666] pointer-events-none" />
                       </div>
-                      <p className="text-[10px] text-amber-300/80 mt-1">Standarisasi Pemkot & Pemkab</p>
+                      <p className="text-[10px] text-[#666666] mt-1">Standarisasi Pemkot & Pemkab</p>
                     </div>
 
                     {/* Field 2: Nama Dinas (Terpisah) */}
                     <div>
-                      <label className="block text-xs font-semibold text-amber-200 mb-1.5">
+                      <label className="block text-xs font-semibold text-[#666666] mb-1.5">
                         Nama Dinas (Terpisah) *
                       </label>
                       <div className="space-y-1.5">
@@ -670,7 +629,7 @@ export function ServicesCatalog({ initialCategory = "Semua" }: ServicesCatalogPr
                           value={ngtmaDinas}
                           onChange={(e) => setNgtmaDinas(e.target.value)}
                           placeholder="Contoh: Dinas Kominfo"
-                          className="form-input bg-slate-900 border-amber-500/40 text-white"
+                          className="form-input bg-[#F9F8F6] border-[#E5E5E5] text-[#1C1C1E]"
                         />
                         <datalist id="dinas-options">
                           {MASTER_DINAS.map((d) => (
@@ -678,12 +637,12 @@ export function ServicesCatalog({ initialCategory = "Semua" }: ServicesCatalogPr
                           ))}
                         </datalist>
                       </div>
-                      <p className="text-[10px] text-amber-300/80 mt-1">Bisa pilih saran atau ketik manual</p>
+                      <p className="text-[10px] text-[#666666] mt-1">Bisa pilih saran atau ketik manual</p>
                     </div>
 
                     {/* Field 3: Nama Anak Perusahaan */}
                     <div>
-                      <label className="block text-xs font-semibold text-amber-200 mb-1.5">
+                      <label className="block text-xs font-semibold text-[#666666] mb-1.5">
                         Nama Anak Perusahaan Telkom
                       </label>
                       <input
@@ -691,28 +650,25 @@ export function ServicesCatalog({ initialCategory = "Semua" }: ServicesCatalogPr
                         value={ngtmaSubsidiary}
                         onChange={(e) => setNgtmaSubsidiary(e.target.value)}
                         placeholder="Contoh: Telkom Akses / Infomedia"
-                        className="form-input bg-slate-900 border-amber-500/40 text-white"
+                        className="form-input bg-[#F9F8F6] border-[#E5E5E5] text-[#1C1C1E]"
                       />
-                      <p className="text-[10px] text-amber-300/80 mt-1">Mitra pelaksanaan NGTMA</p>
+                      <p className="text-[10px] text-[#666666] mt-1">Mitra pelaksanaan NGTMA</p>
                     </div>
                   </div>
                 </div>
               )}
             </div>
 
-            {/* 3. MULTIPLE INPUT TITIK LAYANAN (REVISI 2 & KONDISI POTS / NON-POTS REVISI 1) */}
-            <div className="card-glass p-5 rounded-2xl space-y-4">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-700/50 pb-3">
+            {/* 3. MULTIPLE INPUT TITIK LAYANAN (KONDISI POTS / NON-POTS) */}
+            <div className="bg-white border border-[#E5E5E5] p-5 rounded-2xl space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#E5E5E5] pb-3">
                 <div>
                   <div className="flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
-                    <h4 className="text-sm font-bold text-white uppercase tracking-wider text-[11px]">
-                      2. Input Titik Layanan — Multi-Input (Revisi 2)
+                    <span className="w-2 h-2 rounded-full bg-[#F3F3F1]"></span>
+                    <h4 className="text-sm font-bold text-[#1C1C1E] uppercase tracking-wider text-[11px]">
+                      2. Input Titik Layanan — Multi-Input
                     </h4>
                   </div>
-                  <p className="text-xs text-slate-400 mt-0.5">
-                    Satu pelanggan dapat memiliki banyak titik layanan. Atur kondisi <strong>POTS</strong> (Nomor Order & SID saja) atau <strong>Non-POTS</strong> (lengkap).
-                  </p>
                 </div>
 
                 <button
@@ -726,16 +682,8 @@ export function ServicesCatalog({ initialCategory = "Semua" }: ServicesCatalogPr
                 </button>
               </div>
 
-              {/* Astinet Mentor Note Banner */}
-              <div className="p-3 rounded-xl bg-blue-500/10 border border-blue-500/20 text-xs text-blue-300 flex items-start gap-2.5">
-                <Info size={16} className="text-blue-400 flex-shrink-0 mt-0.5" />
-                <div className="leading-relaxed">
-                  <strong>Catatan Khusus Bimbingan:</strong> Layanan <strong>Astinet</strong> saat ini disediakan dengan opsi standar Non-POTS (lengkap dengan kapasitas bandwidth). Silakan sesuaikan jika instruksi mentor menetapkan Astinet tidak memerlukan field bandwidth.
-                </div>
-              </div>
-
               {loadingPoints ? (
-                <div className="py-12 text-center text-xs text-slate-400">
+                <div className="py-12 text-center text-xs text-[#666666]">
                   Memuat data titik layanan untuk {selectedIdLOP}...
                 </div>
               ) : (
@@ -748,29 +696,29 @@ export function ServicesCatalog({ initialCategory = "Semua" }: ServicesCatalogPr
                         className={cn(
                           "p-4 rounded-xl border transition-all duration-200 space-y-3",
                           isPOTS
-                            ? "bg-slate-950/70 border-violet-500/30"
-                            : "bg-slate-950/70 border-slate-700/80 hover:border-slate-600"
+                            ? "bg-[#F9F8F6] border-[#E5E5E5]"
+                            : "bg-[#F9F8F6] border-[#E5E5E5] hover:border-[#E5E5E5]"
                         )}
                       >
                         {/* Row Header */}
-                        <div className="flex items-center justify-between pb-2 border-b border-slate-800">
+                        <div className="flex items-center justify-between pb-2 border-b border-[#E5E5E5]">
                           <div className="flex items-center gap-3">
-                            <span className="w-6 h-6 rounded-lg bg-slate-800 flex items-center justify-center text-xs font-bold font-mono text-slate-300">
+                            <span className="w-6 h-6 rounded-lg bg-[#FFFFFF] flex items-center justify-center text-xs font-bold font-mono text-[#666666]">
                               {idx + 1}
                             </span>
 
                             {/* Kondisi Layanan Selector: POTS vs Non-POTS */}
                             <div className="flex items-center gap-2">
-                              <span className="text-xs font-semibold text-slate-400">Kondisi:</span>
-                              <div className="flex rounded-lg bg-slate-900 p-0.5 border border-slate-700">
+                              <span className="text-xs font-semibold text-[#666666]">Kondisi:</span>
+                              <div className="flex rounded-lg bg-[#F9F8F6] p-0.5 border border-[#E5E5E5]">
                                 <button
                                   type="button"
                                   onClick={() => handleRowChange(idx, 'serviceGroup', 'Non-POTS')}
                                   className={cn(
                                     "px-2.5 py-1 rounded text-xs font-bold transition-colors cursor-pointer",
                                     !isPOTS
-                                      ? "bg-blue-600 text-white shadow"
-                                      : "text-slate-400 hover:text-white"
+                                      ? "bg-black text-[#1C1C1E] "
+                                      : "text-[#666666] hover:text-[#1C1C1E]"
                                   )}
                                 >
                                   Non-POTS
@@ -781,8 +729,8 @@ export function ServicesCatalog({ initialCategory = "Semua" }: ServicesCatalogPr
                                   className={cn(
                                     "px-2.5 py-1 rounded text-xs font-bold transition-colors cursor-pointer flex items-center gap-1",
                                     isPOTS
-                                      ? "bg-violet-600 text-white shadow"
-                                      : "text-slate-400 hover:text-white"
+                                      ? "bg-black text-[#1C1C1E] "
+                                      : "text-[#666666] hover:text-[#1C1C1E]"
                                   )}
                                 >
                                   <PhoneCall size={11} />
@@ -792,7 +740,7 @@ export function ServicesCatalog({ initialCategory = "Semua" }: ServicesCatalogPr
                             </div>
 
                             {isPOTS && (
-                              <span className="text-[11px] text-violet-400 font-semibold hidden md:inline">
+                              <span className="text-[11px] text-[#666666] font-semibold hidden md:inline">
                                 (Hanya Nomor Order & SID)
                               </span>
                             )}
@@ -802,7 +750,7 @@ export function ServicesCatalog({ initialCategory = "Semua" }: ServicesCatalogPr
                             <button
                               type="button"
                               onClick={() => handleRemoveRow(idx)}
-                              className="p-1.5 rounded-lg text-slate-500 hover:text-red-400 hover:bg-red-500/10 transition-colors cursor-pointer"
+                              className="p-1.5 rounded-lg text-[#666666] hover:text-[#666666] hover:bg-[#F3F3F1] transition-colors cursor-pointer"
                               title="Hapus baris ini"
                             >
                               <Trash2 size={15} />
@@ -815,8 +763,8 @@ export function ServicesCatalog({ initialCategory = "Semua" }: ServicesCatalogPr
                           /* POTS FIELDS: Hanya Nomor Order dan SID (Revisi 1) */
                           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-1">
                             <div>
-                              <label className="block text-[11px] font-semibold text-violet-300 mb-1">
-                                Nomor Order (POTS) *
+                              <label className="block text-[11px] font-semibold text-[#666666] mb-1">
+                                No. Order
                               </label>
                               <input
                                 type="text"
@@ -828,8 +776,8 @@ export function ServicesCatalog({ initialCategory = "Semua" }: ServicesCatalogPr
                               />
                             </div>
                             <div>
-                              <label className="block text-[11px] font-semibold text-violet-300 mb-1">
-                                Nomor SID (Service ID) *
+                              <label className="block text-[11px] font-semibold text-[#666666] mb-1">
+                                SID
                               </label>
                               <input
                                 type="text"
@@ -841,7 +789,7 @@ export function ServicesCatalog({ initialCategory = "Semua" }: ServicesCatalogPr
                               />
                             </div>
                             <div>
-                              <label className="block text-[11px] font-semibold text-slate-400 mb-1">
+                              <label className="block text-[11px] font-semibold text-[#666666] mb-1">
                                 Tanggal Aktif (Opsional)
                               </label>
                               <input
@@ -852,8 +800,8 @@ export function ServicesCatalog({ initialCategory = "Semua" }: ServicesCatalogPr
                               />
                             </div>
                             <div>
-                              <label className="block text-[11px] font-semibold text-violet-300 mb-1">
-                                Harga Layanan (Rp) *
+                              <label className="block text-[11px] font-semibold text-[#666666] mb-1">
+                                Harga Layanan (Rp)
                               </label>
                               <input
                                 type="number"
@@ -872,8 +820,8 @@ export function ServicesCatalog({ initialCategory = "Semua" }: ServicesCatalogPr
                           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-7 gap-3 pt-1">
                             {/* 1. Nama Produk */}
                             <div className="lg:col-span-1">
-                              <label className="block text-[11px] font-semibold text-slate-300 mb-1">
-                                Nama Produk *
+                              <label className="block text-[11px] font-semibold text-[#666666] mb-1">
+                                Nama Produk
                               </label>
                               <div className="relative">
                                 <select
@@ -885,14 +833,14 @@ export function ServicesCatalog({ initialCategory = "Semua" }: ServicesCatalogPr
                                     <option key={prod} value={prod}>{prod}</option>
                                   ))}
                                 </select>
-                                <ChevronDown size={12} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+                                <ChevronDown size={12} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[#666666] pointer-events-none" />
                               </div>
                             </div>
 
                             {/* 2. Bandwidth */}
                             <div className="lg:col-span-1">
-                              <label className="block text-[11px] font-semibold text-slate-300 mb-1">
-                                Bandwidth *
+                              <label className="block text-[11px] font-semibold text-[#666666] mb-1">
+                                Bandwidth
                               </label>
                               <input
                                 type="text"
@@ -905,8 +853,8 @@ export function ServicesCatalog({ initialCategory = "Semua" }: ServicesCatalogPr
 
                             {/* 3. Lokasi */}
                             <div className="lg:col-span-1">
-                              <label className="block text-[11px] font-semibold text-slate-300 mb-1">
-                                Lokasi Titik *
+                              <label className="block text-[11px] font-semibold text-[#666666] mb-1">
+                                Lokasi Titik
                               </label>
                               <input
                                 type="text"
@@ -919,7 +867,7 @@ export function ServicesCatalog({ initialCategory = "Semua" }: ServicesCatalogPr
 
                             {/* 4. Quote */}
                             <div className="lg:col-span-1">
-                              <label className="block text-[11px] font-semibold text-slate-300 mb-1">
+                              <label className="block text-[11px] font-semibold text-[#666666] mb-1">
                                 Nomor Quote
                               </label>
                               <input
@@ -933,8 +881,8 @@ export function ServicesCatalog({ initialCategory = "Semua" }: ServicesCatalogPr
 
                             {/* 5. Nomor Order */}
                             <div className="lg:col-span-1">
-                              <label className="block text-[11px] font-semibold text-slate-300 mb-1">
-                                No. Order *
+                              <label className="block text-[11px] font-semibold text-[#666666] mb-1">
+                                No. Order
                               </label>
                               <input
                                 type="text"
@@ -947,21 +895,21 @@ export function ServicesCatalog({ initialCategory = "Semua" }: ServicesCatalogPr
 
                             {/* 6. SID & Tanggal Aktif */}
                             <div className="lg:col-span-1">
-                              <label className="block text-[11px] font-semibold text-slate-300 mb-1">
-                                SID *
+                              <label className="block text-[11px] font-semibold text-[#666666] mb-1">
+                                SID
                               </label>
                               <input
                                 type="text"
                                 value={row.sid}
                                 onChange={(e) => handleRowChange(idx, 'sid', e.target.value)}
                                 placeholder="1029384756"
-                                className="form-input text-xs font-mono text-emerald-400"
+                                className="form-input text-xs font-mono text-[#666666]"
                                 required
                               />
                             </div>
                             <div className="lg:col-span-1">
-                              <label className="block text-[11px] font-semibold text-slate-300 mb-1">
-                                Harga Layanan (Rp) *
+                              <label className="block text-[11px] font-semibold text-[#666666] mb-1">
+                                Harga Layanan (Rp)
                               </label>
                               <input
                                 type="number"
@@ -984,22 +932,22 @@ export function ServicesCatalog({ initialCategory = "Semua" }: ServicesCatalogPr
 
               {/* Status and Feedback Messages */}
               {pointsError && (
-                <div role="alert" className="p-3 rounded-xl bg-red-500/10 border border-red-500/30 text-xs text-red-300 flex items-center gap-2">
+                <div role="alert" className="p-3 rounded-xl bg-[#F3F3F1] border border-[#E5E5E5] text-xs text-[#666666] flex items-center gap-2">
                   <AlertCircle size={15} />
                   {pointsError}
                 </div>
               )}
               {saveSuccessMessage && (
-                <div role="status" className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-xs text-emerald-300 flex items-center gap-2">
+                <div role="status" className="p-3 rounded-xl bg-[#F3F3F1] border border-[#E5E5E5] text-xs text-[#666666] flex items-center gap-2">
                   <CheckCircle2 size={15} />
                   {saveSuccessMessage}
                 </div>
               )}
 
               {/* Save & Reset Actions */}
-              <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-slate-700/50">
-                <div className="text-xs text-slate-400">
-                  Total Baris Input: <strong className="text-white">{serviceRows.length} titik layanan</strong>
+              <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-[#E5E5E5]">
+                <div className="text-xs text-[#666666]">
+                  Total Baris Input: <strong className="text-[#1C1C1E]">{serviceRows.length} titik layanan</strong>
                 </div>
 
                 <div className="flex items-center gap-3">
@@ -1019,7 +967,7 @@ export function ServicesCatalog({ initialCategory = "Semua" }: ServicesCatalogPr
 
                   <button
                     type="submit"
-                    disabled={savingPoints || !selectedIdLOP}
+                    disabled={savingPoints || !selectedProject || selectedProject.idLOP !== selectedIdLOP.trim()}
                     className="btn-primary text-xs py-2 px-4 flex items-center gap-2 disabled:opacity-50"
                     id="btn-save-service-points"
                   >
@@ -1040,28 +988,28 @@ export function ServicesCatalog({ initialCategory = "Semua" }: ServicesCatalogPr
         <div className="space-y-6">
           <div className="grid grid-cols-3 gap-4">
             {[
-              { label: "Total Layanan Katalog", value: services.length, color: "text-blue-400" },
-              { label: "Layanan Aktif", value: services.filter(s => s.status === "Aktif").length, color: "text-emerald-400" },
-              { label: "Avg Harga/Bulan", value: formatIDR(services.length ? Math.round(services.reduce((a, s) => a + s.priceMonthly, 0) / services.length) : 0), color: "text-violet-400" }
+              { label: "Total Layanan Katalog", value: services.length, color: "text-[#666666]" },
+              { label: "Layanan Aktif", value: services.filter(s => s.status === "Aktif").length, color: "text-[#666666]" },
+              { label: "Avg Harga/Bulan", value: formatIDR(services.length ? Math.round(services.reduce((a, s) => a + s.priceMonthly, 0) / services.length) : 0), color: "text-[#666666]" }
             ].map(s => (
-              <div key={s.label} className="card-glass rounded-xl px-5 py-4"><p className="text-xs text-slate-500">{s.label}</p><p className={cn("text-xl font-bold mt-0.5", s.color)}>{s.value}</p></div>
+              <div key={s.label} className="bg-white border border-[#E5E5E5] rounded-xl px-5 py-4"><p className="text-xs text-[#666666]">{s.label}</p><p className={cn("text-xl font-bold mt-0.5", s.color)}>{s.value}</p></div>
             ))}
           </div>
 
           <div className="space-y-3">
             <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Cari layanan katalog..." className="form-input py-2" />
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto] items-end gap-3">
-              <label className="block text-xs font-semibold text-slate-400">
+              <label className="block text-xs font-semibold text-[#666666]">
                 Tipe Layanan
                 <span className="relative mt-1.5 block">
                   <select value={filterType} onChange={e => setFilterType(e.target.value)} className="form-input w-full appearance-none pr-8 text-sm font-normal">
                     <option value="Semua">Semua Tipe</option>
                     {SERVICE_TYPES.map(type => <option key={type} value={type}>{type}</option>)}
                   </select>
-                  <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+                  <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#666666] pointer-events-none" />
                 </span>
               </label>
-              <label className="block text-xs font-semibold text-slate-400">
+              <label className="block text-xs font-semibold text-[#666666]">
                 Kategori
                 <span className="relative mt-1.5 block">
                   <select value={filterCategory} onChange={e => setFilterCategory(e.target.value)} className="form-input w-full appearance-none pr-8 text-sm font-normal">
@@ -1071,7 +1019,7 @@ export function ServicesCatalog({ initialCategory = "Semua" }: ServicesCatalogPr
                       </option>
                     ))}
                   </select>
-                  <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+                  <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#666666] pointer-events-none" />
                 </span>
               </label>
               <button onClick={() => setModal({ open: true, mode: "add" })} className="btn-primary flex items-center justify-center gap-2" id="btn-add-service"><Plus size={15} />Tambah Layanan</button>
@@ -1080,9 +1028,9 @@ export function ServicesCatalog({ initialCategory = "Semua" }: ServicesCatalogPr
 
           {filteredCatalog.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-16 text-center">
-              <div className="w-16 h-16 rounded-2xl bg-slate-800 border border-slate-700 flex items-center justify-center mb-4"><Wifi size={28} className="text-slate-600" /></div>
-              <p className="text-sm font-semibold text-slate-400">Tidak ada layanan ditemukan</p>
-              <p className="text-xs text-slate-600 mt-1">Coba ubah filter atau tambah layanan baru</p>
+              <div className="w-16 h-16 rounded-2xl bg-[#FFFFFF] border border-[#E5E5E5] flex items-center justify-center mb-4"><Wifi size={28} className="text-[#666666]" /></div>
+              <p className="text-sm font-semibold text-[#666666]">Tidak ada layanan ditemukan</p>
+              <p className="text-xs text-[#666666] mt-1">Coba ubah filter atau tambah layanan baru</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -1095,16 +1043,16 @@ export function ServicesCatalog({ initialCategory = "Semua" }: ServicesCatalogPr
           {modal?.open && <ServiceModal mode={modal.mode} initial={modal.mode === "edit" && modal.editId ? getEditInitial(modal.editId) : blankForm()} onSave={handleSaveCatalog} onClose={() => setModal(null)} />}
           {deleteConfirm && (
             <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-              <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={() => setDeleteConfirm(null)} />
-              <div className="relative bg-slate-900 border border-slate-700 rounded-2xl p-6 max-w-sm w-full shadow-2xl">
+              <div className="absolute inset-0 bg-black/70 " onClick={() => setDeleteConfirm(null)} />
+              <div className="relative bg-[#F9F8F6] border border-[#E5E5E5] rounded-2xl p-6 max-w-sm w-full ">
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 rounded-xl bg-red-500/20 border border-red-500/30 flex items-center justify-center"><Trash2 size={18} className="text-red-400" /></div>
-                  <div><h4 className="text-sm font-bold text-white">Hapus Layanan</h4><p className="text-xs text-slate-400 mt-0.5">Aksi ini tidak bisa dibatalkan</p></div>
+                  <div className="w-10 h-10 rounded-xl bg-[#F3F3F1] border border-[#E5E5E5] flex items-center justify-center"><Trash2 size={18} className="text-[#666666]" /></div>
+                  <div><h4 className="text-sm font-bold text-[#1C1C1E]">Hapus Layanan</h4><p className="text-xs text-[#666666] mt-0.5">Aksi ini tidak bisa dibatalkan</p></div>
                 </div>
-                <p className="text-sm text-slate-300 mb-5">Apakah Anda yakin ingin menghapus layanan <strong className="text-white">{services.find(s => s.id === deleteConfirm)?.name}</strong>?</p>
+                <p className="text-sm text-[#666666] mb-5">Apakah Anda yakin ingin menghapus layanan <strong className="text-[#1C1C1E]">{services.find(s => s.id === deleteConfirm)?.name}</strong>?</p>
                 <div className="flex gap-3">
                   <button onClick={() => setDeleteConfirm(null)} className="btn-secondary flex-1">Batal</button>
-                  <button onClick={() => handleDeleteCatalog(deleteConfirm)} className="flex-1 px-4 py-2 rounded-xl bg-red-600 hover:bg-red-500 text-white text-sm font-semibold transition-colors">Hapus</button>
+                  <button onClick={() => handleDeleteCatalog(deleteConfirm)} className="flex-1 px-4 py-2 rounded-xl bg-black hover:bg-[#F3F3F1] text-[#1C1C1E] text-sm font-semibold transition-colors">Hapus</button>
                 </div>
               </div>
             </div>

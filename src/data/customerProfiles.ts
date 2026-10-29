@@ -73,19 +73,19 @@ export interface CustomerProfile {
 }
 
 const customerSeeds = [
-  { name: 'Provinsi Jawa Tengah', region: 'Semarang', subSegment: 'PROVINSI', pic: 'Bagas Wicaksono', employees: 12500, emailDomain: 'jatengprov.go.id', opd: 42, bodies: 9, asn: 12500, districts: 35, villages: 576, clinics: 370 },
-  { name: 'Pemkot Semarang', region: 'Semarang', subSegment: 'PEMKOT', pic: 'Agus Widodo', employees: 8900, emailDomain: 'semarangkota.go.id', opd: 38, bodies: 8, asn: 8900, districts: 16, villages: 177, clinics: 37 },
-  { name: 'Pemkab Demak', region: 'Demak', subSegment: 'PEMKAB', pic: 'Naufal Hidayat', employees: 3900, emailDomain: 'demakkab.go.id', opd: 31, bodies: 6, asn: 3900, districts: 14, villages: 243, clinics: 27 },
-  { name: 'Pemkab Kendal', region: 'Kendal', subSegment: 'PEMKAB', pic: 'Retno Wulandari', employees: 4100, emailDomain: 'kendalkab.go.id', opd: 33, bodies: 7, asn: 4100, districts: 20, villages: 286, clinics: 30 },
-  { name: 'Pemkot Salatiga', region: 'Salatiga', subSegment: 'PEMKOT', pic: 'Bambang Eko', employees: 2300, emailDomain: 'salatiga.go.id', opd: 29, bodies: 6, asn: 2300, districts: 4, villages: 23, clinics: 6 },
-  { name: 'Pemkab Semarang', region: 'Semarang', subSegment: 'PEMKAB', pic: 'Aditya Pranowo', employees: 4500, emailDomain: 'semarangkab.go.id', opd: 36, bodies: 8, asn: 4500, districts: 19, villages: 235, clinics: 26 },
-  { name: 'Pemkab Batang', region: 'Batang', subSegment: 'PEMKAB', pic: 'Nadia Kusumawardani', employees: 3200, emailDomain: 'batangkab.go.id', opd: 30, bodies: 6, asn: 3200, districts: 15, villages: 248, clinics: 21 },
-  { name: 'Pemkab Pekalongan', region: 'Pekalongan', subSegment: 'PEMKAB', pic: 'Rizal Mahendra', employees: 4200, emailDomain: 'pekalongankab.go.id', opd: 35, bodies: 7, asn: 4200, districts: 19, villages: 285, clinics: 27 },
-  { name: 'Pemkot Pekalongan', region: 'Pekalongan', subSegment: 'PEMKOT', pic: 'Intan Permatasari', employees: 2600, emailDomain: 'pekalongankota.go.id', opd: 30, bodies: 6, asn: 2600, districts: 4, villages: 27, clinics: 14 },
-  { name: 'Pemkab Pemalang', region: 'Pemalang', subSegment: 'PEMKAB', pic: 'Dimas Kurniawan', employees: 4400, emailDomain: 'pemalangkab.go.id', opd: 34, bodies: 7, asn: 4400, districts: 14, villages: 211, clinics: 25 },
-  { name: 'Pemkot Tegal', region: 'Tegal', subSegment: 'PEMKOT', pic: 'Citra Maharani', employees: 2500, emailDomain: 'tegalkota.go.id', opd: 29, bodies: 5, asn: 2500, districts: 4, villages: 27, clinics: 8 },
-  { name: 'Pemkab Tegal', region: 'Tegal', subSegment: 'PEMKAB', pic: 'Fikri Ramadhan', employees: 4300, emailDomain: 'tegalkab.go.id', opd: 33, bodies: 7, asn: 4300, districts: 18, villages: 281, clinics: 29 },
-  { name: 'Pemkab Brebes', region: 'Brebes', subSegment: 'PEMKAB', pic: 'Laras Puspitasari', employees: 4800, emailDomain: 'brebeskab.go.id', opd: 35, bodies: 7, asn: 4800, districts: 17, villages: 297, clinics: 38 },
+  { name: 'Provinsi Jawa Tengah', region: 'Semarang', subSegment: 'PROVINSI', employees: 12500, emailDomain: 'jatengprov.go.id', opd: 42, bodies: 9, asn: 12500, districts: 35, villages: 576, clinics: 370 },
+  { name: 'Pemkot Semarang', region: 'Semarang', subSegment: 'PEMKOT', employees: 8900, emailDomain: 'semarangkota.go.id', opd: 38, bodies: 8, asn: 8900, districts: 16, villages: 177, clinics: 37 },
+  { name: 'Pemkab Demak', region: 'Demak', subSegment: 'PEMKAB', employees: 3900, emailDomain: 'demakkab.go.id', opd: 31, bodies: 6, asn: 3900, districts: 14, villages: 243, clinics: 27 },
+  { name: 'Pemkab Kendal', region: 'Kendal', subSegment: 'PEMKAB', employees: 4100, emailDomain: 'kendalkab.go.id', opd: 33, bodies: 7, asn: 4100, districts: 20, villages: 286, clinics: 30 },
+  { name: 'Pemkot Salatiga', region: 'Salatiga', subSegment: 'PEMKOT', employees: 2300, emailDomain: 'salatiga.go.id', opd: 29, bodies: 6, asn: 2300, districts: 4, villages: 23, clinics: 6 },
+  { name: 'Pemkab Semarang', region: 'Semarang', subSegment: 'PEMKAB', employees: 4500, emailDomain: 'semarangkab.go.id', opd: 36, bodies: 8, asn: 4500, districts: 19, villages: 235, clinics: 26 },
+  { name: 'Pemkab Batang', region: 'Batang', subSegment: 'PEMKAB', employees: 3200, emailDomain: 'batangkab.go.id', opd: 30, bodies: 6, asn: 3200, districts: 15, villages: 248, clinics: 21 },
+  { name: 'Pemkab Pekalongan', region: 'Pekalongan', subSegment: 'PEMKAB', employees: 4200, emailDomain: 'pekalongankab.go.id', opd: 35, bodies: 7, asn: 4200, districts: 19, villages: 285, clinics: 27 },
+  { name: 'Pemkot Pekalongan', region: 'Pekalongan', subSegment: 'PEMKOT', employees: 2600, emailDomain: 'pekalongankota.go.id', opd: 30, bodies: 6, asn: 2600, districts: 4, villages: 27, clinics: 14 },
+  { name: 'Pemkab Pemalang', region: 'Pemalang', subSegment: 'PEMKAB', employees: 4400, emailDomain: 'pemalangkab.go.id', opd: 34, bodies: 7, asn: 4400, districts: 14, villages: 211, clinics: 25 },
+  { name: 'Pemkot Tegal', region: 'Tegal', subSegment: 'PEMKOT', employees: 2500, emailDomain: 'tegalkota.go.id', opd: 29, bodies: 5, asn: 2500, districts: 4, villages: 27, clinics: 8 },
+  { name: 'Pemkab Tegal', region: 'Tegal', subSegment: 'PEMKAB', employees: 4300, emailDomain: 'tegalkab.go.id', opd: 33, bodies: 7, asn: 4300, districts: 18, villages: 281, clinics: 29 },
+  { name: 'Pemkab Brebes', region: 'Brebes', subSegment: 'PEMKAB', employees: 4800, emailDomain: 'brebeskab.go.id', opd: 35, bodies: 7, asn: 4800, districts: 17, villages: 297, clinics: 38 },
 ] as const
 
 const serviceNames = ['ASTINet Dedicated', 'Wifi Managed Service', 'VPN IP MPLS', 'Metro Ethernet']
@@ -105,7 +105,6 @@ const sectionCategories = [
 
 export const CUSTOMER_PROFILES: CustomerProfile[] = customerSeeds.map((seed, index) => {
   const suffix = String(index + 1).padStart(3, '0')
-  const contactName = ['Siti Rahmawati', 'Budi Santoso', 'Dewi Anggraini'][index % 3]
   return {
     id: `CUST-JT-${suffix}`,
     name: seed.name,
@@ -129,7 +128,7 @@ export const CUSTOMER_PROFILES: CustomerProfile[] = customerSeeds.map((seed, ind
         { label: 'Desa / Kelurahan', count: seed.villages },
         { label: 'Puskesmas', count: seed.clinics },
       ],
-    pic: { name: seed.pic, role: 'PIC Pelanggan', phone: `0812-1000-${suffix}`, email: `pic@${seed.emailDomain}` },
+    pic: { name: '', role: 'PIC Pelanggan', phone: '', email: '' },
     accountManager: { name: ['Dina Kartika', 'Andi Pratama', 'Rina Kusuma'][index % 3], role: 'Account Manager', phone: '0812-9000-0101', email: 'account.manager@telkom.co.id' },
     engineer: { name: ['Fajar Nugroho', 'Yoga Prasetya', 'Maya Lestari'][index % 3], role: 'Engineer On Site', phone: '0812-9000-0202', email: 'engineer@telkom.co.id' },
     vision: seed.name === 'Pemkot Semarang'
@@ -153,8 +152,8 @@ export const CUSTOMER_PROFILES: CustomerProfile[] = customerSeeds.map((seed, ind
       'RPJMD 2025–2029 disebut sebagai fondasi menuju “Visi Kota Metropolitan yang Layak Huni, Maju, dan Berkelanjutan di Tahun 2045.”',
     ],
     contacts: [
-      { name: seed.pic, role: 'Pelanggan', position: 'Kepala Bidang TIK', phone: `0812-1000-${suffix}` },
-      { name: contactName, role: 'Pelanggan', position: 'Pranata Komputer Ahli', phone: `0813-2000-${suffix}` },
+      { name: '', role: 'Pelanggan', position: 'Kepala Bidang TIK', phone: '' },
+      { name: '', role: 'Pelanggan', position: 'Pranata Komputer Ahli', phone: '' },
       { name: 'Account Manager Telkom', role: 'Telkom', position: 'Account Manager', phone: '0812-9000-0101' },
     ],
     ivca: sectionCategories.map((category, categoryIndex) => ({

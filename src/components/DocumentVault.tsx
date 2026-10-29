@@ -358,51 +358,51 @@ export function DocumentVault() {
   return (
     <div className="card space-y-6">
       {/* ─── Vault Header & Score ─── */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-slate-800">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-[#E5E5E5]">
         <div className="flex items-center gap-3">
-          <div className="p-3 rounded-xl bg-gradient-to-br from-red-500/20 to-red-600/10 border border-red-500/30 shadow-lg shadow-red-950/40">
-            <Shield size={22} className="text-red-400" />
+          <div className="p-3 rounded-xl    border border-[#E5E5E5]  ">
+            <Shield size={22} className="text-[#666666]" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h3 className="text-base font-bold text-white">Audit-Ready Document Vault</h3>
-              <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20">
+              <h3 className="text-base font-bold text-[#1C1C1E]">Audit-Ready Document Vault</h3>
+              <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-[#F3F3F1] text-[#666666] border border-[#E5E5E5]">
                 P0/P1 Repository
               </span>
             </div>
-            <p className="text-xs text-slate-400 mt-0.5">
+            <p className="text-xs text-[#666666] mt-0.5">
               Repositori dokumen mandatori untuk kepatuhan audit BPK, verifikasi legal, dan tata kelola kontrak Telkom B2G.
             </p>
           </div>
         </div>
 
         {/* Compliance Meter */}
-        <div className="flex items-center gap-4 bg-slate-900/80 border border-slate-800 px-4 py-2.5 rounded-xl self-start sm:self-auto">
+        <div className="flex items-center gap-4 bg-[#F9F8F6] border border-[#E5E5E5] px-4 py-2.5 rounded-xl self-start sm:self-auto">
           <div>
             <div className="flex items-center justify-between text-xs mb-1">
-              <span className="text-slate-400">Status Kepatuhan:</span>
+              <span className="text-[#666666]">Status Kepatuhan:</span>
               <span
                 className={cn(
                   'font-bold ml-2',
                   compliancePercent >= 75
-                    ? 'text-emerald-400'
+                    ? 'text-[#666666]'
                     : compliancePercent >= 50
-                    ? 'text-amber-400'
-                    : 'text-red-400'
+                    ? 'text-[#666666]'
+                    : 'text-[#666666]'
                 )}
               >
                 {compliancePercent}% ({uploadedMandatoryCount}/{totalMandatory} Slot)
               </span>
             </div>
-            <div className="w-36 h-2 bg-slate-800 rounded-full overflow-hidden border border-slate-700/50">
+            <div className="w-36 h-2 bg-[#FFFFFF] rounded-full overflow-hidden border border-[#E5E5E5]">
               <div
                 className={cn(
                   'h-full transition-all duration-500 rounded-full',
                   compliancePercent >= 75
-                    ? 'bg-emerald-500'
+                    ? 'bg-[#F3F3F1]'
                     : compliancePercent >= 50
-                    ? 'bg-amber-500'
-                    : 'bg-red-500'
+                    ? 'bg-[#F3F3F1]'
+                    : 'bg-[#F3F3F1]'
                 )}
                 style={{ width: `${compliancePercent}%` }}
               />
@@ -412,21 +412,21 @@ export function DocumentVault() {
       </div>
 
       {/* ─── BPK Compliance Banner ─── */}
-      <div className="flex items-start gap-3 p-3.5 rounded-xl bg-red-500/10 border border-red-500/20 text-xs">
-        <AlertCircle size={16} className="text-red-400 flex-shrink-0 mt-0.5" />
-        <div className="text-slate-300 leading-relaxed">
-          <strong className="text-red-400">Kepatuhan Berkas Tender & Legal:</strong> Dokumen bertanda{' '}
-          <span className="text-red-400 font-bold">*</span> wajib diunggah sebelum proses penagihan termin (ToP) atau audit BPK.
-          Klik tombol <strong className="text-blue-400">Lihat (Preview)</strong> pada tiap berkas untuk memeriksa isi dokumen langsung di layar.
+      <div className="flex items-start gap-3 p-3.5 rounded-xl bg-[#F3F3F1] border border-[#E5E5E5] text-xs">
+        <AlertCircle size={16} className="text-[#666666] flex-shrink-0 mt-0.5" />
+        <div className="text-[#666666] leading-relaxed">
+          <strong className="text-[#666666]">Kepatuhan Berkas Tender & Legal:</strong> Dokumen bertanda{' '}
+          <span className="text-[#666666] font-bold">*</span> wajib diunggah sebelum proses penagihan termin (ToP) atau audit BPK.
+          Klik tombol <strong className="text-[#666666]">Lihat (Preview)</strong> pada tiap berkas untuk memeriksa isi dokumen langsung di layar.
         </div>
       </div>
 
       {/* ─── 4 Mandatory Slots Grid ─── */}
       <div>
         <div className="flex items-center justify-between mb-3">
-          <h4 className="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-2">
+          <h4 className="text-xs font-bold text-[#666666] uppercase tracking-wider flex items-center gap-2">
             <span>Dokumen Mandatori Proyek</span>
-            <span className="text-[11px] font-normal text-slate-500">
+            <span className="text-[11px] font-normal text-[#666666]">
               ({uploadedMandatoryCount} dari {DOC_SLOTS.length} terunggah)
             </span>
           </h4>
@@ -450,19 +450,19 @@ export function DocumentVault() {
       </div>
 
       {/* ─── Additional Documents Section ─── */}
-      <div className="pt-4 border-t border-slate-800">
+      <div className="pt-4 border-t border-[#E5E5E5]">
         <div className="flex items-center justify-between mb-3.5">
           <div>
-            <h4 className="text-xs font-bold text-slate-300 uppercase tracking-wider">
+            <h4 className="text-xs font-bold text-[#666666] uppercase tracking-wider">
               Dokumen Pendukung & Legalitas Lainnya
             </h4>
-            <p className="text-[11px] text-slate-500 mt-0.5">
+            <p className="text-[11px] text-[#666666] mt-0.5">
               SPK, Surat Penawaran, BAST Mitra, Nota Dinas, atau Perjanjian Kerja Sama Induk
             </p>
           </div>
           <button
             onClick={() => setShowAddModal(true)}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold shadow-md shadow-blue-900/30 transition-all cursor-pointer"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-black hover:bg-[#F3F3F1] text-[#1C1C1E] text-xs font-semibold   transition-all cursor-pointer"
           >
             <FilePlus size={14} />
             <span>Upload Dokumen Baru</span>
@@ -473,21 +473,21 @@ export function DocumentVault() {
           {supportingDocs.map((doc) => (
             <div
               key={doc.id}
-              className="flex items-center justify-between p-3 rounded-xl bg-slate-900/80 border border-slate-800 hover:border-slate-700 transition-all group"
+              className="flex items-center justify-between p-3 rounded-xl bg-[#F9F8F6] border border-[#E5E5E5] hover:border-[#E5E5E5] transition-all group"
             >
               <div
                 onClick={() => setPreviewDoc(doc)}
                 className="flex items-center gap-3 min-w-0 cursor-pointer flex-1 mr-2"
                 title="Klik untuk melihat dokumen"
               >
-                <div className="p-2.5 rounded-lg bg-slate-800 text-blue-400 group-hover:bg-blue-500/10 group-hover:text-blue-300 transition-colors flex-shrink-0">
+                <div className="p-2.5 rounded-lg bg-[#FFFFFF] text-[#666666] group-hover:bg-[#F3F3F1] group-hover:text-[#666666] transition-colors flex-shrink-0">
                   <FileText size={18} />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="text-xs font-semibold text-white truncate group-hover:text-blue-400 transition-colors">
+                  <p className="text-xs font-semibold text-[#1C1C1E] truncate group-hover:text-[#666666] transition-colors">
                     {doc.name}
                   </p>
-                  <div className="flex items-center gap-2 mt-0.5 text-[10px] text-slate-400">
+                  <div className="flex items-center gap-2 mt-0.5 text-[10px] text-[#666666]">
                     <span>{formatFileSize(doc.size)}</span>
                     <span>•</span>
                     <span className="truncate">{doc.instansi || 'B2G'}</span>
@@ -499,14 +499,14 @@ export function DocumentVault() {
                 <button
                   onClick={() => setPreviewDoc(doc)}
                   title="Lihat Pratinjau Dokumen"
-                  className="p-1.5 rounded-lg text-slate-400 hover:text-blue-400 hover:bg-blue-500/10 transition-colors"
+                  className="p-1.5 rounded-lg text-[#666666] hover:text-[#666666] hover:bg-[#F3F3F1] transition-colors"
                 >
                   <Eye size={14} />
                 </button>
                 <button
                   onClick={() => handleDeleteSupportingDoc(doc.id)}
                   title="Hapus Dokumen"
-                  className="p-1.5 rounded-lg text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition-colors"
+                  className="p-1.5 rounded-lg text-[#666666] hover:text-[#666666] hover:bg-[#F3F3F1] transition-colors"
                 >
                   <Trash2 size={13} />
                 </button>
@@ -526,18 +526,18 @@ export function DocumentVault() {
 
       {/* ─── MODAL 2: UPLOAD SUPPORTING DOC MODAL ─── */}
       {showAddModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-lg p-6 shadow-2xl relative">
-            <div className="flex items-center justify-between pb-4 mb-4 border-b border-slate-800">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70  animate-in fade-in duration-200">
+          <div className="bg-[#F9F8F6] border border-[#E5E5E5] rounded-2xl w-full max-w-lg p-6  relative">
+            <div className="flex items-center justify-between pb-4 mb-4 border-b border-[#E5E5E5]">
               <div className="flex items-center gap-2.5">
-                <div className="p-2 rounded-lg bg-blue-500/10 text-blue-400">
+                <div className="p-2 rounded-lg bg-[#F3F3F1] text-[#666666]">
                   <FilePlus size={18} />
                 </div>
-                <h3 className="text-base font-bold text-white">Upload Dokumen Pendukung</h3>
+                <h3 className="text-base font-bold text-[#1C1C1E]">Upload Dokumen Pendukung</h3>
               </div>
               <button
                 onClick={() => setShowAddModal(false)}
-                className="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition-colors"
+                className="text-[#666666] hover:text-[#1C1C1E] p-1 rounded-lg hover:bg-[#FFFFFF] transition-colors"
               >
                 <X size={18} />
               </button>
@@ -545,37 +545,37 @@ export function DocumentVault() {
 
             <form onSubmit={handleSaveSupportingDoc} className="space-y-4 text-xs">
               <div>
-                <label className="block text-slate-300 font-medium mb-1.5">File Dokumen</label>
+                <label className="block text-[#666666] font-medium mb-1.5">File Dokumen</label>
                 <input
                   type="file"
                   onChange={(e) => setSelectedAddFile(e.target.files?.[0] || null)}
-                  className="w-full text-slate-300 file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-500 file:cursor-pointer p-2 rounded-xl bg-slate-950 border border-slate-800"
+                  className="w-full text-[#666666] file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-black file:text-[#1C1C1E] hover:file:bg-[#F3F3F1] file:cursor-pointer p-2 rounded-xl bg-[#F9F8F6] border border-[#E5E5E5]"
                 />
                 {selectedAddFile && (
-                  <p className="text-[11px] text-emerald-400 mt-1 flex items-center gap-1">
+                  <p className="text-[11px] text-[#666666] mt-1 flex items-center gap-1">
                     <Check size={12} /> Terpilih: {selectedAddFile.name} ({formatFileSize(selectedAddFile.size)})
                   </p>
                 )}
               </div>
 
               <div>
-                <label className="block text-slate-300 font-medium mb-1.5">Judul Dokumen / Nama Berkas</label>
+                <label className="block text-[#666666] font-medium mb-1.5">Judul Dokumen / Nama Berkas</label>
                 <input
                   type="text"
                   placeholder="Contoh: Surat Perjanjian Kerja SPK Diskominfo 2024"
                   value={addForm.name}
                   onChange={(e) => setAddForm({ ...addForm, name: e.target.value })}
-                  className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
+                  className="w-full px-3 py-2 bg-[#F9F8F6] border border-[#E5E5E5] rounded-xl text-[#1C1C1E] placeholder:text-[#666666] focus:outline-none focus:border-[#E5E5E5]"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-slate-300 font-medium mb-1.5">Instansi Terkait</label>
+                  <label className="block text-[#666666] font-medium mb-1.5">Instansi Terkait</label>
                   <select
                     value={addForm.instansi}
                     onChange={(e) => setAddForm({ ...addForm, instansi: e.target.value })}
-                    className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-white focus:outline-none focus:border-blue-500"
+                    className="w-full px-3 py-2 bg-[#F9F8F6] border border-[#E5E5E5] rounded-xl text-[#1C1C1E] focus:outline-none focus:border-[#E5E5E5]"
                   >
                     <option value="Pemkot Semarang">Pemkot Semarang</option>
                     <option value="Pemkab Kendal">Pemkab Kendal</option>
@@ -593,39 +593,39 @@ export function DocumentVault() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-slate-300 font-medium mb-1.5">Nomor Surat / Berkas</label>
+                  <label className="block text-[#666666] font-medium mb-1.5">Nomor Surat / Berkas</label>
                   <input
                     type="text"
                     placeholder="Contoh: 027/SPK/DISKOM/2024"
                     value={addForm.nomorSurat}
                     onChange={(e) => setAddForm({ ...addForm, nomorSurat: e.target.value })}
-                    className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
+                    className="w-full px-3 py-2 bg-[#F9F8F6] border border-[#E5E5E5] rounded-xl text-[#1C1C1E] placeholder:text-[#666666] focus:outline-none focus:border-[#E5E5E5]"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-slate-300 font-medium mb-1.5">Deskripsi Singkat</label>
+                <label className="block text-[#666666] font-medium mb-1.5">Deskripsi Singkat</label>
                 <textarea
                   rows={2}
                   placeholder="Keterangan isi berkas atau tujuan upload..."
                   value={addForm.deskripsi}
                   onChange={(e) => setAddForm({ ...addForm, deskripsi: e.target.value })}
-                  className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 resize-none"
+                  className="w-full px-3 py-2 bg-[#F9F8F6] border border-[#E5E5E5] rounded-xl text-[#1C1C1E] placeholder:text-[#666666] focus:outline-none focus:border-[#E5E5E5] resize-none"
                 />
               </div>
 
-              <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-800">
+              <div className="flex items-center justify-end gap-2 pt-3 border-t border-[#E5E5E5]">
                 <button
                   type="button"
                   onClick={() => setShowAddModal(false)}
-                  className="px-4 py-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+                  className="px-4 py-2 rounded-xl text-[#666666] hover:text-[#1C1C1E] hover:bg-[#FFFFFF] transition-colors"
                 >
                   Batal
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold transition-all shadow-md shadow-blue-900/30"
+                  className="px-4 py-2 rounded-xl bg-black hover:bg-[#F3F3F1] text-[#1C1C1E] font-semibold transition-all  "
                 >
                   Simpan & Upload
                 </button>
@@ -670,32 +670,32 @@ function SlotCard({ slot, uploadedDoc, onUpload, onRemove, onPreview }: SlotCard
   const isMissing = !isUploaded && slot.isMandatory
 
   return (
-    <div className="space-y-2 p-4 rounded-xl bg-slate-900/60 border border-slate-800/80 hover:border-slate-700/80 transition-all">
+    <div className="space-y-2 p-4 rounded-xl bg-[#F9F8F6] border border-[#E5E5E5] hover:border-[#E5E5E5] transition-all">
       {/* Slot Header */}
       <div className="flex items-start justify-between">
         <div>
           <div className="flex items-center gap-1.5">
-            <h4 className="text-sm font-bold text-white">{slot.label}</h4>
+            <h4 className="text-sm font-bold text-[#1C1C1E]">{slot.label}</h4>
             {slot.isMandatory && (
-              <span className="text-red-400 text-sm font-bold" title="Wajib Audit BPK">
+              <span className="text-[#666666] text-sm font-bold" title="Wajib Audit BPK">
                 *
               </span>
             )}
             {isMissing ? (
-              <span className="badge text-[10px] bg-red-500/10 text-red-400 border border-red-500/30">
+              <span className="badge text-[10px] bg-[#F3F3F1] text-[#666666] border border-[#E5E5E5]">
                 <AlertCircle size={10} className="mr-1" />
                 MISSING
               </span>
             ) : (
-              <span className="badge text-[10px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
+              <span className="badge text-[10px] bg-[#F3F3F1] text-[#666666] border border-[#E5E5E5]">
                 <CheckCircle2 size={10} className="mr-1" />
                 Uploaded
               </span>
             )}
           </div>
-          <p className="text-xs text-slate-400 mt-0.5">{slot.helperText}</p>
+          <p className="text-xs text-[#666666] mt-0.5">{slot.helperText}</p>
           {slot.mandatoryNote && (
-            <p className="text-[11px] text-amber-400/90 mt-1 flex items-center gap-1">
+            <p className="text-[11px] text-[#666666] mt-1 flex items-center gap-1">
               <AlertCircle size={11} className="flex-shrink-0" />
               {slot.mandatoryNote}
             </p>
@@ -704,7 +704,7 @@ function SlotCard({ slot, uploadedDoc, onUpload, onRemove, onPreview }: SlotCard
         {isUploaded && (
           <button
             onClick={onRemove}
-            className="p-1.5 rounded-lg text-slate-500 hover:text-red-400 hover:bg-red-500/10 transition-all cursor-pointer"
+            className="p-1.5 rounded-lg text-[#666666] hover:text-[#666666] hover:bg-[#F3F3F1] transition-all cursor-pointer"
             title="Hapus / ganti dokumen"
           >
             <Trash2 size={14} />
@@ -724,20 +724,20 @@ function SlotCard({ slot, uploadedDoc, onUpload, onRemove, onPreview }: SlotCard
 
       {/* Uploaded State vs Dropzone */}
       {isUploaded && uploadedDoc ? (
-        <div className="p-3 rounded-xl bg-slate-800/60 border border-slate-700/60 flex items-center justify-between gap-3">
+        <div className="p-3 rounded-xl bg-[#FFFFFF] border border-[#E5E5E5] flex items-center justify-between gap-3">
           <div
             onClick={onPreview}
             className="flex items-center gap-3 min-w-0 cursor-pointer flex-1"
             title="Klik untuk membuka dokumen"
           >
-            <div className="p-2.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex-shrink-0">
+            <div className="p-2.5 rounded-lg bg-[#F3F3F1] border border-[#E5E5E5] text-[#666666] flex-shrink-0">
               <FileCheck size={18} />
             </div>
             <div className="min-w-0 flex-1">
-              <p className="text-xs font-semibold text-white truncate hover:text-blue-400 transition-colors">
+              <p className="text-xs font-semibold text-[#1C1C1E] truncate hover:text-[#666666] transition-colors">
                 {uploadedDoc.name}
               </p>
-              <div className="flex items-center gap-2 mt-0.5 text-[11px] text-slate-400">
+              <div className="flex items-center gap-2 mt-0.5 text-[11px] text-[#666666]">
                 <span>{formatFileSize(uploadedDoc.size)}</span>
                 <span>•</span>
                 <span className="flex items-center gap-1">
@@ -751,7 +751,7 @@ function SlotCard({ slot, uploadedDoc, onUpload, onRemove, onPreview }: SlotCard
           <div className="flex items-center gap-1.5 flex-shrink-0">
             <button
               onClick={onPreview}
-              className="px-2.5 py-1.5 rounded-lg bg-blue-600/20 hover:bg-blue-600 text-blue-300 hover:text-white border border-blue-500/30 text-xs font-medium flex items-center gap-1.5 transition-all cursor-pointer"
+              className="px-2.5 py-1.5 rounded-lg bg-[#F3F3F1] hover:bg-black text-[#666666] hover:text-[#1C1C1E] border border-[#E5E5E5] text-xs font-medium flex items-center gap-1.5 transition-all cursor-pointer"
               title="Lihat Pratinjau Dokumen"
             >
               <Eye size={13} />
@@ -771,17 +771,17 @@ function SlotCard({ slot, uploadedDoc, onUpload, onRemove, onPreview }: SlotCard
           className={cn(
             'block p-4 rounded-xl border border-dashed text-center cursor-pointer transition-all',
             isDragOver
-              ? 'border-blue-400 bg-blue-500/10'
+              ? 'border-[#E5E5E5] bg-[#F3F3F1]'
               : isMissing
-              ? 'border-red-500/30 bg-red-500/5 hover:border-red-500/50'
-              : 'border-slate-700 bg-slate-900/40 hover:border-slate-600 hover:bg-slate-800/40'
+              ? 'border-[#E5E5E5] bg-[#F3F3F1] hover:border-[#E5E5E5]'
+              : 'border-[#E5E5E5] bg-[#F9F8F6] hover:border-[#E5E5E5] hover:bg-[#FFFFFF]'
           )}
         >
           <div className="flex flex-col items-center gap-1.5">
             <div
               className={cn(
                 'p-2 rounded-lg',
-                isMissing ? 'bg-red-500/10 text-red-400' : 'bg-slate-800 text-slate-400'
+                isMissing ? 'bg-[#F3F3F1] text-[#666666]' : 'bg-[#FFFFFF] text-[#666666]'
               )}
             >
               <Upload size={16} />
@@ -790,12 +790,12 @@ function SlotCard({ slot, uploadedDoc, onUpload, onRemove, onPreview }: SlotCard
               <p
                 className={cn(
                   'text-xs font-semibold',
-                  isMissing ? 'text-red-400' : 'text-slate-300'
+                  isMissing ? 'text-[#666666]' : 'text-[#666666]'
                 )}
               >
                 {isDragOver ? 'Lepas file di sini' : 'Klik atau seret file ke sini'}
               </p>
-              <p className="text-[10px] text-slate-500 mt-0.5">
+              <p className="text-[10px] text-[#666666] mt-0.5">
                 {slot.acceptedTypes.replace(/\./g, '').replace(/,/g, ', ').toUpperCase()} · Maks 25 MB
               </p>
             </div>
@@ -856,28 +856,28 @@ function DocumentPreviewModal({ doc, onClose }: DocumentPreviewModalProps) {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/80 backdrop-blur-md animate-in fade-in duration-200">
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-4xl max-h-[92vh] flex flex-col shadow-2xl overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/80  animate-in fade-in duration-200">
+      <div className="bg-[#F9F8F6] border border-[#E5E5E5] rounded-2xl w-full max-w-4xl max-h-[92vh] flex flex-col  overflow-hidden">
         
         {/* Modal Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-800 bg-slate-950/70">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-[#E5E5E5] bg-[#F9F8F6]">
           <div className="flex items-center gap-3 min-w-0">
-            <div className="p-2.5 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-400 flex-shrink-0">
+            <div className="p-2.5 rounded-xl bg-[#F3F3F1] border border-[#E5E5E5] text-[#666666] flex-shrink-0">
               {isImage ? <ImageIcon size={20} /> : <FileText size={20} />}
             </div>
             <div className="min-w-0">
               <div className="flex items-center gap-2">
-                <h3 className="text-sm sm:text-base font-bold text-white truncate">{doc.name}</h3>
-                <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex-shrink-0">
+                <h3 className="text-sm sm:text-base font-bold text-[#1C1C1E] truncate">{doc.name}</h3>
+                <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded bg-[#F3F3F1] text-[#666666] border border-[#E5E5E5] flex-shrink-0">
                   {doc.status === 'verified' ? 'Terverifikasi' : 'Terunggah'}
                 </span>
               </div>
-              <p className="text-xs text-slate-400 mt-0.5 flex items-center gap-2">
+              <p className="text-xs text-[#666666] mt-0.5 flex items-center gap-2">
                 <span>{formatFileSize(doc.size)}</span>
                 <span>•</span>
                 <span>Diupload: {doc.uploadedAt}</span>
                 <span>•</span>
-                <span className="text-slate-300 font-medium">{doc.uploadedBy}</span>
+                <span className="text-[#666666] font-medium">{doc.uploadedBy}</span>
               </p>
             </div>
           </div>
@@ -886,7 +886,7 @@ function DocumentPreviewModal({ doc, onClose }: DocumentPreviewModalProps) {
             {contentUrl && (
               <button
                 onClick={handleOpenNewTab}
-                className="p-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors hidden sm:flex"
+                className="p-2 rounded-lg text-[#666666] hover:text-[#1C1C1E] hover:bg-[#FFFFFF] transition-colors hidden sm:flex"
                 title="Buka di Tab Baru"
               >
                 <ExternalLink size={16} />
@@ -894,14 +894,14 @@ function DocumentPreviewModal({ doc, onClose }: DocumentPreviewModalProps) {
             )}
             <button
               onClick={handleDownload}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-white text-xs font-medium border border-slate-700 transition-all cursor-pointer"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#FFFFFF] hover:bg-[#F3F3F1] text-[#1C1C1E] text-xs font-medium border border-[#E5E5E5] transition-all cursor-pointer"
             >
               <Download size={14} />
               <span className="hidden sm:inline">Download</span>
             </button>
             <button
               onClick={onClose}
-              className="p-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors ml-1 cursor-pointer"
+              className="p-2 rounded-lg text-[#666666] hover:text-[#1C1C1E] hover:bg-[#FFFFFF] transition-colors ml-1 cursor-pointer"
               title="Tutup"
             >
               <X size={18} />
@@ -910,27 +910,27 @@ function DocumentPreviewModal({ doc, onClose }: DocumentPreviewModalProps) {
         </div>
 
         {/* Modal Body: Document Preview Content */}
-        <div className="flex-1 overflow-y-auto p-6 bg-slate-950/40 space-y-5">
+        <div className="flex-1 overflow-y-auto p-6 bg-[#F9F8F6] space-y-5">
           
           {/* Metadata Infobar */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 p-3.5 rounded-xl bg-slate-900 border border-slate-800 text-xs">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 p-3.5 rounded-xl bg-[#F9F8F6] border border-[#E5E5E5] text-xs">
             <div>
-              <p className="text-slate-500 text-[11px]">Nomor Berkas / Surat</p>
-              <p className="text-slate-200 font-semibold mt-0.5 truncate">{doc.nomorSurat || 'TEL.440/B2G/2024'}</p>
+              <p className="text-[#666666] text-[11px]">Nomor Berkas / Surat</p>
+              <p className="text-[#666666] font-semibold mt-0.5 truncate">{doc.nomorSurat || 'TEL.440/B2G/2024'}</p>
             </div>
             <div>
-              <p className="text-slate-500 text-[11px]">Instansi Terkait</p>
-              <p className="text-slate-200 font-semibold mt-0.5 truncate">{doc.instansi || 'Pemerintah Kota Semarang'}</p>
+              <p className="text-[#666666] text-[11px]">Instansi Terkait</p>
+              <p className="text-[#666666] font-semibold mt-0.5 truncate">{doc.instansi || 'Pemerintah Kota Semarang'}</p>
             </div>
             <div>
-              <p className="text-slate-500 text-[11px]">Kategori Berkas</p>
-              <p className="text-slate-200 font-semibold mt-0.5">
+              <p className="text-[#666666] text-[11px]">Kategori Berkas</p>
+              <p className="text-[#666666] font-semibold mt-0.5">
                 {doc.isMandatory ? 'Mandatori (Audit BPK)' : 'Dokumen Pendukung'}
               </p>
             </div>
             <div>
-              <p className="text-slate-500 text-[11px]">Status Legalitas</p>
-              <p className="text-emerald-400 font-semibold mt-0.5 flex items-center gap-1">
+              <p className="text-[#666666] text-[11px]">Status Legalitas</p>
+              <p className="text-[#666666] font-semibold mt-0.5 flex items-center gap-1">
                 <CheckCircle2 size={12} />
                 Sah & Terdaftar
               </p>
@@ -938,13 +938,13 @@ function DocumentPreviewModal({ doc, onClose }: DocumentPreviewModalProps) {
           </div>
 
           {/* Actual File Preview Area */}
-          <div className="rounded-xl border border-slate-800 bg-slate-900 overflow-hidden flex flex-col items-center justify-center min-h-[380px]">
+          <div className="rounded-xl border border-[#E5E5E5] bg-[#F9F8F6] overflow-hidden flex flex-col items-center justify-center min-h-[380px]">
             {isImage && contentUrl ? (
               <div className="p-4 flex items-center justify-center w-full">
                 <img
                   src={contentUrl}
                   alt={doc.name}
-                  className="max-h-[500px] w-auto max-w-full rounded-lg object-contain shadow-lg"
+                  className="max-h-[500px] w-auto max-w-full rounded-lg object-contain "
                 />
               </div>
             ) : isPdf && contentUrl ? (
@@ -955,40 +955,40 @@ function DocumentPreviewModal({ doc, onClose }: DocumentPreviewModalProps) {
               />
             ) : (
               /* Rich Telkom Digital Document Sheet View (for demo & office docs) */
-              <div className="w-full max-w-2xl bg-white text-slate-800 p-8 rounded-lg shadow-xl my-4 text-xs font-sans relative select-text border border-slate-300">
+              <div className="w-full max-w-2xl bg-white text-[#1C1C1E] p-8 rounded-lg  my-4 text-xs font-sans relative select-text border border-[#E5E5E5]">
                 {/* Official Telkom Kop Surat */}
-                <div className="flex items-start justify-between pb-4 border-b-2 border-red-600 mb-6">
+                <div className="flex items-start justify-between pb-4 border-b-2 border-[#E5E5E5] mb-6">
                   <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-xl bg-red-600 flex items-center justify-center text-white font-extrabold text-xl shadow">
+                    <div className="w-12 h-12 rounded-xl bg-black flex items-center justify-center text-[#1C1C1E] font-extrabold text-xl ">
                       T
                     </div>
                     <div>
-                      <h4 className="font-extrabold text-slate-900 text-sm tracking-wide">
+                      <h4 className="font-extrabold text-[#1C1C1E] text-sm tracking-wide">
                         PT TELKOM INDONESIA (PERSERO) TBK
                       </h4>
-                      <p className="text-[11px] text-slate-600 font-medium">
+                      <p className="text-[11px] text-[#666666] font-medium">
                         DIVISI GOVERNMENT & ENTERPRISE SERVICE — WITEL JATENG UTARA
                       </p>
-                      <p className="text-[10px] text-slate-500">
+                      <p className="text-[10px] text-[#666666]">
                         Jl. Pahlawan No. 10, Semarang · Call Center 1500250 · www.telkom.co.id
                       </p>
                     </div>
                   </div>
                   <div className="text-right">
-                    <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-red-100 text-red-700 uppercase border border-red-200">
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-[#F3F3F1] text-[#1C1C1E] uppercase border border-[#E5E5E5]">
                       Dokumen Sah B2G
                     </span>
-                    <p className="text-[10px] text-slate-400 mt-1">Ref: {doc.nomorSurat || 'TEL.027/SMG/2024'}</p>
+                    <p className="text-[10px] text-[#666666] mt-1">Ref: {doc.nomorSurat || 'TEL.027/SMG/2024'}</p>
                   </div>
                 </div>
 
                 {/* Document Body */}
-                <div className="space-y-4 text-slate-700 leading-relaxed">
+                <div className="space-y-4 text-[#1C1C1E] leading-relaxed">
                   <div className="text-center py-2">
-                    <h5 className="font-bold text-slate-900 text-sm uppercase underline tracking-wide">
+                    <h5 className="font-bold text-[#1C1C1E] text-sm uppercase underline tracking-wide">
                       {doc.name.replace(/\.[^/.]+$/, '').replace(/_/g, ' ')}
                     </h5>
-                    <p className="text-[11px] text-slate-500 mt-0.5">
+                    <p className="text-[11px] text-[#666666] mt-0.5">
                       Nomor: {doc.nomorSurat || '440/BA-TELKOM/JTG-UTARA/2024'}
                     </p>
                   </div>
@@ -1000,53 +1000,53 @@ function DocumentPreviewModal({ doc, onClose }: DocumentPreviewModalProps) {
                     Telkom Witel Jateng Utara.
                   </p>
 
-                  <div className="bg-slate-50 p-3.5 rounded-lg border border-slate-200 space-y-1.5 text-[11px]">
+                  <div className="bg-[#F3F3F1] p-3.5 rounded-lg border border-[#E5E5E5] space-y-1.5 text-[11px]">
                     <div className="grid grid-cols-3">
-                      <span className="text-slate-500">Nama Dokumen</span>
-                      <span className="col-span-2 font-semibold text-slate-800">{doc.name}</span>
+                      <span className="text-[#666666]">Nama Dokumen</span>
+                      <span className="col-span-2 font-semibold text-[#1C1C1E]">{doc.name}</span>
                     </div>
                     <div className="grid grid-cols-3">
-                      <span className="text-slate-500">Keterangan / Scope</span>
-                      <span className="col-span-2 text-slate-700">{doc.deskripsi || 'Layanan Astinet & Intranet Pemda'}</span>
+                      <span className="text-[#666666]">Keterangan / Scope</span>
+                      <span className="col-span-2 text-[#1C1C1E]">{doc.deskripsi || 'Layanan Astinet & Intranet Pemda'}</span>
                     </div>
                     <div className="grid grid-cols-3">
-                      <span className="text-slate-500">Petugas Upload</span>
-                      <span className="col-span-2 text-slate-700">{doc.uploadedBy}</span>
+                      <span className="text-[#666666]">Petugas Upload</span>
+                      <span className="col-span-2 text-[#1C1C1E]">{doc.uploadedBy}</span>
                     </div>
                     <div className="grid grid-cols-3">
-                      <span className="text-slate-500">Kepatuhan Regulasi</span>
-                      <span className="col-span-2 text-emerald-700 font-semibold">
+                      <span className="text-[#666666]">Kepatuhan Regulasi</span>
+                      <span className="col-span-2 text-[#1C1C1E] font-semibold">
                         Sesuai Ketentuan Audit BPK &amp; Perpres Pengadaan Pemerintah
                       </span>
                     </div>
                   </div>
 
                   {/* Signatures Mockup */}
-                  <div className="pt-6 grid grid-cols-2 text-center text-[11px] text-slate-800">
+                  <div className="pt-6 grid grid-cols-2 text-center text-[11px] text-[#1C1C1E]">
                     <div>
-                      <p className="text-slate-500">Pihak Pelanggan (Pemda)</p>
-                      <div className="h-14 flex items-center justify-center font-serif italic text-slate-400 text-xs">
+                      <p className="text-[#666666]">Pihak Pelanggan (Pemda)</p>
+                      <div className="h-14 flex items-center justify-center font-serif italic text-[#666666] text-xs">
                         [Tanda Tangan &amp; Stempel Basah]
                       </div>
-                      <p className="font-bold text-slate-900">Pejabat Pembuat Komitmen (PPK)</p>
-                      <p className="text-[10px] text-slate-500">{doc.instansi || 'Pemerintah Kota Semarang'}</p>
+                      <p className="font-bold text-[#1C1C1E]">Pejabat Pembuat Komitmen (PPK)</p>
+                      <p className="text-[10px] text-[#666666]">{doc.instansi || 'Pemerintah Kota Semarang'}</p>
                     </div>
 
                     <div>
-                      <p className="text-slate-500">Pihak Penyedia</p>
+                      <p className="text-[#666666]">Pihak Penyedia</p>
                       <div className="h-14 flex items-center justify-center">
-                        <span className="px-2 py-1 rounded border border-emerald-600 bg-emerald-50 text-emerald-800 text-[10px] font-bold">
+                        <span className="px-2 py-1 rounded border border-[#E5E5E5] bg-[#F3F3F1] text-[#1C1C1E] text-[10px] font-bold">
                           ✓ Digital Signed Telkom e-Sign
                         </span>
                       </div>
-                      <p className="font-bold text-slate-900">{doc.uploadedBy.split('(')[0]}</p>
-                      <p className="text-[10px] text-slate-500">PT Telkom Indonesia (Persero) Tbk</p>
+                      <p className="font-bold text-[#1C1C1E]">{doc.uploadedBy.split('(')[0]}</p>
+                      <p className="text-[10px] text-[#666666]">PT Telkom Indonesia (Persero) Tbk</p>
                     </div>
                   </div>
                 </div>
 
                 {/* Document Footer Watermark */}
-                <div className="mt-8 pt-3 border-t border-slate-200 text-center text-[9px] text-slate-400 uppercase tracking-widest">
+                <div className="mt-8 pt-3 border-t border-[#E5E5E5] text-center text-[9px] text-[#666666] uppercase tracking-widest">
                   Dokumen Resmi Diarsipkan di B2Gov Portal · Witel Jateng Utara
                 </div>
               </div>
@@ -1055,13 +1055,13 @@ function DocumentPreviewModal({ doc, onClose }: DocumentPreviewModalProps) {
         </div>
 
         {/* Modal Footer */}
-        <div className="flex items-center justify-between px-6 py-3.5 border-t border-slate-800 bg-slate-950/70 text-xs">
-          <span className="text-slate-400">
+        <div className="flex items-center justify-between px-6 py-3.5 border-t border-[#E5E5E5] bg-[#F9F8F6] text-xs">
+          <span className="text-[#666666]">
             Terverifikasi secara sistem · Format {doc.name.split('.').pop()?.toUpperCase()}
           </span>
           <button
             onClick={onClose}
-            className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-medium transition-colors cursor-pointer"
+            className="px-4 py-2 rounded-xl bg-[#FFFFFF] hover:bg-[#F3F3F1] text-[#1C1C1E] font-medium transition-colors cursor-pointer"
           >
             Tutup Pratinjau
           </button>

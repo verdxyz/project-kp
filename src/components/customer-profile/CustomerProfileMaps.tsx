@@ -34,17 +34,17 @@ function parseRupiah(value: string) {
 
 function MapsSidebar({ active, onChange }: { active: MapsSection; onChange: (section: MapsSection) => void }) {
   return (
-    <aside className="rounded-2xl border border-slate-700/70 bg-slate-900/80 p-3">
-      <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/5 p-3">
+    <aside className="rounded-2xl border border-[#E5E5E5] bg-[#F9F8F6] p-3">
+      <div className="rounded-xl border border-[#E5E5E5] bg-[#F3F3F1] p-3">
         <div className="flex items-center justify-between">
-          <p className="text-xs font-bold text-white">Progres Anda</p>
-          <span className="text-[10px] font-bold text-emerald-300">6/6</span>
+          <p className="text-xs font-bold text-[#1C1C1E]">Progres Anda</p>
+          <span className="text-[10px] font-bold text-[#666666]">6/6</span>
         </div>
-        <p className="mt-2 text-xs text-slate-300"><strong className="text-base text-white">6/6</strong> Kriteria Terpenuhi.</p>
-        <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-slate-800">
-          <div className="h-full w-full rounded-full bg-emerald-500" />
+        <p className="mt-2 text-xs text-[#666666]"><strong className="text-base text-[#1C1C1E]">6/6</strong> Kriteria Terpenuhi.</p>
+        <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-[#FFFFFF]">
+          <div className="h-full w-full rounded-full bg-[#F3F3F1]" />
         </div>
-        <a href="#maps-sections" className="mt-3 inline-block text-xs font-semibold text-slate-300 underline hover:text-white">Lihat Kriteria</a>
+        <a href="#maps-sections" className="mt-3 inline-block text-xs font-semibold text-[#666666] underline hover:text-[#1C1C1E]">Lihat Kriteria</a>
       </div>
       <nav id="maps-sections" className="mt-3 space-y-1" aria-label="Submenu MAPS">
         {MAPS_SECTIONS.map((label) => (
@@ -53,12 +53,12 @@ function MapsSidebar({ active, onChange }: { active: MapsSection; onChange: (sec
             type="button"
             onClick={() => onChange(label)}
             className={`flex w-full items-center gap-2.5 rounded-lg px-3 py-2.5 text-left text-xs transition ${
-              active === label ? 'bg-blue-500/15 text-slate-100' : 'text-slate-300 hover:bg-slate-800'
+              active === label ? 'bg-[#F3F3F1] text-[#666666]' : 'text-[#666666] hover:bg-[#FFFFFF]'
             }`}
           >
-            <Check size={14} className="shrink-0 text-emerald-400" />
+            <Check size={14} className="shrink-0 text-[#666666]" />
             <span className="flex-1">{label}</span>
-            <span className="text-blue-400">›</span>
+            <span className="text-[#666666]">›</span>
           </button>
         ))}
       </nav>
@@ -69,8 +69,8 @@ function MapsSidebar({ active, onChange }: { active: MapsSection; onChange: (sec
 function PanelTitle({ title, subtitle }: { title: string; subtitle?: string }) {
   return (
     <div className="mb-5">
-      <h3 className="text-base font-semibold text-slate-100">{title}</h3>
-      {subtitle && <p className="mt-1 text-xs text-slate-400">{subtitle}</p>}
+      <h3 className="text-base font-semibold text-[#666666]">{title}</h3>
+      {subtitle && <p className="mt-1 text-xs text-[#666666]">{subtitle}</p>}
     </div>
   )
 }
@@ -94,8 +94,8 @@ function EditableCard({
   }
 
   return (
-    <article className={`overflow-hidden rounded-xl border border-slate-700/60 bg-slate-950/35 ${className}`}>
-      <h4 className={`border-b border-slate-700/50 bg-emerald-500/10 px-3 py-2.5 text-center text-xs font-semibold text-slate-200 ${className.includes('currency-card') ? 'text-base' : ''}`}>{title}</h4>
+    <article className={`overflow-hidden rounded-xl border border-[#E5E5E5] bg-[#F9F8F6] ${className}`}>
+      <h4 className={`border-b border-[#E5E5E5] bg-[#F3F3F1] px-3 py-2.5 text-center text-xs font-semibold text-[#666666] ${className.includes('currency-card') ? 'text-base' : ''}`}>{title}</h4>
       <textarea
         aria-label={title}
         value={draft}
@@ -106,9 +106,9 @@ function EditableCard({
         onBlur={save}
         placeholder={`Buat ${title} Disini`}
         rows={Math.max(2, Math.min(6, draft.split('\n').length))}
-        className={`min-h-20 w-full resize-y bg-transparent px-3 py-3 text-sm leading-relaxed text-slate-200 outline-none focus:bg-cyan-500/5 ${className.includes('currency-card') ? 'text-xl font-bold' : ''}`}
+        className={`min-h-20 w-full resize-y bg-transparent px-3 py-3 text-sm leading-relaxed text-[#666666] outline-none focus:bg-[#F3F3F1] ${className.includes('currency-card') ? 'text-xl font-bold' : ''}`}
       />
-      {saveStatus && <p aria-live="polite" className="px-3 pb-2 text-right text-[10px] text-slate-500">{saveStatus}</p>}
+      {saveStatus && <p aria-live="polite" className="px-3 pb-2 text-right text-[10px] text-[#666666]">{saveStatus}</p>}
     </article>
   )
 }
@@ -136,13 +136,13 @@ export function EditableRecordModal({
     <div className="fixed inset-0 z-[80] flex items-center justify-center bg-black/70 p-4" onMouseDown={(event) => {
       if (event.target === event.currentTarget) onClose()
     }}>
-      <form onSubmit={submit} className="max-h-[90vh] w-full max-w-xl space-y-4 overflow-y-auto rounded-2xl border border-slate-700 bg-slate-900 p-5">
+      <form onSubmit={submit} className="max-h-[90vh] w-full max-w-xl space-y-4 overflow-y-auto rounded-2xl border border-[#E5E5E5] bg-[#F9F8F6] p-5">
         <div className="flex items-center justify-between">
-          <h4 className="text-sm font-bold text-white">{title}</h4>
-          <button type="button" onClick={onClose} aria-label="Tutup" className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-800"><X size={16} /></button>
+          <h4 className="text-sm font-bold text-[#1C1C1E]">{title}</h4>
+          <button type="button" onClick={onClose} aria-label="Tutup" className="rounded-lg p-1.5 text-[#666666] hover:bg-[#FFFFFF]"><X size={16} /></button>
         </div>
         {columns.map((column) => (
-          <label key={column.key} className="block text-xs font-semibold text-slate-300">
+          <label key={column.key} className="block text-xs font-semibold text-[#666666]">
             {column.label}
             {column.type === 'image'
               ? <input type="file" accept="image/png,image/jpeg" aria-label={`Upload ${column.label}`} className="form-input mt-1.5" onChange={(event) => {
@@ -173,7 +173,7 @@ export function EditableRecordModal({
               : <input type={column.type === 'currency' ? 'text' : column.type ?? 'text'} inputMode={column.type === 'currency' ? 'numeric' : undefined} value={column.type === 'currency' ? formatRupiah(values[column.key] ?? '') : values[column.key] ?? ''} onChange={(event) => setValues((current) => ({ ...current, [column.key]: column.type === 'currency' ? String(parseRupiah(event.target.value)) : event.target.value }))} placeholder={`Buat ${column.label} Disini`} className="form-input mt-1.5" />}
           </label>
         ))}
-        {uploadError && <p role="alert" className="text-xs text-amber-300">{uploadError}</p>}
+        {uploadError && <p role="alert" className="text-xs text-[#666666]">{uploadError}</p>}
         <div className="flex justify-end gap-2">
           <button type="button" onClick={onClose} className="btn-secondary">Batal</button>
           <button type="submit" disabled={Boolean(uploadError)} className="btn-primary flex items-center gap-2"><Save size={14} />Simpan</button>
@@ -212,32 +212,32 @@ export function EditableTable({
   }
 
   return (
-    <section className="overflow-hidden rounded-xl border border-slate-700/60">
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-700/60 px-4 py-3">
-        <h4 className="text-sm font-semibold text-slate-200">{title}</h4>
+    <section className="overflow-hidden rounded-xl border border-[#E5E5E5]">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#E5E5E5] px-4 py-3">
+        <h4 className="text-sm font-semibold text-[#666666]">{title}</h4>
         <button type="button" onClick={() => openEditor(null)} className="btn-primary flex items-center gap-1.5 px-3 py-2 text-[10px]"><Plus size={13} />{addLabel.replace(/^\+\s*/, '')}</button>
       </div>
       <div className="overflow-x-auto">
         <table className="w-full min-w-[650px] text-left">
-          <thead><tr className="border-b border-slate-700/50 bg-slate-950/50">
-            {columns.map((column) => <th key={column.key} className="px-3 py-3 text-[10px] font-bold text-slate-400">{column.label}</th>)}
-            <th className="px-3 py-3 text-[10px] font-bold text-slate-400">Aksi</th>
+          <thead><tr className="border-b border-[#E5E5E5] bg-[#F9F8F6]">
+            {columns.map((column) => <th key={column.key} className="px-3 py-3 text-[10px] font-bold text-[#666666]">{column.label}</th>)}
+            <th className="px-3 py-3 text-[10px] font-bold text-[#666666]">Aksi</th>
           </tr></thead>
-          <tbody className="divide-y divide-slate-800/80">
+          <tbody className="divide-y divide-[#E5E5E5]">
             {rows.map((row, index) => (
-              <tr key={`${row[columns[0]?.key] ?? 'row'}-${index}`} className="hover:bg-slate-800/30">
-                {columns.map((column) => <td key={column.key} className="max-w-sm px-3 py-3 text-xs leading-relaxed text-slate-300">{column.type === 'image' && row[column.key]
+              <tr key={`${row[columns[0]?.key] ?? 'row'}-${index}`} className="hover:bg-[#FFFFFF]">
+                {columns.map((column) => <td key={column.key} className="max-w-sm px-3 py-3 text-xs leading-relaxed text-[#666666]">{column.type === 'image' && row[column.key]
                   ? <img src={row[column.key]} alt={`${row.institution ?? title} logo`} className="h-10 w-10 rounded object-contain" />
-                  : row[column.key] ? column.type === 'currency' ? formatRupiah(row[column.key]) : row[column.key] : <span className="text-slate-600">-</span>}</td>)}
+                  : row[column.key] ? column.type === 'currency' ? formatRupiah(row[column.key]) : row[column.key] : <span className="text-[#666666]">-</span>}</td>)}
                 <td className="px-3 py-3">
                   <div className="flex items-center gap-1">
-                    <button type="button" aria-label={`Edit ${row[columns[0]?.key] ?? title}`} onClick={() => openEditor(index)} className="rounded-lg p-2 text-slate-400 hover:bg-blue-500/15 hover:text-blue-300"><Pencil size={13} /></button>
-                    <button type="button" aria-label={`Hapus ${row[columns[0]?.key] ?? title}`} onClick={() => onChange(rows.filter((_, rowIndex) => rowIndex !== index))} className="rounded-lg p-2 text-slate-400 hover:bg-blue-500/15 hover:text-blue-300"><Trash2 size={13} /></button>
+                    <button type="button" aria-label={`Edit ${row[columns[0]?.key] ?? title}`} onClick={() => openEditor(index)} className="rounded-lg p-2 text-[#666666] hover:bg-[#F3F3F1] hover:text-[#666666]"><Pencil size={13} /></button>
+                    <button type="button" aria-label={`Hapus ${row[columns[0]?.key] ?? title}`} onClick={() => onChange(rows.filter((_, rowIndex) => rowIndex !== index))} className="rounded-lg p-2 text-[#666666] hover:bg-[#F3F3F1] hover:text-[#666666]"><Trash2 size={13} /></button>
                   </div>
                 </td>
               </tr>
             ))}
-            {rows.length === 0 && <tr><td colSpan={columns.length + 1} className="px-4 py-8 text-center text-xs text-slate-500">{emptyMessage}</td></tr>}
+            {rows.length === 0 && <tr><td colSpan={columns.length + 1} className="px-4 py-8 text-center text-xs text-[#666666]">{emptyMessage}</td></tr>}
           </tbody>
         </table>
       </div>
@@ -252,8 +252,8 @@ function CustomerOverview({ customer, onUpdate }: { customer: CustomerProfile; o
     <div>
       <PanelTitle title="Customer Profile" />
       <div className="grid gap-4 sm:grid-cols-2">
-        <article className="overflow-hidden rounded-xl border border-slate-700/60 bg-slate-950/35">
-          <h4 className="border-b border-slate-700/50 bg-emerald-500/10 px-3 py-2.5 text-center text-xs font-semibold text-slate-200">Telepon</h4>
+        <article className="overflow-hidden rounded-xl border border-[#E5E5E5] bg-[#F9F8F6]">
+          <h4 className="border-b border-[#E5E5E5] bg-[#F3F3F1] px-3 py-2.5 text-center text-xs font-semibold text-[#666666]">Telepon</h4>
           <div className="px-3 py-3"><CountryPhoneInput label="Telepon" value={customer.phone} onSave={(value) => saveString('phone', value)} /></div>
         </article>
         <EditableCard title="Jumlah Pegawai" value={customer.employeeCount.toLocaleString('id-ID')} onSave={(value) => onUpdate({ employeeCount: Number(value.replace(/\./g, '')) || 0 })} />
@@ -297,7 +297,7 @@ function ManagementProfile({ customer, onUpdate }: { customer: CustomerProfile; 
     <div>
       <PanelTitle title="Management Profile" />
       <div className="mb-5">
-        <h4 className="mb-2 text-sm font-medium text-slate-300">Struktur Organisasi</h4>
+        <h4 className="mb-2 text-sm font-medium text-[#666666]">Struktur Organisasi</h4>
         <input ref={inputRef} type="file" accept=".png,.jpeg,.jpg,.webp,.pdf" className="hidden" onChange={(event) => {
           const fileName = event.target.files?.[0]?.name
           if (fileName) onUpdate({ organizationChart: fileName })
@@ -306,11 +306,11 @@ function ManagementProfile({ customer, onUpdate }: { customer: CustomerProfile; 
           event.preventDefault()
           const file = event.dataTransfer.files[0]
           if (file) onUpdate({ organizationChart: file.name })
-        }} className="flex min-h-16 w-full items-center justify-between gap-3 rounded-xl border border-dashed border-slate-600 px-4 py-3 text-left text-xs text-slate-400 hover:border-cyan-500/50">
-          <span className="flex items-center gap-3"><CloudUpload size={18} className="text-cyan-400" />{customer.organizationChart || 'Letakkan dokumen di sini atau klik tombol unggah'}</span>
-          <span className="rounded-full border border-slate-600 px-4 py-2 font-semibold text-slate-200">Unggah Dokumen</span>
+        }} className="flex min-h-16 w-full items-center justify-between gap-3 rounded-xl border border-dashed border-[#E5E5E5] px-4 py-3 text-left text-xs text-[#666666] hover:border-[#E5E5E5]">
+          <span className="flex items-center gap-3"><CloudUpload size={18} className="text-[#666666]" />{customer.organizationChart || 'Letakkan dokumen di sini atau klik tombol unggah'}</span>
+          <span className="rounded-full border border-[#E5E5E5] px-4 py-2 font-semibold text-[#666666]">Unggah Dokumen</span>
         </button>
-        <p className="mt-1 text-[10px] italic text-slate-500">Format PNG/JPEG/JPG/WEBP, ukuran maks. 25 MB, jumlah maks. 3.</p>
+        <p className="mt-1 text-[10px] italic text-[#666666]">Format PNG/JPEG/JPG/WEBP, ukuran maks. 25 MB, jumlah maks. 3.</p>
       </div>
       <EditableTable
         title="Daftar Kontak Pelanggan"
@@ -352,7 +352,7 @@ function InstitutionProfile({ customer, onUpdate }: { customer: CustomerProfile;
     <div className="space-y-6">
       <PanelTitle title="Institution Profile" />
       <section>
-        <h4 className="mb-3 text-sm font-medium text-slate-300">Industry Value Chain Analysis (IVCA)</h4>
+        <h4 className="mb-3 text-sm font-medium text-[#666666]">Industry Value Chain Analysis (IVCA)</h4>
         <div className="grid gap-3 lg:grid-cols-6">
           <div className="lg:col-span-1">{renderIvcacard('Supporting Industry')}</div>
           <div className="lg:col-span-4">{renderIvcacard('Complement Institution')}</div>
@@ -373,8 +373,8 @@ function InstitutionProfile({ customer, onUpdate }: { customer: CustomerProfile;
         addLabel="+ Tambah Produk"
         onChange={(rows) => onUpdate({ institutionProducts: rows.map((row) => ({ name: row.name ?? '', status: row.status ?? '' })) })}
       />
-      <section className="space-y-3 border-t border-slate-700/60 pt-5">
-        <h4 className="text-sm font-semibold text-slate-200">Market Issues (Framework 3C)</h4>
+      <section className="space-y-3 border-t border-[#E5E5E5] pt-5">
+        <h4 className="text-sm font-semibold text-[#666666]">Market Issues (Framework 3C)</h4>
         <EditableCard title="Comparator" value={market.comparator} onSave={(comparator) => onUpdate({ marketAnalysis: { ...market, comparator } })} />
         <EditableCard title="Key Challenges / Watch-outs" value={market.challenges} onSave={(challenges) => onUpdate({ marketAnalysis: { ...market, challenges } })} />
         <EditableCard title="Customer" value={market.customer} onSave={(customerText) => onUpdate({ marketAnalysis: { ...market, customer: customerText } })} />
@@ -407,9 +407,9 @@ function Benchmark({ customer, onUpdate }: { customer: CustomerProfile; onUpdate
         onChange={(rows) => onUpdate({ benchmarkPractices: rows.map((row) => ({ logo: row.logo ?? '', institution: row.institution ?? '', description: row.description ?? '' })) })}
       />
       <section>
-        <h4 className="mb-3 text-sm font-medium text-slate-300">TOWS Analysis</h4>
+        <h4 className="mb-3 text-sm font-medium text-[#666666]">TOWS Analysis</h4>
         <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-          <div className="flex min-h-32 items-center justify-center rounded-xl border border-slate-700/60 bg-slate-800/70 p-4 text-center text-xs font-semibold text-slate-300">Internal Factors <span className="mx-2 text-slate-500">／</span> External Factors</div>
+          <div className="flex min-h-32 items-center justify-center rounded-xl border border-[#E5E5E5] bg-[#FFFFFF] p-4 text-center text-xs font-semibold text-[#666666]">Internal Factors <span className="mx-2 text-[#666666]">／</span> External Factors</div>
           {towsCards.map(({ key, title }) => (
             <EditableCard key={key} title={title} value={tows[key]} onSave={(value) => onUpdate({ towsAnalysis: { ...tows, [key]: value } })} />
           ))}
@@ -440,7 +440,7 @@ function RevenueWallet({ customer, onUpdate }: { customer: CustomerProfile; onUp
     <div className="space-y-5">
       <PanelTitle title="Revenue and Wallet Shared" />
       <section>
-        <h4 className="mb-3 text-sm font-medium text-slate-300">Revenue Shared</h4>
+        <h4 className="mb-3 text-sm font-medium text-[#666666]">Revenue Shared</h4>
         <div className="grid gap-3 md:grid-cols-3">
           {customer.revenueSummary.map((item, index) => (
             <EditableCard
@@ -467,8 +467,8 @@ function RevenueWallet({ customer, onUpdate }: { customer: CustomerProfile; onUp
         addLabel="+ Tambah Daftar Belanja"
         onChange={(rows) => onUpdate({ walletSpend: rows.map((row) => ({ product: row.product ?? '', amount: parseRupiah(row.amount ?? ''), institution: row.institution ?? '' })) })}
       />
-      <section className="rounded-xl border border-slate-700/60 p-4">
-        <h4 className="text-sm font-semibold text-slate-200">Wallet Shared Telkom</h4>
+      <section className="rounded-xl border border-[#E5E5E5] p-4">
+        <h4 className="text-sm font-semibold text-[#666666]">Wallet Shared Telkom</h4>
         <div className="mt-4 grid gap-3 sm:grid-cols-3">
           {[
             { title: 'Total Belanja Pelanggan (Non Telkom)', key: 'walletNonTelkom' as const },
@@ -479,13 +479,13 @@ function RevenueWallet({ customer, onUpdate }: { customer: CustomerProfile; onUp
           ))}
         </div>
         <div className="mt-5 flex flex-col items-center justify-center gap-5 sm:flex-row">
-          <div className="flex h-56 w-56 items-center justify-center rounded-full border-[28px] border-violet-400/90">
+          <div className="flex h-56 w-56 items-center justify-center rounded-full border-[28px] border-[#E5E5E5]">
             <div className="text-center">
-              <p className="text-xs text-slate-400">Total Belanja</p>
-              <p className="text-lg font-bold text-white">{customer.walletSummary.walletNonTelkom}</p>
+              <p className="text-xs text-[#666666]">Total Belanja</p>
+              <p className="text-lg font-bold text-[#1C1C1E]">{customer.walletSummary.walletNonTelkom}</p>
             </div>
           </div>
-          <p className="text-xs text-slate-300"><span className="mr-2 inline-block h-3 w-3 rounded-full bg-violet-400" />{customer.name}</p>
+          <p className="text-xs text-[#666666]"><span className="mr-2 inline-block h-3 w-3 rounded-full bg-[#F3F3F1]" />{customer.name}</p>
         </div>
         <EditableCard className="mt-4" title="Kinerja Finansial" value={customer.financialPerformance} onSave={(financialPerformance) => onUpdate({ financialPerformance })} />
       </section>
@@ -532,29 +532,29 @@ function BusinessProspect({ customer }: { customer: CustomerProfile }) {
   return (
     <div>
       <PanelTitle title="Business Prospect" subtitle="Daftar business opportunity di pipeline proyek." />
-      <section className="overflow-hidden rounded-xl border border-slate-700/60">
-        <div className="border-b border-slate-700/60 px-4 py-3">
-          <h4 className="text-sm font-semibold text-slate-200">Daftar Business Opportunity</h4>
+      <section className="overflow-hidden rounded-xl border border-[#E5E5E5]">
+        <div className="border-b border-[#E5E5E5] px-4 py-3">
+          <h4 className="text-sm font-semibold text-[#666666]">Daftar Business Opportunity</h4>
         </div>
-        {loadError && <p role="alert" className="bg-amber-500/5 px-4 py-2 text-xs text-amber-300">{loadError}</p>}
+        {loadError && <p role="alert" className="bg-[#F3F3F1] px-4 py-2 text-xs text-[#666666]">{loadError}</p>}
         <div className="overflow-x-auto">
           <table className="w-full min-w-[760px] text-left">
-            <thead><tr className="border-b border-slate-700/50 bg-slate-950/50">
-              {['Proyek / LOP ID', 'Nama Proyek', 'Kategori Proyek', 'Tahap', 'Nilai Penawaran', 'Kategori Solusi'].map((heading) => <th key={heading} className="px-3 py-3 text-[10px] font-bold text-slate-400">{heading}</th>)}
+            <thead><tr className="border-b border-[#E5E5E5] bg-[#F9F8F6]">
+              {['Proyek / LOP ID', 'Nama Proyek', 'Kategori Proyek', 'Tahap', 'Nilai Penawaran', 'Kategori Solusi'].map((heading) => <th key={heading} className="px-3 py-3 text-[10px] font-bold text-[#666666]">{heading}</th>)}
             </tr></thead>
-            <tbody className="divide-y divide-slate-800/80">
+            <tbody className="divide-y divide-[#E5E5E5]">
               {opportunities.map((project) => (
-                <tr key={project.id} className="hover:bg-slate-800/30">
-                  <td className="px-3 py-3 font-mono text-xs text-cyan-300">{project.idLOP}</td>
-                  <td className="px-3 py-3 text-xs text-slate-200">{project.projectName}</td>
-                  <td className="px-3 py-3 text-xs text-slate-300">{project.category}</td>
-                  <td className="px-3 py-3 text-xs text-slate-300">{project.stage}</td>
-                  <td className="px-3 py-3 text-xs font-semibold text-slate-200">{formatRupiah(project.budget)}</td>
-                  <td className="px-3 py-3 text-xs text-slate-300">{project.serviceType}</td>
+                <tr key={project.id} className="hover:bg-[#FFFFFF]">
+                  <td className="px-3 py-3 font-mono text-xs text-[#666666]">{project.idLOP}</td>
+                  <td className="px-3 py-3 text-xs text-[#666666]">{project.projectName}</td>
+                  <td className="px-3 py-3 text-xs text-[#666666]">{project.category}</td>
+                  <td className="px-3 py-3 text-xs text-[#666666]">{project.stage}</td>
+                  <td className="px-3 py-3 text-xs font-semibold text-[#666666]">{formatRupiah(project.budget)}</td>
+                  <td className="px-3 py-3 text-xs text-[#666666]">{project.serviceType}</td>
                 </tr>
               ))}
-              {!loading && opportunities.length === 0 && <tr><td colSpan={6} className="px-4 py-8 text-center text-xs text-slate-500">Belum ada business opportunity untuk instansi ini di Sales Funnel.</td></tr>}
-              {loading && <tr><td colSpan={6} className="px-4 py-8 text-center text-xs text-slate-500">Memuat data Sales Funnel...</td></tr>}
+              {!loading && opportunities.length === 0 && <tr><td colSpan={6} className="px-4 py-8 text-center text-xs text-[#666666]">Belum ada business opportunity untuk instansi ini di Sales Funnel.</td></tr>}
+              {loading && <tr><td colSpan={6} className="px-4 py-8 text-center text-xs text-[#666666]">Memuat data Sales Funnel...</td></tr>}
             </tbody>
           </table>
         </div>
@@ -626,8 +626,8 @@ export function CustomerProfileMaps({
   return (
     <div className="grid items-start gap-4 lg:grid-cols-[270px_minmax(0,1fr)]">
       <MapsSidebar active={activeSection} onChange={setActiveSection} />
-      <section className="min-h-[440px] rounded-2xl border border-slate-700/70 bg-slate-900/70 p-4 sm:p-6">
-        {saveError && <p role="alert" className="mb-4 rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-xs text-amber-300">{saveError}</p>}
+      <section className="min-h-[440px] rounded-2xl border border-[#E5E5E5] bg-[#F9F8F6] p-4 sm:p-6">
+        {saveError && <p role="alert" className="mb-4 rounded-lg border border-[#E5E5E5] bg-[#F3F3F1] px-3 py-2 text-xs text-[#666666]">{saveError}</p>}
         {sectionContent[activeSection]}
       </section>
     </div>

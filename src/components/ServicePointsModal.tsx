@@ -56,21 +56,15 @@ export function ServicePointsModal({ idLOP, onClose }: { idLOP: string; onClose:
       const sheets = [
         {
           name: 'Non-POTS',
-          headers: ['NAMA LAYANAN', 'HARGA LAYANAN', 'BANDWIDTH', 'LOKASI', 'QUOTE', 'NO ORDER', 'SID', 'TANGGAL AKTIF'],
-          rows: [
-            ['Astinet', 15000000, '100 Mbps', 'Kantor Diskominfo Lt. 2', 'Q-2026-001', 'ORD-2026-NP-001', 'SID-SMG-001', '2026-01-15'],
-          ],
+          headers: ['Nama Produk *', 'Bandwidth *', 'Lokasi Titik *', 'Nomor Quote', 'No. Order *', 'SID *', 'Harga Layanan (Rp) *'],
         },
         {
           name: 'POTS',
-          headers: ['NAMA LAYANAN', 'HARGA LAYANAN', 'BANDWIDTH', 'LOKASI', 'NO ORDER', 'SID', 'TANGGAL AKTIF'],
-          rows: [
-            ['HSI', 1500000, '50 Mbps', 'Ruang Pelayanan', 'ORD-2026-POTS-001', 'SID-POTS-001', '2026-01-15'],
-          ],
+          headers: ['Nama Produk *', 'Bandwidth *', 'Lokasi Titik *', 'Nomor Quote', 'No. Order *', 'SID *'],
         },
       ]
-      for (const { name, headers, rows } of sheets) {
-        const worksheet = XLSX.utils.aoa_to_sheet([headers, ...rows])
+      for (const { name, headers } of sheets) {
+        const worksheet = XLSX.utils.aoa_to_sheet([headers])
         worksheet['!cols'] = headers.map((header) => ({ wch: Math.max(header.length + 4, 18) }))
         worksheet['!freeze'] = { xSplit: 0, ySplit: 1, topLeftCell: 'A2', activePane: 'bottomLeft', state: 'frozen' }
         worksheet['!autofilter'] = { ref: XLSX.utils.encode_range({ s: { r: 0, c: 0 }, e: { r: 0, c: headers.length - 1 } }) }
@@ -84,17 +78,17 @@ export function ServicePointsModal({ idLOP, onClose }: { idLOP: string; onClose:
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
-      <section className="relative flex max-h-[92vh] w-full max-w-4xl flex-col overflow-hidden rounded-xl border border-slate-700 bg-slate-900 shadow-2xl">
-        <header className="flex items-start justify-between border-b border-slate-800 px-5 py-4">
+      <div className="absolute inset-0 bg-black/70 " onClick={onClose} />
+      <section className="relative flex max-h-[92vh] w-full max-w-4xl flex-col overflow-hidden rounded-xl border border-[#E5E5E5] bg-[#F9F8F6] ">
+        <header className="flex items-start justify-between border-b border-[#E5E5E5] px-5 py-4">
           <div>
-            <h3 className="flex items-center gap-2 font-bold text-white"><FileSpreadsheet size={17} className="text-emerald-400" />Import & Data Titik Layanan</h3>
-            <p className="mt-1 font-mono text-xs text-blue-400">{idLOP}</p>
+            <h3 className="flex items-center gap-2 font-bold text-[#1C1C1E]"><FileSpreadsheet size={17} className="text-[#666666]" />Import & Data Titik Layanan</h3>
+            <p className="mt-1 font-mono text-xs text-[#666666]">{idLOP}</p>
           </div>
-          <button type="button" onClick={onClose} aria-label="Tutup" className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-800 hover:text-white"><X size={18} /></button>
+          <button type="button" onClick={onClose} aria-label="Tutup" className="rounded-lg p-1.5 text-[#666666] hover:bg-[#FFFFFF] hover:text-[#1C1C1E]"><X size={18} /></button>
         </header>
 
-        <div className="flex flex-wrap items-center gap-3 border-b border-slate-800 p-5">
+        <div className="flex flex-wrap items-center gap-3 border-b border-[#E5E5E5] p-5">
           <button type="button" onClick={downloadTemplate} className="btn-secondary flex items-center gap-2">
             <Download size={14} />Unduh Template Excel
           </button>
@@ -107,7 +101,7 @@ export function ServicePointsModal({ idLOP, onClose }: { idLOP: string; onClose:
               {importingGroup === serviceGroup ? `Mengimpor ${serviceGroup}...` : `Upload File ${serviceGroup}`}
               <input
                 type="file"
-                accept=".xlsx,.xls"
+                accept=".xlsx,.xls,.csv"
                 disabled={importingGroup !== null}
                 onChange={(event) => {
                   const selectedFile = event.target.files?.[0]
@@ -118,25 +112,25 @@ export function ServicePointsModal({ idLOP, onClose }: { idLOP: string; onClose:
               />
             </label>
           ))}
-          <p className="w-full text-xs text-slate-500">Gunakan tombol sesuai jenis file. Isi Harga Layanan untuk setiap SID; kapasitas POTS boleh dikosongkan jika tidak tersedia.</p>
+          <p className="w-full text-xs text-[#666666]">Gunakan tombol sesuai jenis file. Harga Layanan wajib diisi untuk Non-POTS; kolom POTS mengikuti template dan tidak memerlukan harga.</p>
         </div>
 
         {(error || message) && (
-          <p role={error ? 'alert' : 'status'} className={`px-5 pt-3 text-xs ${error ? 'text-red-400' : 'text-emerald-400'}`}>
+          <p role={error ? 'alert' : 'status'} className={`px-5 pt-3 text-xs ${error ? 'text-[#666666]' : 'text-[#666666]'}`}>
             {error || message}
           </p>
         )}
 
         <div className="min-h-0 flex-1 overflow-auto p-5">
           <div className="mb-3 flex items-center justify-between">
-            <h4 className="text-sm font-semibold text-white">Daftar Titik Layanan Terdaftar</h4>
-            <span className="text-xs text-slate-400">{points.length} Titik</span>
+            <h4 className="text-sm font-semibold text-[#1C1C1E]">Daftar Titik Layanan Terdaftar</h4>
+            <span className="text-xs text-[#666666]">{points.length} Titik</span>
           </div>
-          {loading ? <p className="py-6 text-center text-xs text-slate-400">Memuat titik layanan...</p> : points.length === 0 ? (
-            <p className="py-6 text-center text-xs text-slate-500">Belum ada titik layanan untuk proyek ini.</p>
+          {loading ? <p className="py-6 text-center text-xs text-[#666666]">Memuat titik layanan...</p> : points.length === 0 ? (
+            <p className="py-6 text-center text-xs text-[#666666]">Belum ada titik layanan untuk proyek ini.</p>
           ) : (
             <table className="w-full text-left text-xs">
-              <thead className="sticky top-0 bg-slate-950 text-slate-400">
+              <thead className="sticky top-0 bg-[#F9F8F6] text-[#666666]">
                 <tr>
                   <th className="px-3 py-2">Kondisi</th>
                   <th className="px-3 py-2">Produk</th>
@@ -147,20 +141,20 @@ export function ServicePointsModal({ idLOP, onClose }: { idLOP: string; onClose:
                   <th className="px-3 py-2 text-right">Kapasitas</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-800">
+              <tbody className="divide-y divide-[#E5E5E5]">
                 {points.map((point) => (
                   <tr key={point.id}>
                     <td className="px-3 py-2">
-                      <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${point.serviceGroup === 'POTS' ? 'bg-violet-500/20 text-violet-300' : 'bg-blue-500/20 text-blue-300'}`}>
+                      <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${point.serviceGroup === 'POTS' ? 'bg-[#F3F3F1] text-[#666666]' : 'bg-[#F3F3F1] text-[#666666]'}`}>
                         {point.serviceGroup || 'Non-POTS'}
                       </span>
                     </td>
-                    <td className="px-3 py-2 text-slate-200">{point.productType}</td>
-                    <td className="px-3 py-2 font-mono text-emerald-400">{point.sid}</td>
-                    <td className="px-3 py-2 text-right tabular-nums text-emerald-300">{point.servicePrice ? `Rp ${point.servicePrice.toLocaleString('id-ID')}` : '—'}</td>
-                    <td className="px-3 py-2 text-slate-300">{point.orderNo || '—'}</td>
-                    <td className="px-3 py-2 text-slate-400 truncate max-w-xs">{point.location || '—'}</td>
-                    <td className="px-3 py-2 text-right tabular-nums text-slate-300">
+                    <td className="px-3 py-2 text-[#666666]">{point.productType}</td>
+                    <td className="px-3 py-2 font-mono text-[#666666]">{point.sid}</td>
+                    <td className="px-3 py-2 text-right tabular-nums text-[#666666]">{point.servicePrice ? `Rp ${point.servicePrice.toLocaleString('id-ID')}` : '—'}</td>
+                    <td className="px-3 py-2 text-[#666666]">{point.orderNo || '—'}</td>
+                    <td className="px-3 py-2 text-[#666666] truncate max-w-xs">{point.location || '—'}</td>
+                    <td className="px-3 py-2 text-right tabular-nums text-[#666666]">
                       {point.capacityMbps > 0
                         ? `${point.capacityMbps.toLocaleString('id-ID')} Mbps`
                         : point.bandwidth || '—'}

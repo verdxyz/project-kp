@@ -22,10 +22,10 @@ function SectionHeader({
   return (
     <div className="flex items-center justify-between mb-4">
       <div className="flex items-center gap-2">
-        <div className="w-1 h-5 rounded-full bg-gradient-to-b from-blue-400 to-blue-700" />
+        <div className="w-1 h-5 rounded-full bg-black" />
         <div>
-          <h2 className="text-base font-bold text-white">{title}</h2>
-          {subtitle && <p className="text-xs text-slate-500 mt-0.5">{subtitle}</p>}
+          <h2 className="text-base font-bold text-[#1C1C1E]">{title}</h2>
+          {subtitle && <p className="text-xs text-[#666666] mt-0.5">{subtitle}</p>}
         </div>
       </div>
       {children}
@@ -67,8 +67,8 @@ export default function App() {
   }, [])
 
   if (authLoading) return (
-    <div className="min-h-screen bg-[#090D16] flex items-center justify-center">
-      <div className="w-5 h-5 border-2 border-slate-600 border-t-red-500 rounded-full animate-spin" aria-label="Memuat sesi" />
+    <div className="min-h-screen bg-[#F9F8F6] flex items-center justify-center">
+      <div className="w-5 h-5 border-2 border-[#E5E5E5] border-t-[#666666] rounded-full animate-spin" aria-label="Memuat sesi" />
     </div>
   )
   if (!user) return <LoginScreen onLoginSuccess={setUser} />
@@ -77,7 +77,7 @@ export default function App() {
   const activeView: ViewKey = VIEW_MAP[activeMenu] ?? 'analytics'
 
   return (
-    <div className="flex h-screen bg-slate-900 overflow-hidden">
+    <div className="flex h-screen bg-[#F9F8F6] overflow-hidden">
       {/* Sidebar */}
       <Sidebar
         activeNav={activeMenu}
@@ -85,15 +85,14 @@ export default function App() {
           if (VIEW_MAP[menu] === 'analytics') setAnalyticsFocus(undefined)
           setActiveMenu(menu)
         }}
+        onLogout={async () => {
+          try { await AuthService.logout() } finally { setUser(null) }
+        }}
       />
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col overflow-hidden">
         <Topbar
-          user={user}
-          onLogout={async () => {
-            try { await AuthService.logout() } finally { setUser(null) }
-          }}
           title={
             activeView === 'contracts'
               ? 'Kontrak & Manajemen Dokumen'
@@ -110,23 +109,19 @@ export default function App() {
               : 'B2G Project & Contract Management'
           }
           subtitle={
-            activeView === 'contracts'
-              ? 'Repositori kontrak, P0/P1 uploads, dan manajemen dokumen pengadaan'
-              : activeView === 'services-catalog'
+            activeView === 'services-catalog'
               ? activeMenu === 'gtma'
-                ? 'Data layanan dengan kategori GTMA'
-                : 'Kelola seluruh data layanan Own Channel, GTMA, dan NGTMA'
-              : activeView === 'customers-db'
-              ? 'Pilih instansi untuk melihat detail profil pelanggan'
-              : activeView === 'customer-profile'
-              ? 'Profil strategis, layanan, kontrak, dan dokumen pelanggan'
+                  ? 'Data layanan dengan kategori GTMA'
+                  : 'Kelola seluruh data layanan Own Channel, GTMA, dan NGTMA'
+                : activeView === 'customer-profile'
+                ? 'Profil strategis, layanan, kontrak, dan dokumen pelanggan'
               : activeView === 'projects-db'
               ? activeMenu === 'gtma'
                 ? 'Input proyek GTMA, SID, progres, dan dokumen yang terhubung ke laporan'
                 : 'Manajemen data pengadaan, progres, dan dokumen proyek'
               : activeView === 'analytics'
-              ? 'Analisis progres pekerjaan per tahap dan performa proyek'
-              : 'Telkom Indonesia · Witel Jateng Utara · Dashboard Pengadaan Pemerintah'
+              ? ''
+              : ''
           }
         />
 
@@ -139,10 +134,6 @@ export default function App() {
           {/* ═══════════════════════════════════════════════════════════════════ */}
           {activeView === 'contracts' && (
             <section>
-              <SectionHeader
-                title="Dokumen Kontrak per Proyek"
-                subtitle="Unggah dan unduh dokumen yang terhubung langsung dengan ID LOP"
-              />
               <ProjectDatabase showStats={false} />
             </section>
           )}
@@ -152,10 +143,6 @@ export default function App() {
           {/* ═══════════════════════════════════════════════════════════════════ */}
           {activeView === 'services-catalog' && (
             <section>
-              <SectionHeader
-                title="Data Layanan"
-                subtitle="Kelola layanan Own Channel, GTMA, dan NGTMA"
-              />
               <ServicesCatalog initialCategory={activeMenu === 'gtma' ? 'GTMA' : 'Semua'} />
             </section>
           )}
@@ -165,10 +152,6 @@ export default function App() {
           {/* ═══════════════════════════════════════════════════════════════════ */}
           {activeView === 'customers-db' && (
             <section>
-              <SectionHeader
-                title="Profile Instansi"
-                subtitle="Kelola data pelanggan dan prospek instansi pemerintah"
-              />
               <CustomerDatabase onOpenProfile={(name) => {
                 setSelectedCustomerName(name)
                 setActiveMenu('customer-profile')
